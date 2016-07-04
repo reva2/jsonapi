@@ -11,6 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Decoders;
 
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\Data\DocumentInterface;
 use Reva2\JsonApi\Contracts\Decoders\Data\ResourceInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
@@ -277,6 +278,47 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
         $parser = new DataParser($factory);
         $this->assertSame($doc, $parser->parseDocument($data, 'document1'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowJsonApiExceptionOnError()
+    {
+        $data = new \stdClass();
+        
+        $exception = new \InvalidArgumentException("Test exception");
+        
+        $decoder = $this->getMockBuilder(DocumentDecoderInterface::class)->getMock();
+        $decoder
+            ->expects($this->once())
+            ->method('decode')
+            ->withAnyParameters()
+            ->willThrowException($exception);
+        
+        $factory = $this->getMockBuilder(DecodersFactoryInterface::class)->getMock();
+        $factory
+            ->expects($this->once())
+            ->method('getDocumentDecoder')
+            ->withAnyParameters()
+            ->willReturn($decoder);
+        
+        try {
+            $parser = new DataParser($factory);
+            $parser->parseDocument($data, 'document1');
+            
+            $this->fail("Parser should throw JsonApiException on error");
+        } catch (JsonApiException $e) {
+            $this->assertEquals(500, $e->getHttpCode());
+            $this->assertSame($exception, $e->getPrevious());
+            
+            $errors = $e->getErrors();
+            $error = $errors[0];
+
+            $this->assertEquals(500, $error->getStatus());
+            $this->assertEquals('Internal server error', $error->getTitle());
+            $this->assertEquals($exception->getMessage(), $error->getDetail());
+        }
     }
 
 

@@ -61,7 +61,7 @@ class RequestDecoder implements DecoderInterface
      */
     public function decode($content)
     {
-        $data = $this->decode($content);
+        $data = $this->decodeJson($content);
 
         return $this->parser->parseDocument($data, $this->docType);
     }

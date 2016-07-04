@@ -76,7 +76,7 @@ class DecodersFactory implements DecodersFactoryInterface
      */
     public function registerDocumentDecoder($docType, $decoder)
     {
-        return $this->registerDecoderByCategory('res', $docType, $decoder);
+        return $this->registerDecoderByCategory('doc', $docType, $decoder);
     }
 
     /**
@@ -125,7 +125,7 @@ class DecodersFactory implements DecodersFactoryInterface
      */
     private function registerDecoderByCategory($category, $resType, $decoder)
     {
-        if ((!is_string($decoder)) && ($decoder instanceof \Closure)) {
+        if ((!is_string($decoder)) && (!$decoder instanceof \Closure)) {
             throw new \InvalidArgumentException('Decoder must be a string containing class name or \Closure instance');
         }
         
@@ -164,20 +164,20 @@ class DecodersFactory implements DecodersFactoryInterface
     private function createDecoder($category, $decoder)
     {
         $decoder = (is_string($decoder)) ? new $decoder() : $decoder();
-
+        
         if (('res' === $category) && (!$decoder instanceof ResourceDecoderInterface)) {
             throw new \LogicException(sprintf(
-                "Decoder must implement %s interface",
+                "Resource decoder must implement %s interface",
                 ResourceDecoderInterface::class
             ));
         } elseif (('query' === $category) && (!$decoder instanceof QueryParamsDecoderInterface)) {
             throw new \LogicException(sprintf(
-                "Decoder must implement %s interface",
+                "Query parameters decoder must implement %s interface",
                 QueryParamsDecoderInterface::class
             ));
-        } elseif (!$decoder instanceof DocumentDecoderInterface) {
+        } elseif (('doc' === $category) && (!$decoder instanceof DocumentDecoderInterface)) {
             throw new \LogicException(sprintf(
-                "Decoder must implement %s interface",
+                "Document decoder must implement %s interface",
                 DocumentDecoderInterface::class
             ));
         }

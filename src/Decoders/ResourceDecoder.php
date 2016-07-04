@@ -36,7 +36,7 @@ abstract class ResourceDecoder implements ResourceDecoderInterface
         $resource = $this->createResource();
         if (!$resource instanceof ResourceInterface) {
             throw new \OutOfBoundsException(
-                sprintf("Object must implement %s interface", ResourceInterface::class),
+                sprintf("Resource object must implement %s interface", ResourceInterface::class),
                 500
             );
         }
@@ -49,9 +49,10 @@ abstract class ResourceDecoder implements ResourceDecoderInterface
             $parser->setPath('attributes');
 
             $attributes = $this->parseAttributes($parser->getValue($data, 'attributes'), $parser);
+
             if (!$attributes instanceof AttributesInterface) {
                 throw new \OutOfBoundsException(
-                    sprintf("Object must implement %s interface", AttributesInterface::class),
+                    sprintf("Attributes object must implement %s interface", AttributesInterface::class),
                     500
                 );
             }
@@ -67,7 +68,7 @@ abstract class ResourceDecoder implements ResourceDecoderInterface
             $relationships = $this->parseRelationships($parser->getValue($data, 'relationships'), $parser);
             if (!$relationships instanceof RelationshipsInterface) {
                 throw new \OutOfBoundsException(
-                    sprintf("Object must implement %s interface", RelationshipsInterface::class),
+                    sprintf("Relationships object must implement %s interface", RelationshipsInterface::class),
                     500
                 );
             }
@@ -76,7 +77,7 @@ abstract class ResourceDecoder implements ResourceDecoderInterface
             
             $parser->restorePath();
         }
-        
+
         return $resource;
     }
 
