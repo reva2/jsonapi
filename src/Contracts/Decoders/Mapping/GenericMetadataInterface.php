@@ -8,4 +8,16 @@
  * file that was distributed with this source code.
  */
 
-$loader = require __DIR__ . '/../vendor/autoload.php';
+
+namespace Reva2\JsonApi\Contracts\Decoders\Mapping;
+
+
+interface GenericMetadataInterface
+{
+    /**
+     * Returns class name
+     *
+     * @return string
+     */
+    public function getClassName();
+}

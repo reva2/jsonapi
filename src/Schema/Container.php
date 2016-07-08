@@ -11,6 +11,7 @@
 namespace Reva2\JsonApi\Schema;
 
 use Doctrine\Common\Util\ClassUtils;
+use Neomerx\JsonApi\Schema\Container as BaseContainer;
 
 /**
  * Schema container for JSON API encoder
@@ -18,7 +19,7 @@ use Doctrine\Common\Util\ClassUtils;
  * @package Reva2\JsonApi\Schema
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class Container
+class Container extends BaseContainer
 {
     /**
      * @inheritdoc

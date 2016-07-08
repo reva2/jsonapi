@@ -26,6 +26,9 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  */
 class HeadersChecker implements HeadersCheckerInterface
 {
+    const INVALID_CONTENT_TYPE_ERROR = 'ebb239c5-221d-42d2-a2f7-ca4bbc3d476f';
+    const UNSUPPORTED_CONTENT_TYPE_ERROR = 'aa389b54-1b33-4b0f-a5f4-1d680ca5f6d3';
+    const UNSUPPORTED_ACCEPT_ERROR = '6df3b139-d9ef-4576-8d0a-c0ce2e803827';
     /**
      * @var CodecMatcherInterface
      */
@@ -64,7 +67,7 @@ class HeadersChecker implements HeadersCheckerInterface
                     rand(),
                     null,
                     JsonApiException::HTTP_CODE_BAD_REQUEST,
-                    'invalid-content-type',
+                    self::INVALID_CONTENT_TYPE_ERROR,
                     "Invalid content type"
                 ),
                 JsonApiException::HTTP_CODE_BAD_REQUEST
@@ -78,7 +81,7 @@ class HeadersChecker implements HeadersCheckerInterface
                     rand(),
                     null,
                     JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
-                    'unsupported-content-type',
+                    self::UNSUPPORTED_CONTENT_TYPE_ERROR,
                     'Unsupported content type'
                 ),
                 JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
@@ -102,7 +105,7 @@ class HeadersChecker implements HeadersCheckerInterface
                     rand(),
                     null,
                     JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
-                    'unsupported-media-type',
+                    self::UNSUPPORTED_ACCEPT_ERROR,
                     'Unsupported media type'
                 ),
                 JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE

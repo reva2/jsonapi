@@ -8,4 +8,11 @@
  * file that was distributed with this source code.
  */
 
-$loader = require __DIR__ . '/../vendor/autoload.php';
+
+namespace Reva2\JsonApi\Annotations;
+
+
+class Relationship
+{
+
+}
