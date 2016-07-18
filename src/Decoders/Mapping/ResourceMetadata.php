@@ -113,11 +113,6 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     {
         if (null === $metadata) {
             return $this;
-        } elseif (!$metadata instanceof ResourceMetadataInterface) {
-            throw new \InvalidArgumentException(sprintf(
-                "Couldn't merge metadata from %s instance",
-                get_class($metadata)
-            ));
         }
 
         $this->attributes = array_merge($this->attributes, $metadata->getAttributes());

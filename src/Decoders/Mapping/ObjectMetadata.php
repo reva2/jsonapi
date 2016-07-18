@@ -57,11 +57,6 @@ class ObjectMetadata extends ClassMetadata implements ObjectMetadataInterface
     {
         if (null === $metadata) {
             return $this;
-        } elseif (!$metadata instanceof ObjectMetadataInterface) {
-            throw new \InvalidArgumentException(sprintf(
-                "Couldn't merge metadata from %s instance",
-                get_class($metadata)
-            ));
         }
 
         $this->properties = array_merge($this->properties, $metadata->getProperties());
