@@ -12,7 +12,7 @@
 namespace Reva2\JsonApi\Decoders\Mapping;
 
 use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
-use Reva2\JsonApi\Contracts\Decoders\Mapping\ReferenceMetadataInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 
 /**
  * JSON API document metadata
@@ -23,7 +23,7 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\ReferenceMetadataInterface;
 class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterface
 {
     /**
-     * @var ReferenceMetadataInterface
+     * @var PropertyMetadataInterface
      * @internal
      */
     public $content;
@@ -45,10 +45,10 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
     /**
      * Sets metadata for document content
      *
-     * @param ReferenceMetadataInterface $metadata
+     * @param PropertyMetadataInterface $metadata
      * @return $this
      */
-    public function setContentMetadata(ReferenceMetadataInterface $metadata)
+    public function setContentMetadata(PropertyMetadataInterface $metadata)
     {
         $this->content = $metadata;
 
@@ -58,7 +58,7 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
     /**
      * @inheritdoc
      */
-    public function canBeEmpty()
+    public function isAllowEmpty()
     {
         return $this->allowEmpty;
     }

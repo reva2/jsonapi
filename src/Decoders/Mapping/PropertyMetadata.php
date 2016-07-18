@@ -34,6 +34,18 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public $setter;
 
     /**
+     * @var string
+     * @internal
+     */
+    public $dataType;
+
+    /**
+     * @var null|string|array
+     * @internal
+     */
+    public $dataTypeParams;
+
+    /**
      * Constructor
      *
      * @param string $property
@@ -43,7 +55,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     {
         parent::__construct($className);
 
-        $this->propertyName = $className;
+        $this->propertyName = $property;
     }
 
     /**
@@ -70,6 +82,52 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      */
     public function setSetter($setter = null) {
         $this->setter = $setter;
+
+        return $this;
+    }
+
+    /**
+     * Returns property data type
+     *
+     * @return string
+     */
+    public function getDataType()
+    {
+        return $this->dataType;
+    }
+
+    /**
+     * Sets property data type
+     *
+     * @param string $dataType
+     * @return $this
+     */
+    public function setDataType($dataType)
+    {
+        $this->dataType = $dataType;
+
+        return $this;
+    }
+
+    /**
+     * Returns additional data type params
+     *
+     * @return array|null|string
+     */
+    public function getDataTypeParams()
+    {
+        return $this->dataTypeParams;
+    }
+
+    /**
+     * Sets additional data type params
+     *
+     * @param array|null|string $dataTypeParams
+     * @return $this
+     */
+    public function setDataTypeParams($dataTypeParams = null)
+    {
+        $this->dataTypeParams = $dataTypeParams;
 
         return $this;
     }

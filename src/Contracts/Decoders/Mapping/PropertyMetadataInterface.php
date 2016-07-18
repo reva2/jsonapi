@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Reva2\JsonApi\Contracts\Decoders\Mapping;
 
 /**
@@ -34,7 +33,7 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
     public function getDataType();
 
     /**
-     * Returns property data type additional params
+     * Returns property data type additional parameters
      * 
      * @return string|array
      */

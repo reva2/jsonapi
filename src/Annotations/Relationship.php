@@ -11,8 +11,16 @@
 
 namespace Reva2\JsonApi\Annotations;
 
-
-class Relationship
+/**
+ * JSON API relationship annotation
+ *
+ * @package Reva2\JsonApi\Annotations
+ * @author Sergey Revenko <reva2@orbita1.ru>
+ *
+ * @Annotation
+ * @Target({"PROPERTY"})
+ */
+class Relationship extends Property
 {
 
 }

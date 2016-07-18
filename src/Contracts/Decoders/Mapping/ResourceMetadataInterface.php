@@ -16,9 +16,8 @@ namespace Reva2\JsonApi\Contracts\Decoders\Mapping;
  * @package Reva2\JsonApi\Contracts\Decoders\Mapping
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-interface ResourceMetadataInterface extends GenericMetadataInterface
+interface ResourceMetadataInterface extends ClassMetadataInterface
 {
-
     /**
      * Returns resource name
      *
@@ -29,38 +28,21 @@ interface ResourceMetadataInterface extends GenericMetadataInterface
     /**
      * Returns metadata resource attributes
      *
-     * @return AttributeMetadataInterface[]
+     * @return PropertyMetadataInterface[]
      */
     public function getAttributes();
 
     /**
      * Returns metadata for resource relationships
      *
-     * @return RelationshipMetadataInterface
+     * @return PropertyMetadataInterface[]
      */
     public function getRelationships();
 
     /**
-     * Returns name of field that store discriminator value
+     * Merge metadata from parent resource
      *
-     * @return string|null
+     * @param ResourceMetadataInterface $metadata
      */
-    public function getDiscriminatorField();
-
-    /**
-     * Returns class name that corresponds to specified
-     * discriminator value
-     *
-     * @param string $value
-     * @return string
-     */
-    public function getDiscriminatorClass($value);
-
-    /**
-     * Merge metadata from parent resources
-     *
-     * @param mixed $metadata
-     * @return mixed
-     */
-    public function mergeMetadata($metadata);
+    public function mergeMetadata(ResourceMetadataInterface $metadata);
 }

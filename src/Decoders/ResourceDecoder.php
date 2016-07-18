@@ -17,7 +17,6 @@ use Reva2\JsonApi\Contracts\Decoders\Data\ResourceInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Decoders\ResourceDecoderInterface;
 
-
 /**
  * Base class for JSON API resource decoders
  *

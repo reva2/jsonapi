@@ -16,11 +16,11 @@ namespace Reva2\JsonApi\Annotations;
  *
  * @package Reva2\JsonApi\Annotations
  * @author Sergey Revenko <dedsemen@gmail.com>
+ *
+ * @Annotation
+ * @Target({"PROPERTY"})
  */
-class Attribute
+class Attribute extends Property
 {
-    /**
-     * @var string
-     */
-    public $type;
+
 }

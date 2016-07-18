@@ -21,7 +21,7 @@ interface DocumentMetadataInterface extends GenericMetadataInterface
     /**
      * Returns metadata data for document' content
      * 
-     * @return ReferenceMetadataInterface
+     * @return PropertyMetadataInterface
      */
     public function getContentMetadata();
 
@@ -30,5 +30,5 @@ interface DocumentMetadataInterface extends GenericMetadataInterface
      * 
      * @return bool
      */
-    public function canBeEmpty();
+    public function isAllowEmpty();
 }

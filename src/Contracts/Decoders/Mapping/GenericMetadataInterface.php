@@ -11,7 +11,12 @@
 
 namespace Reva2\JsonApi\Contracts\Decoders\Mapping;
 
-
+/**
+ * Base metadata
+ *
+ * @package Reva2\JsonApi\Contracts\Decoders\Mapping
+ * @author Sergey Revenko <dedsemen@gmail.com>
+ */
 interface GenericMetadataInterface
 {
     /**

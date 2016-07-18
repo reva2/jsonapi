@@ -11,8 +11,7 @@
 
 namespace Reva2\JsonApi\Decoders\Mapping;
 
-use Reva2\JsonApi\Contracts\Decoders\Mapping\AttributeMetadataInterface;
-use Reva2\JsonApi\Contracts\Decoders\Mapping\RelationshipMetadataInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
 
 /**
@@ -21,7 +20,7 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
  * @package Reva2\JsonApi\Decoders\Mapping
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class ResourceMetadata extends GenericMetadata implements ResourceMetadataInterface
+class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterface
 {
     /**
      * @var string
@@ -30,28 +29,16 @@ class ResourceMetadata extends GenericMetadata implements ResourceMetadataInterf
     public $name;
 
     /**
-     * @var AttributeMetadataInterface[]
+     * @var PropertyMetadataInterface[]
      * @internal
      */
     public $attributes = [];
 
     /**
-     * @var RelationshipMetadataInterface[]
+     * @var PropertyMetadataInterface[]
      * @internal
      */
     public $relationships = [];
-
-    /***
-     * @var string|null
-     * @internal
-     */
-    public $discField;
-
-    /**
-     * @var array
-     * @internal
-     */
-    public $discMap;
 
     /**
      * Constructor
@@ -85,10 +72,10 @@ class ResourceMetadata extends GenericMetadata implements ResourceMetadataInterf
     /**
      * Add resource attribute metadata
      *
-     * @param AttributeMetadataInterface $attribute
+     * @param PropertyMetadataInterface $attribute
      * @return $this
      */
-    public function addAttribute(AttributeMetadataInterface $attribute)
+    public function addAttribute(PropertyMetadataInterface $attribute)
     {
         $this->attributes[$attribute->getPropertyName()] = $attribute;
 
@@ -106,10 +93,10 @@ class ResourceMetadata extends GenericMetadata implements ResourceMetadataInterf
     /**
      * Add resource relationship metadata
      *
-     * @param RelationshipMetadataInterface $relationship
+     * @param PropertyMetadataInterface $relationship
      * @return $this
      */
-    public function addRelationship(RelationshipMetadataInterface $relationship)
+    public function addRelationship(PropertyMetadataInterface $relationship)
     {
         $this->relationships[$relationship->getPropertyName()] = $relationship;
 
@@ -117,61 +104,12 @@ class ResourceMetadata extends GenericMetadata implements ResourceMetadataInterf
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getDiscriminatorField()
-    {
-        return $this->discField;
-    }
-
-    /**
-     * Sets discriminator field
-     *
-     * @param string|null $field
-     * @return $this
-     */
-    public function setDiscriminatorField($field = null)
-    {
-        $this->discField = $field;
-
-        return $this;
-    }
-
-    /**
-     * Sets discriminator map
-     *
-     * @param array $map
-     * @return $this
-     */
-    public function setDiscriminatorMap(array $map)
-    {
-        $this->discMap = $map;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDiscriminatorClass($value)
-    {
-        if (!array_key_exists($value, $this->discMap)) {
-            throw new \InvalidArgumentException(sprintf(
-                "Discriminator class for value '%s' not specified",
-                $value
-            ));
-        }
-
-        return $this->discMap[$value];
-    }
-
-    /**
      * Merge resource metadata
      *
-     * @param mixed $metadata
+     * @param ResourceMetadataInterface $metadata
      * @return $this
      */
-    public function mergeMetadata($metadata)
+    public function mergeMetadata(ResourceMetadataInterface $metadata = null)
     {
         if (null === $metadata) {
             return $this;
