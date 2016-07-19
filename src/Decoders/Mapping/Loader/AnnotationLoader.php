@@ -14,13 +14,14 @@ namespace Reva2\JsonApi\Decoders\Mapping\Loader;
 use Doctrine\Common\Annotations\Reader;
 use Reva2\JsonApi\Annotations\Attribute;
 use Reva2\JsonApi\Annotations\Document as ApiDocument;
+use Reva2\JsonApi\Annotations\Resource as ApiResource;
+use Reva2\JsonApi\Annotations\Object as ApiObject;
+use Reva2\JsonApi\Annotations\Content as ApiContent;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;
-use Reva2\JsonApi\Annotations\Resource as ApiResource;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
-use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
-use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
+use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
 use Reva2\JsonApi\Decoders\Mapping\DocumentMetadata;
 use Reva2\JsonApi\Decoders\Mapping\ObjectMetadata;
 use Reva2\JsonApi\Decoders\Mapping\PropertyMetadata;
@@ -59,7 +60,9 @@ class AnnotationLoader implements LoaderInterface
         } elseif (null !== ($document = $this->reader->getClassAnnotation($class, ApiDocument::class))) {
             return $this->loadDocumentMetadata($document, $class);
         } else {
-            return $this->loadObjectMetadata($class);
+            $object = $this->reader->getClassAnnotation($class, ApiObject::class);
+
+            return $this->loadObjectMetadata($class, $object);
         }
     }
 
@@ -72,7 +75,10 @@ class AnnotationLoader implements LoaderInterface
      */
     private function loadResourceMetadata(ApiResource $resource, \ReflectionClass $class)
     {
-        $metadata = new ResourceMetadata($resource->name, $class->getName());
+        $metadata = new ResourceMetadata( $class->getName());
+        $metadata->setName($resource->name);
+
+        $this->loadDiscriminatorMetadata($resource, $metadata);
 
         $properties = $class->getProperties();
         foreach ($properties as $property) {
@@ -92,11 +98,16 @@ class AnnotationLoader implements LoaderInterface
 
     /**
      * @param \ReflectionClass $class
+     * @param ApiObject|null $object
      * @return ObjectMetadata
      */
-    private function loadObjectMetadata(\ReflectionClass $class)
+    private function loadObjectMetadata(\ReflectionClass $class, ApiObject $object = null)
     {
         $metadata = new ObjectMetadata($class->name);
+
+        if (null !== $object) {
+            $this->loadDiscriminatorMetadata($object, $metadata);
+        }
 
         $properties = $class->getProperties();
         foreach ($properties as $property) {
@@ -122,8 +133,17 @@ class AnnotationLoader implements LoaderInterface
     private function loadDocumentMetadata(ApiDocument $document, \ReflectionClass $class)
     {
         $metadata = new DocumentMetadata($class->getName());
+        $metadata->setAllowEmpty($document->allowEmpty);
 
+        $properties = $class->getProperties();
+        foreach ($properties as $property) {
+            $content = $this->reader->getPropertyAnnotation($property, ApiContent::class);
+            if (null !== $content) {
+                $metadata->setContentMetadata($this->loadPropertyMetadata($content, $property));
 
+                break;
+            }
+        }
 
         return $metadata;
     }
@@ -223,7 +243,7 @@ class AnnotationLoader implements LoaderInterface
         } else {
             $type = ltrim($type, '\\');
 
-            if (!class_exists($type) && !interface_exists($type)) {
+            if (!class_exists($type)) {
                 throw new \InvalidArgumentException(sprintf(
                     "Unknown object type '%s' specified",
                     $type
@@ -262,7 +282,22 @@ class AnnotationLoader implements LoaderInterface
         }
 
         $parentMetadata = $this->loadClassMetadata($parentClass);
-
         $metadata->mergeMetadata($parentMetadata);
+    }
+
+    /**
+     * Load discriminator metadata
+     *
+     * @param ApiObject $object
+     * @param ClassMetadata $metadata
+     */
+    private function loadDiscriminatorMetadata(ApiObject $object, ClassMetadata $metadata)
+    {
+        if (!$object->discField) {
+            return;
+        }
+
+        $metadata->setDiscriminatorField($object->discField);
+        $metadata->setDiscriminatorMap($object->discMap);
     }
 }

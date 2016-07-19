@@ -69,7 +69,7 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
      * @param bool $allow
      * @return $this
      */
-    public function setCanBeEmpty($allow)
+    public function setAllowEmpty($allow)
     {
         $this->allowEmpty = $allow;
 

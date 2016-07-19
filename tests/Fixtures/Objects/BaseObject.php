@@ -18,6 +18,13 @@ use Reva2\JsonApi\Annotations as API;
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Objects
  * @author Sergey Revenko <reva2@orbita1.ru>
+ *
+ * @API\Object(
+ *     discField="parentProp",
+ *     discMap={
+ *      "example": "Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject"
+ *     }
+ * )
  */
 class BaseObject
 {

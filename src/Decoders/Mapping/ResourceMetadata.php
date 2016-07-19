@@ -41,24 +41,22 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     public $relationships = [];
 
     /**
-     * Constructor
-     *
-     * @param string $name
-     * @param $className
-     */
-    public function __construct($name, $className)
-    {
-        parent::__construct($className);
-
-        $this->name = $name;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name = null)
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -108,7 +106,7 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
      */
     public function mergeMetadata($metadata = null)
     {
-        if (null === $metadata) {
+        if (null !== $metadata) {
             if (!$metadata instanceof ResourceMetadataInterface) {
                 /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface */
 
@@ -116,6 +114,10 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
                     "Failed to merge metadata from parent class %s",
                     $metadata->getClassName()
                 ));
+            }
+
+            if (empty($this->name)) {
+                $this->name = $metadata->getName();
             }
 
             $this->attributes = array_merge($this->attributes, $metadata->getAttributes());

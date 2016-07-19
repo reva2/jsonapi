@@ -12,11 +12,19 @@
 namespace Reva2\JsonApi\Tests\Decoders\Mapping\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
+use Reva2\JsonApi\Tests\Fixtures\Documents\PetsList;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
+use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
 
 /**
  * Test for metadata loader that use doctrine annotations
@@ -153,5 +161,87 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('scalar', $prop->getDataType());
         $this->assertSame('string', $prop->getDataTypeParams());
         $this->assertSame('setParentProp', $prop->getSetter());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldLoadObjectDiscriminatorMetadata()
+    {
+        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(BaseObject::class));
+
+        $this->assertInstanceOf(ObjectMetadataInterface::class, $metadata);
+        $this->assertSame('parentProp', $metadata->getDiscriminatorField());
+        $this->assertSame(ExampleObject::class, $metadata->getDiscriminatorClass('example'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldLoadResourceMetadata()
+    {
+        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(Cat::class));
+
+        $this->assertInstanceOf(ResourceMetadataInterface::class, $metadata);
+        $this->assertSame('pets', $metadata->getName());
+
+        $attributes = $metadata->getAttributes();
+        $this->assertInternalType('array', $attributes);
+
+        $this->assertArrayHasKey('name', $attributes);
+        $attr = $attributes['name'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $attr);
+        $this->assertSame('scalar', $attr->getDataType());
+        $this->assertSame('string', $attr->getDataTypeParams());
+        $this->assertNull($attr->getSetter());
+
+        $this->assertArrayHasKey('family', $attributes);
+        $attr = $attributes['family'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $attr);
+        $this->assertSame('scalar', $attr->getDataType());
+        $this->assertSame('string', $attr->getDataTypeParams());
+        $this->assertNull($attr->getSetter());
+
+        $relationships = $metadata->getRelationships();
+        $this->assertInternalType('array', $relationships);
+
+        $this->assertArrayHasKey('store', $relationships);
+        $rel = $relationships['store'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $rel);
+        $this->assertSame('object', $rel->getDataType());
+        $this->assertSame(Store::class, $rel->getDataTypeParams());
+        $this->assertNull($rel->getSetter());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldLoadResourceDiscriminatorMetadata()
+    {
+        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(Pet::class));
+
+        $this->assertInstanceOf(ResourceMetadataInterface::class, $metadata);
+        $this->assertSame('family', $metadata->getDiscriminatorField());
+        $this->assertSame(Cat::class, $metadata->getDiscriminatorClass('cat'));
+        $this->assertSame(Dog::class, $metadata->getDiscriminatorClass('dog'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldLoadDocumentMetadata()
+    {
+        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(PetsList::class));
+
+        $this->assertInstanceOf(DocumentMetadataInterface::class, $metadata);
+        $this->assertSame(PetsList::class, $metadata->getClassName());
+        $this->assertTrue($metadata->isAllowEmpty());
+
+        $content = $metadata->getContentMetadata();
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $content);
+        $this->assertSame('data', $content->getPropertyName());
+        $this->assertSame('array', $content->getDataType());
+        $this->assertSame(['object', Pet::class], $content->getDataTypeParams());
+        $this->assertNull($content->getSetter());
     }
 }
