@@ -53,13 +53,20 @@ class ObjectMetadata extends ClassMetadata implements ObjectMetadataInterface
     /**
      * @inheritdoc
      */
-    public function mergeMetadata(ObjectMetadataInterface $metadata = null)
+    public function mergeMetadata($metadata = null)
     {
         if (null === $metadata) {
-            return $this;
-        }
+            if (!$metadata instanceof ObjectMetadataInterface) {
+                /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface */
 
-        $this->properties = array_merge($this->properties, $metadata->getProperties());
+                throw new \RuntimeException(sprintf(
+                    "Failed to merge metadata from parent class %s",
+                    $metadata->getClassName()
+                ));
+            }
+
+            $this->properties = array_merge($this->properties, $metadata->getProperties());
+        }
 
         return $this;
     }

@@ -81,4 +81,12 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 
         return $this->discMap[$value];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function mergeMetadata($metadata)
+    {
+        throw new \RuntimeException('Not implemented');
+    }
 }

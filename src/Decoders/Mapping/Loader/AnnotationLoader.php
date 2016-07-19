@@ -17,6 +17,7 @@ use Reva2\JsonApi\Annotations\Document as ApiDocument;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;
 use Reva2\JsonApi\Annotations\Resource as ApiResource;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
@@ -84,31 +85,7 @@ class AnnotationLoader implements LoaderInterface
             }
         }
 
-        if (false !== ($parent = $class->getParentClass())) {
-            $parentMetadata = $this->loadClassMetadata($parent);
-            if (!$parentMetadata instanceof ResourceMetadataInterface) {
-                throw new \RuntimeException(sprintf(
-                    "Failed to merge metadata from parent class '%s'",
-                    $parent->name
-                ));
-            }
-        }
-
-        return $metadata;
-    }
-
-    /**
-     * Parse JSON API document metadata
-     *
-     * @param ApiDocument $document
-     * @param \ReflectionClass $class
-     * @return DocumentMetadata
-     */
-    private function loadDocumentMetadata(ApiDocument $document, \ReflectionClass $class)
-    {
-        $metadata = new DocumentMetadata($class->getName());
-
-
+        $this->loadParentMetadata($metadata, $class);
 
         return $metadata;
     }
@@ -130,17 +107,23 @@ class AnnotationLoader implements LoaderInterface
             }
         }
 
-        if (false !== ($parent = $class->getParentClass())) {
-            $parentMetadata = $this->loadClassMetadata($parent);
-            if (!$parentMetadata instanceof ObjectMetadataInterface) {
-                throw new \RuntimeException(sprintf(
-                    "Failed to merge metadata from parent class '%s'",
-                    $parent->name
-                ));
-            }
+        $this->loadParentMetadata($metadata, $class);
 
-            $metadata->mergeMetadata($parentMetadata);
-        }
+        return $metadata;
+    }
+
+    /**
+     * Parse JSON API document metadata
+     *
+     * @param ApiDocument $document
+     * @param \ReflectionClass $class
+     * @return DocumentMetadata
+     */
+    private function loadDocumentMetadata(ApiDocument $document, \ReflectionClass $class)
+    {
+        $metadata = new DocumentMetadata($class->getName());
+
+
 
         return $metadata;
     }
@@ -263,5 +246,23 @@ class AnnotationLoader implements LoaderInterface
     private function isScalarDataType($type)
     {
         return in_array($type, ['string', 'bool', 'boolean', 'int', 'integer', 'float', 'double']);
+    }
+
+    /**
+     * Load and merge metadata from parent class
+     *
+     * @param ClassMetadataInterface $metadata
+     * @param \ReflectionClass $class
+     */
+    private function loadParentMetadata(ClassMetadataInterface $metadata, \ReflectionClass $class)
+    {
+        $parentClass = $class->getParentClass();
+        if (false === $parentClass) {
+            return;
+        }
+
+        $parentMetadata = $this->loadClassMetadata($parentClass);
+
+        $metadata->mergeMetadata($parentMetadata);
     }
 }

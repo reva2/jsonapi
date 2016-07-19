@@ -104,19 +104,23 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     }
 
     /**
-     * Merge resource metadata
-     *
-     * @param ResourceMetadataInterface $metadata
-     * @return $this
+     * @inheritdoc
      */
-    public function mergeMetadata(ResourceMetadataInterface $metadata = null)
+    public function mergeMetadata($metadata = null)
     {
         if (null === $metadata) {
-            return $this;
-        }
+            if (!$metadata instanceof ResourceMetadataInterface) {
+                /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface */
 
-        $this->attributes = array_merge($this->attributes, $metadata->getAttributes());
-        $this->relationships = array_merge($this->relationships, $metadata->getRelationships());
+                throw new \RuntimeException(sprintf(
+                    "Failed to merge metadata from parent class %s",
+                    $metadata->getClassName()
+                ));
+            }
+
+            $this->attributes = array_merge($this->attributes, $metadata->getAttributes());
+            $this->relationships = array_merge($this->relationships, $metadata->getRelationships());
+        }
 
         return $this;
     }

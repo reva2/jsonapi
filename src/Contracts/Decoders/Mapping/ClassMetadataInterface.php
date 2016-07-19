@@ -34,4 +34,11 @@ interface ClassMetadataInterface extends GenericMetadataInterface
      * @return string
      */
     public function getDiscriminatorClass($value);
+
+    /**
+     * Merge parent object metadata
+     *
+     * @param mixed $metadata
+     */
+    public function mergeMetadata($metadata);
 }

@@ -138,26 +138,7 @@ class DataParser implements DataParserInterface
      */
     public function parseInt($data, $path)
     {
-        $this->setPath($path);
-
-        $pathValue = null;
-        if ($this->hasValue($data, $path)) {
-            $value = $this->getValue($data, $path);
-            if ((null === $value) || (is_int($value))) {
-                $pathValue = $value;
-            } elseif (is_numeric($value)) {
-                $pathValue = (int) $value;
-            } else {
-                throw new \InvalidArgumentException(
-                    sprintf("Value expected to be an integer, but %s given", gettype($value)),
-                    400
-                );
-            }
-        }
-
-        $this->restorePath();
-
-        return $pathValue;
+        return $this->parseNumeric($data, $path, 'int');
     }
 
     /**
@@ -165,26 +146,7 @@ class DataParser implements DataParserInterface
      */
     public function parseFloat($data, $path)
     {
-        $this->setPath($path);
-
-        $pathValue = null;
-        if ($this->hasValue($data, $path)) {
-            $value = $this->getValue($data, $path);
-            if ((null === $value) || (is_float($value))) {
-                $pathValue = $value;
-            } elseif (is_numeric($pathValue)) {
-                $pathValue = (float) $value;
-            } else {
-                throw new \InvalidArgumentException(
-                    sprintf("Value expected to be a float, but %s given", gettype($value)),
-                    400
-                );
-            }
-        }
-
-        $this->restorePath();
-
-        return $pathValue;
+        return $this->parseNumeric($data, $path, 'float');
     }
 
     /**
@@ -417,5 +379,38 @@ class DataParser implements DataParserInterface
                 500
             );
         }
+    }
+
+    /**
+     * Parse numeric value
+     *
+     * @param mixed $data
+     * @param string $path
+     * @param string $type
+     * @return float|int|null
+     */
+    protected function parseNumeric($data, $path, $type)
+    {
+        $this->setPath($path);
+
+        $pathValue = null;
+        if ($this->hasValue($data, $path)) {
+            $value = $this->getValue($data, $path);
+            $rightType = ('int' === $type) ? is_int($value) : is_float($value);
+            if ($rightType) {
+                $pathValue = $value;
+            } elseif (is_numeric($pathValue)) {
+                $pathValue = ('int' === $type) ? (int) $value : (float) $value;
+            } elseif (null !== $value) {
+                throw new \InvalidArgumentException(
+                    sprintf("Value expected to be %s, but %s given", $type, gettype($value)),
+                    400
+                );
+            }
+        }
+
+        $this->restorePath();
+
+        return $pathValue;
     }
 }

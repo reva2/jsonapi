@@ -38,11 +38,4 @@ interface ResourceMetadataInterface extends ClassMetadataInterface
      * @return PropertyMetadataInterface[]
      */
     public function getRelationships();
-
-    /**
-     * Merge metadata from parent resource
-     *
-     * @param ResourceMetadataInterface $metadata
-     */
-    public function mergeMetadata(ResourceMetadataInterface $metadata);
 }

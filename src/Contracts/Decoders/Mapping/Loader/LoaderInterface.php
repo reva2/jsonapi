@@ -22,7 +22,7 @@ interface LoaderInterface
      * Load JSON API metadata into a ClassMetadata instance
      *
      * @param \ReflectionClass $class
-     * @return bool Whether the loader succeeded
+     * @return mixed Whether the loader succeeded
      */
     public function loadClassMetadata(\ReflectionClass $class);
 }

@@ -53,7 +53,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #Value expected to be an integer, but .+ given#
+     * @expectedExceptionMessageRegExp #Value expected to be int, but .+ given#
      */
     public function shouldParseIntegers()
     {
@@ -75,7 +75,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #alue expected to be a float, but .+ given#
+     * @expectedExceptionMessageRegExp #alue expected to be float, but .+ given#
      */
     public function shouldParseFloats()
     {

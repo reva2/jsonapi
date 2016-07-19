@@ -25,11 +25,4 @@ interface ObjectMetadataInterface extends ClassMetadataInterface
      * @return PropertyMetadataInterface[]
      */
     public function getProperties();
-
-    /**
-     * Merge parent object metadata
-     *
-     * @param ObjectMetadataInterface $metadata
-     */
-    public function mergeMetadata(ObjectMetadataInterface $metadata);
 }
