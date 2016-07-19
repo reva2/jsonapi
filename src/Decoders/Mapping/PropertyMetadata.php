@@ -46,6 +46,12 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public $dataTypeParams;
 
     /**
+     * @var string|null
+     * @internal
+     */
+    public $ormEntity;
+
+    /**
      * Constructor
      *
      * @param string $property
@@ -128,6 +134,27 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public function setDataTypeParams($dataTypeParams = null)
     {
         $this->dataTypeParams = $dataTypeParams;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOrmEntityClass()
+    {
+        return $this->ormEntity;
+    }
+
+    /**
+     * Sets name of ORM entity class
+     *
+     * @param string|null $entityClass
+     * @return $this
+     */
+    public function setOrmEntityClass($entityClass = null)
+    {
+        $this->ormEntity = $entityClass;
 
         return $this;
     }
