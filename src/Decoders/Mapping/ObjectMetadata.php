@@ -55,7 +55,7 @@ class ObjectMetadata extends ClassMetadata implements ObjectMetadataInterface
      */
     public function mergeMetadata($metadata = null)
     {
-        if (null === $metadata) {
+        if (null !== $metadata) {
             if (!$metadata instanceof ObjectMetadataInterface) {
                 /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface */
 

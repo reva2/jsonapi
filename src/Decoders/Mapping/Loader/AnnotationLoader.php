@@ -19,7 +19,6 @@ use Reva2\JsonApi\Annotations\Object as ApiObject;
 use Reva2\JsonApi\Annotations\Content as ApiContent;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;
-use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
 use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
 use Reva2\JsonApi\Decoders\Mapping\DocumentMetadata;
@@ -82,6 +81,10 @@ class AnnotationLoader implements LoaderInterface
 
         $properties = $class->getProperties();
         foreach ($properties as $property) {
+            if ($property->getDeclaringClass()->name !== $class->name) {
+                continue;
+            }
+
             foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
                 if ($annotation instanceof Attribute) {
                     $metadata->addAttribute($this->loadPropertyMetadata($annotation, $property));
@@ -90,8 +93,6 @@ class AnnotationLoader implements LoaderInterface
                 }
             }
         }
-
-        $this->loadParentMetadata($metadata, $class);
 
         return $metadata;
     }
@@ -111,14 +112,15 @@ class AnnotationLoader implements LoaderInterface
 
         $properties = $class->getProperties();
         foreach ($properties as $property) {
-            foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
-                if ($annotation instanceof Property) {
-                    $metadata->addProperty($this->loadPropertyMetadata($annotation, $property));
-                }
+            if ($property->getDeclaringClass()->name !== $class->name) {
+                continue;
+            }
+
+            $annotation = $this->reader->getPropertyAnnotation($property, Property::class);
+            if (null !== $annotation) {
+                $metadata->addProperty($this->loadPropertyMetadata($annotation, $property));
             }
         }
-
-        $this->loadParentMetadata($metadata, $class);
 
         return $metadata;
     }
@@ -137,9 +139,13 @@ class AnnotationLoader implements LoaderInterface
 
         $properties = $class->getProperties();
         foreach ($properties as $property) {
-            $content = $this->reader->getPropertyAnnotation($property, ApiContent::class);
-            if (null !== $content) {
-                $metadata->setContentMetadata($this->loadPropertyMetadata($content, $property));
+            if ($property->getDeclaringClass()->name !== $class->name) {
+                continue;
+            }
+
+            $annotation = $this->reader->getPropertyAnnotation($property, ApiContent::class);
+            if (null !== $annotation) {
+                $metadata->setContentMetadata($this->loadPropertyMetadata($annotation, $property));
 
                 break;
             }
@@ -268,23 +274,6 @@ class AnnotationLoader implements LoaderInterface
     private function isScalarDataType($type)
     {
         return in_array($type, ['string', 'bool', 'boolean', 'int', 'integer', 'float', 'double']);
-    }
-
-    /**
-     * Load and merge metadata from parent class
-     *
-     * @param ClassMetadataInterface $metadata
-     * @param \ReflectionClass $class
-     */
-    private function loadParentMetadata(ClassMetadataInterface $metadata, \ReflectionClass $class)
-    {
-        $parentClass = $class->getParentClass();
-        if (false === $parentClass) {
-            return;
-        }
-
-        $parentMetadata = $this->loadClassMetadata($parentClass);
-        $metadata->mergeMetadata($parentMetadata);
     }
 
     /**

@@ -154,13 +154,6 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PropertyMetadataInterface::class, $prop);
         $this->assertSame('object', $prop->getDataType());
         $this->assertSame(AnotherObject::class, $prop->getDataTypeParams());
-
-        $this->assertArrayHasKey('parentProp', $properties);
-        $prop = $properties['parentProp'];
-        $this->assertInstanceOf(PropertyMetadataInterface::class, $prop);
-        $this->assertSame('scalar', $prop->getDataType());
-        $this->assertSame('string', $prop->getDataTypeParams());
-        $this->assertSame('setParentProp', $prop->getSetter());
     }
 
     /**
@@ -180,10 +173,9 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldLoadResourceMetadata()
     {
-        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(Cat::class));
+        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(Pet::class));
 
         $this->assertInstanceOf(ResourceMetadataInterface::class, $metadata);
-        $this->assertSame('pets', $metadata->getName());
 
         $attributes = $metadata->getAttributes();
         $this->assertInternalType('array', $attributes);

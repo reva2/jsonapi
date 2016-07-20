@@ -12,10 +12,10 @@
 namespace Reva2\JsonApi\Decoders\Mapping\Factory;
 
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Cache\CacheInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Factory\MetadataFactoryInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
-use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
 
 /**
  * JSON API metadata factory
@@ -76,9 +76,9 @@ class LazyMetadataFactory implements MetadataFactoryInterface
             return $this->loadedClasses[$class];
         }
         
-        if (class_exists($class)) {
+        if (!class_exists($class)) {
             throw new \RuntimeException(sprintf(
-                "The class or interface '%s' doesn't exist",
+                "The class '%s' doesn't exist",
                 $class
             ));
         }
@@ -86,7 +86,7 @@ class LazyMetadataFactory implements MetadataFactoryInterface
         $reflection = new \ReflectionClass($class);
         
         $metadata = $this->loader->loadClassMetadata($reflection);
-        if (($metadata instanceof ResourceMetadataInterface) && (null !== ($parent = $reflection->getParentClass()))) {
+        if (($metadata instanceof ClassMetadataInterface) && (false !== ($parent = $reflection->getParentClass()))) {
             $metadata->mergeMetadata($this->getMetadataFor($parent->getName()));
         }
 

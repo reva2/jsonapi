@@ -87,6 +87,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      */
     public function mergeMetadata($metadata)
     {
-        throw new \RuntimeException('Not implemented');
+        // Nothing to do here
     }
 }
