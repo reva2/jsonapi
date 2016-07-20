@@ -56,7 +56,7 @@ interface EnvironmentInterface
     /**
      * Encoder schemas container
      *
-     * @return ContainerInterface;
+     * @return ContainerInterface
      */
     public function getSchemaContainer();
 

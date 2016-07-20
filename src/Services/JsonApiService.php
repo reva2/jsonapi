@@ -160,7 +160,12 @@ class JsonApiService implements JsonApiServiceInterface
      */
     private function parseBody(Request $request)
     {
-        return $this->environment->getDecoder()->decode($request->getContent());
+        $body = $request->getContent();
+        if (is_resource($body)) {
+            $body = stream_get_contents($body);
+        }
+
+        return $this->environment->getDecoder()->decode($body);
     }
 
     /**

@@ -74,7 +74,7 @@ class AnnotationLoader implements LoaderInterface
      */
     private function loadResourceMetadata(ApiResource $resource, \ReflectionClass $class)
     {
-        $metadata = new ResourceMetadata( $class->getName());
+        $metadata = new ResourceMetadata($class->name);
         $metadata->setName($resource->name);
 
         $this->loadDiscriminatorMetadata($resource, $metadata);
@@ -134,7 +134,7 @@ class AnnotationLoader implements LoaderInterface
      */
     private function loadDocumentMetadata(ApiDocument $document, \ReflectionClass $class)
     {
-        $metadata = new DocumentMetadata($class->getName());
+        $metadata = new DocumentMetadata($class->name);
         $metadata->setAllowEmpty($document->allowEmpty);
 
         $properties = $class->getProperties();
@@ -176,7 +176,7 @@ class AnnotationLoader implements LoaderInterface
             $metadata->setSetter($annotation->setter);
         } elseif (false === $property->isPublic()) {
             $setter = 'set' . ucfirst($property->name);
-            if (false == $property->getDeclaringClass()->hasMethod($setter)) {
+            if (false === $property->getDeclaringClass()->hasMethod($setter)) {
                 throw new \RuntimeException(sprintf(
                     "Couldn't find setter for non public property: %s:%s",
                     $property->class,
