@@ -1,0 +1,24 @@
+{
+  "test": {
+    "parentProp": "example",
+    "strProp": "test string",
+    "intProp": "10",
+    "integerProp": "15",
+    "boolProp": "yes",
+    "booleanProp": "no",
+    "floatProp": "15.5",
+    "doubleProp": "10.5",
+    "dateProp": "2016-07-21",
+    "timeProp": "12:00:00",
+    "datetimeProp": "2016-07-21 12:00:00",
+    "rawArray": [1, "test", true],
+    "strArray": ["first", "second", "third"],
+    "intArray": ["1", "2", 3],
+    "dateArray": ["12:00:00", "12:30:00"],
+    "objArray": [{"name": "another1"}, {"name": "another2"}],
+    "arrArray": [["1", "2"], ["3", "4"]],
+    "customProp": "first, second, third",
+    "rawProp": {"name": "name", "test": "test"},
+    "objProp": {"name": "another"}
+  }
+}

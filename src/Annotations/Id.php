@@ -9,21 +9,18 @@
  */
 
 
-namespace Reva2\JsonApi\Tests\Fixtures\Objects;
-
-use Reva2\JsonApi\Annotations as API;
+namespace Reva2\JsonApi\Annotations;
 
 /**
- * Another example object
+ * JSON API resource identifier annoation
  *
- * @package Reva2\JsonApi\Tests\Fixtures\Objects
+ * @package Reva2\JsonApi\Annotations
  * @author Sergey Revenko <reva2@orbita1.ru>
+ *
+ * @Annotation
+ * @Target({"PROPERTY"})
  */
-class AnotherObject
+class Id extends Property
 {
-    /**
-     * @var string
-     * @API\Property()
-     */
-    public $name;
+
 }

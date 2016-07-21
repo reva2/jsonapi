@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Decoders\Mapping;
 
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 
 /**
  * Generic class metadata
@@ -22,7 +23,7 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 {
     /***
-     * @var string|null
+     * @var PropertyMetadataInterface|null
      * @internal
      */
     public $discField;
@@ -44,10 +45,10 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * Sets discriminator field
      *
-     * @param string|null $field
+     * @param PropertyMetadataInterface|null $field
      * @return $this
      */
-    public function setDiscriminatorField($field = null)
+    public function setDiscriminatorField(PropertyMetadataInterface $field = null)
     {
         $this->discField = $field;
 

@@ -11,7 +11,6 @@
 namespace Reva2\JsonApi\Http;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Reva2\JsonApi\Contracts\Decoders\Data\DocumentInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
 
 /**
@@ -28,7 +27,7 @@ class Request implements RequestInterface
     protected $query;
 
     /**
-     * @var DocumentInterface|null
+     * @var mixed|null
      */
     protected $body;
 
@@ -36,9 +35,9 @@ class Request implements RequestInterface
      * Constructor
      *
      * @param EncodingParametersInterface $query
-     * @param DocumentInterface|null $body
+     * @param mixed|null $body
      */
-    public function __construct(EncodingParametersInterface $query, DocumentInterface $body = null)
+    public function __construct(EncodingParametersInterface $query, $body = null)
     {
         $this->query = $query;
         $this->body = $body;

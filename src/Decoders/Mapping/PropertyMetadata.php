@@ -37,6 +37,12 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @var string
      * @internal
      */
+    public $dataPath;
+
+    /**
+     * @var string
+     * @internal
+     */
     public $dataType;
 
     /**
@@ -88,6 +94,25 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      */
     public function setSetter($setter = null) {
         $this->setter = $setter;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDataPath()
+    {
+        return (null !== $this->dataPath) ? $this->dataPath : $this->propertyName;
+    }
+
+    /**
+     * @param string|null $dataPath
+     * @return $this
+     */
+    public function setDataPath($dataPath = null)
+    {
+        $this->dataPath = $dataPath;
 
         return $this;
     }

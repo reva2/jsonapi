@@ -22,7 +22,7 @@ interface ClassMetadataInterface extends GenericMetadataInterface
     /**
      * Returns name of field that store discriminator value
      *
-     * @return string|null
+     * @return PropertyMetadataInterface|null
      */
     public function getDiscriminatorField();
 

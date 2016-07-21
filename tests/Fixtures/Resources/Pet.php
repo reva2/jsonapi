@@ -24,13 +24,19 @@ use Reva2\JsonApi\Tests\Fixtures as Fixtures;
  *     name="pets",
  *     discField="family",
  *     discMap={
- *      "cat": Fixtures\Resources\Cat::class,
- *      "dog": Fixtures\Resources\Dog::class
+ *      "cats": Fixtures\Resources\Cat::class,
+ *      "dogs": Fixtures\Resources\Dog::class
  *     }
  * )
  */
 class Pet
 {
+    /**
+     * @var string
+     * @API\Id()
+     */
+    public $id;
+
     /**
      * @var string
      * @API\Attribute()

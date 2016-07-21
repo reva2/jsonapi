@@ -26,6 +26,13 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
     public function getPropertyName();
 
     /**
+     * Returns path to data. By default equals to property name.
+     *
+     * @return string;
+     */
+    public function getDataPath();
+
+    /**
      * Returns property data type
      *
      * @return string

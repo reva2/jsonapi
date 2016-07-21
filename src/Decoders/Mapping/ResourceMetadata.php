@@ -29,6 +29,11 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     public $name;
 
     /**
+     * @var PropertyMetadataInterface
+     */
+    public $idMetadata;
+
+    /**
      * @var PropertyMetadataInterface[]
      * @internal
      */
@@ -55,6 +60,25 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     public function setName($name = null)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return PropertyMetadataInterface
+     */
+    public function getIdMetadata()
+    {
+        return $this->idMetadata;
+    }
+
+    /**
+     * @param PropertyMetadataInterface $idMetadata
+     * @return $this
+     */
+    public function setIdMetadata($idMetadata)
+    {
+        $this->idMetadata = $idMetadata;
 
         return $this;
     }
@@ -118,6 +142,10 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
 
             if (empty($this->name)) {
                 $this->name = $metadata->getName();
+            }
+
+            if (null === $this->idMetadata) {
+                $this->idMetadata = $metadata->getIdMetadata();
             }
 
             $this->attributes = array_merge($this->attributes, $metadata->getAttributes());

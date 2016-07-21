@@ -63,9 +63,7 @@ class HeadersChecker implements HeadersCheckerInterface
     {
         if (count($header->getMediaTypes()) > 1) {
             throw new JsonApiException(
-                new Error(
-                    rand(),
-                    null,
+                $this->createApiError(
                     JsonApiException::HTTP_CODE_BAD_REQUEST,
                     self::INVALID_CONTENT_TYPE_ERROR,
                     "Invalid content type"
@@ -77,9 +75,7 @@ class HeadersChecker implements HeadersCheckerInterface
         $this->matcher->matchDecoder($header);
         if (null === $this->matcher->getDecoderHeaderMatchedType()) {
             throw new JsonApiException(
-                new Error(
-                    rand(),
-                    null,
+                $this->createApiError(
                     JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
                     self::UNSUPPORTED_CONTENT_TYPE_ERROR,
                     'Unsupported content type'
@@ -101,9 +97,7 @@ class HeadersChecker implements HeadersCheckerInterface
 
         if (null === $this->matcher->getEncoderHeaderMatchedType()) {
             throw new JsonApiException(
-                new Error(
-                    rand(),
-                    null,
+                $this->createApiError(
                     JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
                     self::UNSUPPORTED_ACCEPT_ERROR,
                     'Unsupported media type'
@@ -111,5 +105,17 @@ class HeadersChecker implements HeadersCheckerInterface
                 JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
             );
         }
+    }
+
+    /**
+     * Create JSON API error
+     * @param int $status
+     * @param string $code
+     * @param string $title
+     * @return Error
+     */
+    private function createApiError($status, $code, $title)
+    {
+        return new Error(rand(), null, $status, $code, $title);
     }
 }

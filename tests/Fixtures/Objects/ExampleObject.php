@@ -106,6 +106,18 @@ class ExampleObject extends BaseObject
     public $dateArray;
 
     /**
+     * @var AnotherObject[]
+     * @API\Property(type="Array<Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject>")
+     */
+    public $objArray;
+
+    /**
+     * @var array
+     * @API\Property(type="Array<Array<int>>")
+     */
+    public $arrArray;
+
+    /**
      * @var string[]
      * @API\Property(parser="parseCustomProp")
      */
@@ -123,9 +135,12 @@ class ExampleObject extends BaseObject
     public $objProp;
 
     /**
-     * Parser for custom property
+     * Parse value of customProp field
+     *
+     * @param mixed $value
+     * @return array
      */
-    public function parseCustomProp() {
-        $this->customProp = [];
+    public function parseCustomProp($value) {
+        return explode(', ', (string) $value);
     }
 }

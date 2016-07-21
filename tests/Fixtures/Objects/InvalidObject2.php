@@ -14,16 +14,16 @@ namespace Reva2\JsonApi\Tests\Fixtures\Objects;
 use Reva2\JsonApi\Annotations as API;
 
 /**
- * Another example object
+ * Another invalid JSON API object
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Objects
  * @author Sergey Revenko <reva2@orbita1.ru>
  */
-class AnotherObject
+class InvalidObject2
 {
     /**
-     * @var string
-     * @API\Property()
+     * @var mixed
+     * @API\Property(parser="parseData")
      */
-    public $name;
+    public $data;
 }

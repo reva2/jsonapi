@@ -11,14 +11,20 @@
 
 namespace Reva2\JsonApi\Tests\Decoders;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Reva2\JsonApi\Contracts\Decoders\Data\DocumentInterface;
-use Reva2\JsonApi\Contracts\Decoders\Data\ResourceInterface;
-use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
-use Reva2\JsonApi\Contracts\Decoders\DecodersFactoryInterface;
-use Reva2\JsonApi\Contracts\Decoders\DocumentDecoderInterface;
-use Reva2\JsonApi\Contracts\Decoders\ResourceDecoderInterface;
 use Reva2\JsonApi\Decoders\DataParser;
+use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
+use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
+use Reva2\JsonApi\Tests\Fixtures\Documents\PetsList;
+use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
+use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
+use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
@@ -29,6 +35,19 @@ use Symfony\Component\Validator\Constraints\DateTime;
  */
 class DataParserTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var DataParser
+     */
+    protected $parser;
+
+    protected function setUp()
+    {
+        $reader = new AnnotationReader();
+        $loader = new AnnotationLoader($reader);
+        $factory = new LazyMetadataFactory($loader);
+
+        $this->parser = new DataParser($factory);
+    }
 
     /**
      * @test
@@ -41,13 +60,11 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $data->key = 'value';
         $data->invalid = new DateTime();
 
-        $parser = $this->getParser();
-
-        $this->assertSame('value', $parser->parseString($data, 'key'));
-        $this->assertNull($parser->parseString($data, 'unknown'));
+        $this->assertSame('value', $this->parser->parseString($data, 'key'));
+        $this->assertNull($this->parser->parseString($data, 'unknown'));
 
         // should throw exception on invalid value
-        $parser->parseString($data, 'invalid');
+        $this->parser->parseString($data, 'invalid');
     }
 
     /**
@@ -62,14 +79,12 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $data->another = '10';
         $data->invalid = 'invalid';
 
-        $parser = $this->getParser();
-
-        $this->assertSame(10, $parser->parseInt($data, 'key'));
-        $this->assertSame(10, $parser->parseInt($data, 'another'));
-        $this->assertNull($parser->parseInt($data, 'unknown'));
+        $this->assertSame(10, $this->parser->parseInt($data, 'key'));
+        $this->assertSame(10, $this->parser->parseInt($data, 'another'));
+        $this->assertNull($this->parser->parseInt($data, 'unknown'));
 
         // should throw exception on invalid value
-        $parser->parseInt($data, 'invalid');
+        $this->parser->parseInt($data, 'invalid');
     }
 
     /**
@@ -84,14 +99,12 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $data->another = '10.5';
         $data->invalid = 'invalid';
 
-        $parser = $this->getParser();
-
-        $this->assertSame(10.5, $parser->parseFloat($data, 'key'));
-        $this->assertSame(10.5, $parser->parseFloat($data, 'another'));
-        $this->assertNull($parser->parseFloat($data, 'unknown'));
+        $this->assertSame(10.5, $this->parser->parseFloat($data, 'key'));
+        $this->assertSame(10.5, $this->parser->parseFloat($data, 'another'));
+        $this->assertNull($this->parser->parseFloat($data, 'unknown'));
 
         // should throw exception on invalid value
-        $parser->parseFloat($data, 'invalid');
+        $this->parser->parseFloat($data, 'invalid');
     }
 
     /**
@@ -117,25 +130,24 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $data->zero = 0;
         $data->invalid = new \DateTime();
 
-        $parser = $this->getParser();
 
-        $this->assertTrue($parser->parseBool($data, 'bool'));
-        $this->assertTrue($parser->parseBool($data, 'yes'));
-        $this->assertFalse($parser->parseBool($data, 'no'));
-        $this->assertTrue($parser->parseBool($data, 'trueString'));
-        $this->assertFalse($parser->parseBool($data, 'falseString'));
-        $this->assertTrue($parser->parseBool($data, 'y'));
-        $this->assertFalse($parser->parseBool($data, 'n'));
-        $this->assertTrue($parser->parseBool($data, 'on'));
-        $this->assertFalse($parser->parseBool($data, 'off'));
-        $this->assertTrue($parser->parseBool($data, 'enabled'));
-        $this->assertFalse($parser->parseBool($data, 'disabled'));
-        $this->assertTrue($parser->parseBool($data, 'number'));
-        $this->assertFalse($parser->parseBool($data, 'zero'));
-        $this->assertNull($parser->parseBool($data, 'unknown'));
+        $this->assertTrue($this->parser->parseBool($data, 'bool'));
+        $this->assertTrue($this->parser->parseBool($data, 'yes'));
+        $this->assertFalse($this->parser->parseBool($data, 'no'));
+        $this->assertTrue($this->parser->parseBool($data, 'trueString'));
+        $this->assertFalse($this->parser->parseBool($data, 'falseString'));
+        $this->assertTrue($this->parser->parseBool($data, 'y'));
+        $this->assertFalse($this->parser->parseBool($data, 'n'));
+        $this->assertTrue($this->parser->parseBool($data, 'on'));
+        $this->assertFalse($this->parser->parseBool($data, 'off'));
+        $this->assertTrue($this->parser->parseBool($data, 'enabled'));
+        $this->assertFalse($this->parser->parseBool($data, 'disabled'));
+        $this->assertTrue($this->parser->parseBool($data, 'number'));
+        $this->assertFalse($this->parser->parseBool($data, 'zero'));
+        $this->assertNull($this->parser->parseBool($data, 'unknown'));
 
         // should throw exception on invalid value
-        $parser->parseBool($data, 'invalid');
+        $this->parser->parseBool($data, 'invalid');
     }
 
     /**
@@ -151,24 +163,22 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $data->time = '18:29:15';
         $data->invalid = 'invalid';
 
-        $parser = $this->getParser();
-
-        $date = $parser->parseDateTime($data, 'date');
+        $date = $this->parser->parseDateTime($data, 'date');
         $this->assertInstanceOf(\DateTimeImmutable::class, $date);
         $this->assertEquals($data->date, $date->format('Y-m-d'));
 
-        $datetime = $parser->parseDateTime($data, 'datetime', 'Y-m-d H:i:s');
+        $datetime = $this->parser->parseDateTime($data, 'datetime', 'Y-m-d H:i:s');
         $this->assertInstanceOf(\DateTimeImmutable::class, $datetime);
         $this->assertEquals($data->datetime, $datetime->format('Y-m-d H:i:s'));
 
-        $time = $parser->parseDateTime($data, 'time', 'H:i:s');
+        $time = $this->parser->parseDateTime($data, 'time', 'H:i:s');
         $this->assertInstanceOf(\DateTimeImmutable::class, $time);
         $this->assertEquals($data->time, $time->format('H:i:s'));
 
-        $this->assertNull($parser->parseDateTime($data, 'unknown'));
+        $this->assertNull($this->parser->parseDateTime($data, 'unknown'));
 
         // should throw exception on invalid value
-        $parser->parseDateTime($data, 'invalid');
+        $this->parser->parseDateTime($data, 'invalid');
     }
 
     /**
@@ -179,78 +189,94 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
     public function shouldParseArrays()
     {
         $data = new \stdClass();
-        $data->strings = ['first', 'second', 'third'];
-        $data->integers = [1, 2, 3];
-        $data->floats = [0.5, 1.5, 2.5];
-        $data->booleans = [false, false, true];
-        $data->dates = ['2016-07-01'];
-        $data->datetimes = ['2016-07-01 18:29:15'];
-        $data->times = ['18:29:15'];
-        $data->map = ['first' => 'one', 'second' => 'two', 'third' => 'three'];
-        $data->invalid = 1;
+        $data->arrayValue = ['first', 'second', 'third'];
+        $data->invalid = false;
 
-        $parser = $this->getParser();
+        $itemParser = function ($data, $path, DataParser $parser) {
+            $value = $parser->parseString($data, $path);
 
-        $this->assertSame($data->strings, $parser->parseArray($data, 'strings', 'string'));
-        $this->assertSame($data->integers, $parser->parseArray($data, 'integers', 'int'));
-        $this->assertSame($data->integers, $parser->parseArray($data, 'integers', 'integer'));
-        $this->assertSame($data->floats, $parser->parseArray($data, 'floats', 'float'));
-        $this->assertSame($data->floats, $parser->parseArray($data, 'floats', 'double'));
-        $this->assertSame($data->booleans, $parser->parseArray($data, 'booleans', 'bool'));
-        $this->assertSame($data->booleans, $parser->parseArray($data, 'booleans', 'boolean'));
+            return $value[0];
+        };
 
-        $dates = $parser->parseArray($data, 'dates', 'date');
-        $this->assertInternalType('array', $dates);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $dates[0]);
+        $this->assertSame(['f', 's', 't'], $this->parser->parseArray($data, 'arrayValue', $itemParser));
 
-        $datetimes = $parser->parseArray($data, 'datetimes', 'datetime');
-        $this->assertInternalType('array', $datetimes);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $datetimes[0]);
-
-        $times = $parser->parseArray($data, 'times', 'time');
-        $this->assertInternalType('array', $times);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $times[0]);
-
-        $this->assertSame($data->map, $parser->parseArray($data, 'map', 'string'));
-
-        $custom = $parser->parseArray($data, 'strings', function ($data, $path, DataParserInterface $parser) {
-            return substr($parser->getValue($data, $path), 0, 1);
-        });
-        $this->assertSame(['f', 's', 't'], $custom);
-
-        $this->assertNull($parser->parseArray($data, 'uknown', 'string'));
-
-        // should throw exception on invalid value
-        $parser->parseArray($data, 'invalid', 'string');
+        $this->parser->parseArray($data, 'invalid', $itemParser);
     }
 
     /**
      * @test
      */
-    public function shouldParseResources()
+    public function shouldParseObject()
     {
-        $data = new \stdClass();
-        $data->resource = null;
+        $data = $this->getDataFromFile('object.json');
 
-        $resource = $this->getMockBuilder(ResourceInterface::class)->getMock();
+        $val = $this->parser->parseObject($data, 'test', BaseObject::class);
 
-        $decoder = $this->getMockBuilder(ResourceDecoderInterface::class)->getMock();
-        $decoder
-            ->expects($this->once())
-            ->method('decode')
-            ->withAnyParameters()
-            ->willReturn($resource);
+        $this->assertInstanceOf(ExampleObject::class, $val);
+        /* @var $val ExampleObject */
 
-        $factory = $this->getMockBuilder(DecodersFactoryInterface::class)->getMock();
-        $factory
-            ->expects($this->once())
-            ->method('getResourceDecoder')
-            ->with('resource1')
-            ->willReturn($decoder);
+        $this->assertSame('example', $val->getParentProp());
+        $this->assertSame('test string', $val->strProp);
+        $this->assertSame(10, $val->intProp);
+        $this->assertSame(15, $val->integerProp);
+        $this->assertTrue($val->boolProp);
+        $this->assertFalse($val->booleanProp);
+        $this->assertSame(15.5, $val->floatProp);
+        $this->assertSame(10.5, $val->doubleProp);
 
-        $parser = new DataParser($factory);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $val->datetimeProp);
+        $this->assertSame('2016-07-21', $val->dateProp->format('Y-m-d'));
 
-        $this->assertSame($resource, $parser->parseResource($data, 'resource', 'resource1'));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $val->timeProp);
+        $this->assertSame('12:00:00', $val->timeProp->format('H:i:s'));
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $val->datetimeProp);
+        $this->assertSame('2016-07-21 12:00:00', $val->datetimeProp->format('Y-m-d H:i:s'));
+
+        $this->assertSame([1, 'test', true], $val->rawArray);
+        $this->assertSame(['first', 'second', 'third'], $val->strArray);
+        $this->assertSame([1, 2, 3], $val->intArray);
+
+        $this->assertInternalType('array', $val->dateArray);
+        $this->assertCount(2, $val->dateArray);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $val->dateArray[0]);
+        $this->assertSame('12:00:00', $val->dateArray[0]->format('H:i:s'));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $val->dateArray[1]);
+        $this->assertSame('12:30:00', $val->dateArray[1]->format('H:i:s'));
+
+        $this->assertInternalType('array', $val->objArray);
+        $this->assertCount(2, $val->objArray);
+        $this->assertInstanceOf(AnotherObject::class, $val->objArray[0]);
+        $this->assertSame('another1', $val->objArray[0]->name);
+        $this->assertInstanceOf(AnotherObject::class, $val->objArray[1]);
+        $this->assertSame('another2', $val->objArray[1]->name);
+
+        $this->assertSame([[1, 2], [3, 4]], $val->arrArray);
+
+        $this->assertSame(['first', 'second', 'third'], $val->customProp);
+
+        $this->assertInstanceOf(\stdClass::class, $val->rawProp);
+
+        $this->assertInstanceOf(AnotherObject::class, $val->objProp);
+        $this->assertSame('another', $val->objProp->name);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldParseResource()
+    {
+        $data = $this->getDataFromFile('resource.json');
+
+        $result = $this->parser->parseResource($data, 'pet', Pet::class);
+
+        $this->assertInstanceOf(Cat::class, $result);
+        /* @var $result Cat */
+
+        $this->assertSame('mycat', $result->id);
+        $this->assertSame('Kitty', $result->name);
+        $this->assertInstanceOf(Store::class, $result->store);
+        $this->assertSame('mystore', $result->store->getId());
     }
 
     /**
@@ -258,79 +284,53 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldParseDocuments()
     {
-        $data = new \stdClass();
+        $data = $this->getDataFromFile('document.json');
 
-        $doc = $this->getMockBuilder(DocumentInterface::class)->getMock();
+        $doc = $this->parser->parseDocument($data, PetsList::class);
 
-        $decoder = $this->getMockBuilder(DocumentDecoderInterface::class)->getMock();
-        $decoder
-            ->expects($this->once())
-            ->method('decode')
-            ->withAnyParameters()
-            ->willReturn($doc);
+        $this->assertInstanceOf(PetsList::class, $doc);
+        /* @var $doc PetsList */
 
-        $factory = $this->getMockBuilder(DecodersFactoryInterface::class)->getMock();
-        $factory
-            ->expects($this->once())
-            ->method('getDocumentDecoder')
-            ->with('document1')
-            ->willReturn($decoder);
-
-        $parser = new DataParser($factory);
-        $this->assertSame($doc, $parser->parseDocument($data, 'document1'));
+        $this->assertInternalType('array', $doc->data);
+        $this->assertCount(2, $doc->data);
+        $this->assertInstanceOf(Cat::class, $doc->data[0]);
+        $this->assertInstanceOf(Dog::class, $doc->data[1]);
     }
 
     /**
      * @test
      */
-    public function shouldThrowJsonApiExceptionOnError()
+    public function shouldThrowJsonApiExceptionOnInvalidDocument()
     {
-        $data = new \stdClass();
-        
-        $exception = new \InvalidArgumentException("Test exception");
-        
-        $decoder = $this->getMockBuilder(DocumentDecoderInterface::class)->getMock();
-        $decoder
-            ->expects($this->once())
-            ->method('decode')
-            ->withAnyParameters()
-            ->willThrowException($exception);
-        
-        $factory = $this->getMockBuilder(DecodersFactoryInterface::class)->getMock();
-        $factory
-            ->expects($this->once())
-            ->method('getDocumentDecoder')
-            ->withAnyParameters()
-            ->willReturn($decoder);
-        
         try {
-            $parser = new DataParser($factory);
-            $parser->parseDocument($data, 'document1');
-            
-            $this->fail("Parser should throw JsonApiException on error");
-        } catch (JsonApiException $e) {
-            $this->assertEquals(500, $e->getHttpCode());
-            $this->assertSame($exception, $e->getPrevious());
-            
-            $errors = $e->getErrors();
-            $error = $errors[0];
+            $data = $this->getDataFromFile('invalid-document.json');
+            $this->parser->parseDocument($data, PetsList::class);
 
-            $this->assertEquals(500, $error->getStatus());
-            $this->assertEquals('Internal server error', $error->getTitle());
-            $this->assertEquals($exception->getMessage(), $error->getDetail());
+            $this->fail("Should throw exception on invalid document");
+        } catch (JsonApiException $e) {
+            $this->assertSame(409, $e->getHttpCode());
+
+            $error = $e->getErrors()[0];
+            $this->assertInstanceOf(Error::class, $error);
+            /* @var $error Error */
+
+            $this->assertEquals(409, $error->getStatus());
+            $this->assertSame(DataParser::ERROR_CODE, $error->getCode());
+            $this->assertSame("Value must contain resource of type 'stores'", $error->getDetail());
+            $this->assertSame(['pointer' => '/data/0/relationships/store'], $error->getSource());
         }
     }
 
-
     /**
-     * Returns instance of parser
+     * Return data from specified json file
      *
-     * @return DataParser
+     * @param string $filename
+     * @return mixed
      */
-    private function getParser()
+    private function getDataFromFile($filename)
     {
-        $factory = $this->getMockBuilder(DecodersFactoryInterface::class)->getMock();
+        $path = __DIR__ . '/../Fixtures/Data/' . $filename;
 
-        return new DataParser($factory);
+        return json_decode(file_get_contents($path));
     }
 }

@@ -26,6 +26,11 @@ interface ResourceMetadataInterface extends ClassMetadataInterface
     public function getName();
 
     /**
+     * @return PropertyMetadataInterface
+     */
+    public function getIdMetadata();
+
+    /**
      * Returns metadata resource attributes
      *
      * @return PropertyMetadataInterface[]

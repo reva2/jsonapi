@@ -21,6 +21,8 @@ use Reva2\JsonApi\Tests\Fixtures\Documents\PetsList;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
+use Reva2\JsonApi\Tests\Fixtures\Objects\InvalidObject;
+use Reva2\JsonApi\Tests\Fixtures\Objects\InvalidObject2;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
@@ -164,7 +166,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(BaseObject::class));
 
         $this->assertInstanceOf(ObjectMetadataInterface::class, $metadata);
-        $this->assertSame('parentProp', $metadata->getDiscriminatorField());
+        $this->assertSame('parentProp', $metadata->getDiscriminatorField()->getPropertyName());
         $this->assertSame(ExampleObject::class, $metadata->getDiscriminatorClass('example'));
     }
 
@@ -214,9 +216,9 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(Pet::class));
 
         $this->assertInstanceOf(ResourceMetadataInterface::class, $metadata);
-        $this->assertSame('family', $metadata->getDiscriminatorField());
-        $this->assertSame(Cat::class, $metadata->getDiscriminatorClass('cat'));
-        $this->assertSame(Dog::class, $metadata->getDiscriminatorClass('dog'));
+        $this->assertSame('family', $metadata->getDiscriminatorField()->getPropertyName());
+        $this->assertSame(Cat::class, $metadata->getDiscriminatorClass('cats'));
+        $this->assertSame(Dog::class, $metadata->getDiscriminatorClass('dogs'));
     }
 
     /**
@@ -236,5 +238,29 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('array', $content->getDataType());
         $this->assertSame(['object', Pet::class], $content->getDataTypeParams());
         $this->assertNull($content->getSetter());
+    }
+
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessageRegExp #Couldn't find setter for non public property: .*#
+     */
+    public function shouldThrowIfThereAreNotSetterForNonPublicProperty()
+    {
+        $this->loader->loadClassMetadata(new \ReflectionClass(InvalidObject::class));
+
+        $this->fail("Should throw exception if there are not settings for non public property");
+    }
+
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp #Custom parser function .* for property '.*' does not exist#
+     */
+    public function shouldThrowIfCustomParserFunctionIsNotDefined()
+    {
+        $this->loader->loadClassMetadata(new \ReflectionClass(InvalidObject2::class));
+
+        $this->fail("Should throw exception if specified custom parser function is not defined");
     }
 }

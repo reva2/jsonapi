@@ -36,4 +36,15 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $metadata->getDiscriminatorClass('unknown');
     }
+
+    /**
+     * @test
+     */
+    public function shouldBeAbleMergeMetadata()
+    {
+        $metadata = new ClassMetadata('MyClass');
+        $metadata->mergeMetadata(new ClassMetadata('AnotherClass'));
+
+        $this->assertSame(1, 1);
+    }
 }

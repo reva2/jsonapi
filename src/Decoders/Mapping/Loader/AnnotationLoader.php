@@ -14,12 +14,14 @@ namespace Reva2\JsonApi\Decoders\Mapping\Loader;
 use Doctrine\Common\Annotations\Reader;
 use Reva2\JsonApi\Annotations\Attribute;
 use Reva2\JsonApi\Annotations\Document as ApiDocument;
+use Reva2\JsonApi\Annotations\Id;
 use Reva2\JsonApi\Annotations\Resource as ApiResource;
 use Reva2\JsonApi\Annotations\Object as ApiObject;
 use Reva2\JsonApi\Annotations\Content as ApiContent;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
 use Reva2\JsonApi\Decoders\Mapping\DocumentMetadata;
 use Reva2\JsonApi\Decoders\Mapping\ObjectMetadata;
@@ -77,8 +79,6 @@ class AnnotationLoader implements LoaderInterface
         $metadata = new ResourceMetadata($class->name);
         $metadata->setName($resource->name);
 
-        $this->loadDiscriminatorMetadata($resource, $metadata);
-
         $properties = $class->getProperties();
         foreach ($properties as $property) {
             if ($property->getDeclaringClass()->name !== $class->name) {
@@ -90,9 +90,13 @@ class AnnotationLoader implements LoaderInterface
                     $metadata->addAttribute($this->loadPropertyMetadata($annotation, $property));
                 } elseif ($annotation instanceof Relationship) {
                     $metadata->addRelationship($this->loadPropertyMetadata($annotation, $property));
+                } elseif ($annotation instanceof Id) {
+                    $metadata->setIdMetadata($this->loadPropertyMetadata($annotation, $property));
                 }
             }
         }
+
+        $this->loadDiscriminatorMetadata($resource, $metadata);
 
         return $metadata;
     }
@@ -106,10 +110,6 @@ class AnnotationLoader implements LoaderInterface
     {
         $metadata = new ObjectMetadata($class->name);
 
-        if (null !== $object) {
-            $this->loadDiscriminatorMetadata($object, $metadata);
-        }
-
         $properties = $class->getProperties();
         foreach ($properties as $property) {
             if ($property->getDeclaringClass()->name !== $class->name) {
@@ -120,6 +120,10 @@ class AnnotationLoader implements LoaderInterface
             if (null !== $annotation) {
                 $metadata->addProperty($this->loadPropertyMetadata($annotation, $property));
             }
+        }
+
+        if (null !== $object) {
+            $this->loadDiscriminatorMetadata($object, $metadata);
         }
 
         return $metadata;
@@ -170,6 +174,7 @@ class AnnotationLoader implements LoaderInterface
         $metadata
             ->setDataType($dataType)
             ->setDataTypeParams($dataTypeParams)
+            ->setDataPath($this->getDataPath($annotation, $property))
             ->setOrmEntityClass($annotation->ormEntity);
 
         if ($annotation->setter) {
@@ -288,7 +293,50 @@ class AnnotationLoader implements LoaderInterface
             return;
         }
 
-        $metadata->setDiscriminatorField($object->discField);
+        $fieldMeta = null;
+        $field = $object->discField;
+        if ($metadata instanceof ObjectMetadataInterface) {
+            $properties = $metadata->getProperties();
+            if (array_key_exists($field, $properties)) {
+                $fieldMeta = $properties[$field];
+            }
+        } elseif ($metadata instanceof ResourceMetadata) {
+            $attributes = $metadata->getAttributes();
+            if (array_key_exists($field, $attributes)) {
+                $fieldMeta = $attributes[$field];
+            }
+        }
+
+        if (null === $fieldMeta) {
+            throw new \InvalidArgumentException("Specified discriminator field not found in object properties");
+        } elseif (('scalar' !== $fieldMeta->getDataType()) || ('string' !== $fieldMeta->getDataTypeParams())) {
+            throw new \InvalidArgumentException("Discriminator field must point to property that contain string value");
+        }
+
+        $metadata->setDiscriminatorField($fieldMeta);
         $metadata->setDiscriminatorMap($object->discMap);
+    }
+
+    /**
+     * Returns data path
+     *
+     * @param Property $annotation
+     * @param \ReflectionProperty $property
+     * @return string
+     */
+    private function getDataPath(Property $annotation, \ReflectionProperty $property)
+    {
+        $prefix = '';
+        if ($annotation instanceof Attribute) {
+            $prefix = 'attributes.';
+        } elseif ($annotation instanceof Relationship) {
+            $prefix = 'relationships.';
+        }
+
+        if (!empty($prefix)) {
+            return (null !== $annotation->path) ? $prefix . $annotation->path : $prefix . $property->name;
+        }
+
+        return $annotation->path;
     }
 }

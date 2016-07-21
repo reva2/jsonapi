@@ -1,0 +1,13 @@
+{
+  "pet": {
+    "id": "mycat",
+    "type": "pets",
+    "attributes": {
+      "name": "Kitty",
+      "family": "cats"
+    },
+    "relationships": {
+      "store": {"id": "mystore", "type": "stores"}
+    }
+  }
+}

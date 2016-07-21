@@ -65,6 +65,25 @@ interface DataParserInterface
     public function getValue($data, $path);
 
     /**
+     * Parse data object value at specified path as is
+     *
+     * @param object|array $data
+     * @param string $path
+     * @return mixed
+     */
+    public function parseRaw($data, $path);
+
+    /**
+     * Parse data object value at specified path using callback
+     *
+     * @param object|array $data
+     * @param string $path
+     * @param callable $callback
+     * @return mixed
+     */
+    public function parseCallback($data, $path, $callback);
+
+    /**
      * Parse data object value at specified path as string
      *
      * @param object|array $data
@@ -120,11 +139,11 @@ interface DataParserInterface
      *
      * @param object|array $data
      * @param string $path
-     * @param string|\Closure $itemsParser
+     * @param \Closure $itemsParser
      * @return array
      * @throws \InvalidArgumentException
      */
-    public function parseArray($data, $path, $itemsParser);
+    public function parseArray($data, $path, \Closure $itemsParser);
 
     /**
      * Parse data object value at specified path as resource
@@ -133,16 +152,25 @@ interface DataParserInterface
      * @param object|array $data
      * @param string $path
      * @param string $resType
-     * @return ResourceInterface|null
+     * @return mixed|null
      */
     public function parseResource($data, $path, $resType);
+
+    /**
+     * Parse data object as JSON API object
+     *
+     * @param object|array $data
+     * @param string $objType
+     * @return mixed
+     */
+    public function parseObject($data, $path, $objType);
 
     /**
      * Parse data object as JSON API document
      *
      * @param object|array $data
      * @param string $docType
-     * @return DocumentInterface
+     * @return mixed
      */
     public function parseDocument($data, $docType);
 

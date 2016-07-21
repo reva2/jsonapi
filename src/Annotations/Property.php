@@ -30,6 +30,13 @@ class Property
     public $type;
 
     /**
+     * Data path
+     *
+     * @var string
+     */
+    public $path;
+
+    /**
      * Method use for value parsing
      *
      * @var string

@@ -57,7 +57,7 @@ class RequestDecoder implements DecoderInterface
      * Decode request content
      *
      * @param string $content
-     * @return DocumentInterface
+     * @return mixed
      */
     public function decode($content)
     {

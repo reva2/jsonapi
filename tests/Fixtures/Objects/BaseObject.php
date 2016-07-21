@@ -43,4 +43,14 @@ class BaseObject
     {
         $this->parentProp = $value;
     }
+
+    /**
+     * Returns value of parent property
+     *
+     * @return string
+     */
+    public function getParentProp()
+    {
+        return $this->parentProp;
+    }
 }
