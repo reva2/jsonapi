@@ -17,7 +17,7 @@ namespace Reva2\JsonApi\Annotations;
  * @package Reva2\JsonApi\Annotations
  * @author Sergey Revenko <dedsemen@gmail.com>
  *
- * @Annotations
+ * @Annotation
  * @Target({"CLASS"})
  */
 class Document

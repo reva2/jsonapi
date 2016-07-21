@@ -11,7 +11,6 @@
 namespace Reva2\JsonApi\Contracts\Http;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Reva2\JsonApi\Contracts\Decoders\Data\DocumentInterface;
 
 /**
  * JSON API request interface
@@ -31,7 +30,7 @@ interface RequestInterface
     /**
      * Returns request body
      *
-     * @return DocumentInterface|null
+     * @return mixed|null
      */
     public function getBody();
 }

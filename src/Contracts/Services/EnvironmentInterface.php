@@ -14,7 +14,6 @@ use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Reva2\JsonApi\Contracts\Decoders\DocumentDecoderInterface;
 use Reva2\JsonApi\Contracts\Decoders\QueryParamsDecoderInterface;
 
 /**
@@ -73,11 +72,4 @@ interface EnvironmentInterface
      * @return QueryParamsDecoderInterface
      */
     public function getQueryParamsDecoder();
-
-    /**
-     * Returns expected decoder for request body
-     *
-     * @return string|DocumentDecoderInterface|null
-     */
-    public function getExpectedBodyDecoder();
 }

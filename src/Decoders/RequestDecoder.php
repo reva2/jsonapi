@@ -14,7 +14,6 @@ namespace Reva2\JsonApi\Decoders;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Reva2\JsonApi\Contracts\Decoders\Data\DocumentInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 
 /**

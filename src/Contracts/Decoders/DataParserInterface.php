@@ -11,9 +11,6 @@
 namespace Reva2\JsonApi\Contracts\Decoders;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Reva2\JsonApi\Contracts\Decoders\Data\DocumentInterface;
-use Reva2\JsonApi\Contracts\Decoders\Data\ResourceInterface;
 
 /**
  * Interface for JSON API requests parser
