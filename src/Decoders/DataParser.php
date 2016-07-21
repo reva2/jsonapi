@@ -561,8 +561,8 @@ class DataParser implements DataParserInterface
     /**
      * Parse value that contains array
      *
-     * @param $data
-     * @param $path
+     * @param object|array $data
+     * @param string $path
      * @param array $params
      * @return array|null
      */
