@@ -205,7 +205,6 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('object', $rel->getDataType());
         $this->assertSame(Store::class, $rel->getDataTypeParams());
         $this->assertNull($rel->getSetter());
-        $this->assertSame('Store', $rel->getOrmEntityClass());
     }
 
     /**

@@ -10,6 +10,7 @@
 
 namespace Reva2\JsonApi\Decoders;
 
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
@@ -291,29 +292,10 @@ class DataParser implements DataParserInterface
         if ((true === $this->hasValue($data, $path)) &&
             (null !== ($value = $this->getValue($data, $path)))
         ) {
-            $metadata = $this->factory->getMetadataFor($objType);
-            /* @var $metadata ObjectMetadataInterface */
+            $this->restorePath();
 
-            if (null !== ($discField = $metadata->getDiscriminatorField())) {
-                $discValue = $this->parseString($value, $discField->getDataPath());
-                $discClass = $metadata->getDiscriminatorClass($discValue);
-                if ($discClass !== $objType) {
-                    $this->restorePath();
-
-                    return $this->parseObject($data, $path, $discClass);
-                }
-            }
-
-            $objClass = $metadata->getClassName();
-            $pathValue = new $objClass();
-
-            $properties = $metadata->getProperties();
-            foreach ($properties as $property) {
-                $this->parseProperty($value, $pathValue, $property);
-            }
+            $pathValue = $this->parseObjectValue($value, $objType);
         }
-
-        $this->restorePath();
 
         return $pathValue;
     }
@@ -389,24 +371,7 @@ class DataParser implements DataParserInterface
         } catch (JsonApiException $e) {
             throw $e;
         } catch (\Exception $e) {
-            $status = $e->getCode();
-            $message = 'Failed to parse document';
-            if (empty($status)) {
-                $message = 'Internal server error';
-                $status = 500;
-            }
-
-            $error = new Error(
-                rand(),
-                null,
-                $status,
-                self::ERROR_CODE,
-                $message,
-                $e->getMessage(),
-                ['pointer' => $this->getPath()]
-            );
-
-            throw new JsonApiException($error, $status, $e);
+            throw  $this->convertToApiException($e, 'document');
         }
     }
 
@@ -415,7 +380,23 @@ class DataParser implements DataParserInterface
      */
     public function parseQueryParams($data, $paramsType)
     {
-        throw new \RuntimeException('Not implemented');
+        try {
+            $this->initPathStack();
+
+            $query = $this->parseObjectValue($data, $paramsType);
+            if (!$query instanceof EncodingParametersInterface) {
+                throw new \InvalidArgumentException(sprintf(
+                    "Query parameters object must implement interface %s",
+                    EncodingParametersInterface::class
+                ));
+            }
+
+            return $query;
+        } catch (JsonApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw  $this->convertToApiException($e, 'query');
+        }
     }
 
     /**
@@ -526,7 +507,7 @@ class DataParser implements DataParserInterface
                 return $this->parseArrayValue($data, $path, $metadata->getDataTypeParams());
 
             case 'object':
-                return $this->parseObjectValue($data, $path, $metadata->getDataTypeParams());
+                return $this->parseResourceOrObject($data, $path, $metadata->getDataTypeParams());
 
             case 'raw':
                 return $this->parseRaw($data, $path);
@@ -547,7 +528,7 @@ class DataParser implements DataParserInterface
      * @param string $objClass
      * @return mixed|null
      */
-    public function parseObjectValue($data, $path, $objClass)
+    public function parseResourceOrObject($data, $path, $objClass)
     {
         $metadata = $this->factory->getMetadataFor($objClass);
 
@@ -556,6 +537,39 @@ class DataParser implements DataParserInterface
         } else {
             return $this->parseObject($data, $path, $objClass);
         }
+    }
+
+    /**
+     * Parse value that contains JSON API object
+     *
+     * @param object|array $data
+     * @param string $objType
+     * @return mixed
+     */
+    public function parseObjectValue($data, $objType)
+    {
+        $metadata = $this->factory->getMetadataFor($objType);
+        if (!$metadata instanceof ObjectMetadataInterface) {
+            throw new \InvalidArgumentException('Invalid object metadata');
+        }
+
+        if (null !== ($discField = $metadata->getDiscriminatorField())) {
+            $discValue = $this->parseString($data, $discField->getDataPath());
+            $discClass = $metadata->getDiscriminatorClass($discValue);
+            if ($discClass !== $objType) {
+                return $this->parseObjectValue($data, $discClass);
+            }
+        }
+
+        $objClass = $metadata->getClassName();
+        $obj = new $objClass();
+
+        $properties = $metadata->getProperties();
+        foreach ($properties as $property) {
+            $this->parseProperty($data, $obj, $property);
+        }
+
+        return $obj;
     }
 
     /**
@@ -596,7 +610,7 @@ class DataParser implements DataParserInterface
                     $data,
                     $path,
                     function ($data, $path, DataParser $parser) use ($typeParams) {
-                        return $parser->parseObjectValue($data, $path, $typeParams);
+                        return $parser->parseResourceOrObject($data, $path, $typeParams);
                     }
                 );
 
@@ -655,5 +669,37 @@ class DataParser implements DataParserInterface
             default:
                 throw new \InvalidArgumentException(sprintf("Unsupported scalar type '%s' specified", $type));
         }
+    }
+
+    /**
+     * Convert any exception to JSON API exception
+     *
+     * @param \Exception $e
+     * @param string $objType
+     * @return JsonApiException
+     */
+    private function convertToApiException(\Exception $e, $objType)
+    {
+        $status = $e->getCode();
+        $message = 'Failed to parse document';
+        if (empty($status)) {
+            $message = 'Internal server error';
+            $status = 500;
+        }
+
+        $source = null;
+        switch ($objType) {
+            case 'document':
+                $source = ['pointer' => $this->getPath()];
+                break;
+
+            case 'query':
+                $source = ['parameter' => $this->getPath()];
+                break;
+        }
+
+        $error = new Error(rand(), null, $status, self::ERROR_CODE, $message, $e->getMessage(), $source);
+
+        return new JsonApiException($error, $status, $e);
     }
 }

@@ -51,7 +51,7 @@ class Pet
 
     /**
      * @var Store
-     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Store", ormEntity="Store")
+     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Store")
      */
     public $store;
 

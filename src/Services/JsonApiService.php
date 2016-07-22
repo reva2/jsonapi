@@ -13,7 +13,6 @@ namespace Reva2\JsonApi\Services;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Reva2\JsonApi\Contracts\Decoders\Data\DocumentInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Contracts\Services\JsonApiServiceInterface;
@@ -156,7 +155,7 @@ class JsonApiService implements JsonApiServiceInterface
      * Parse body parameters
      *
      * @param Request $request
-     * @return DocumentInterface|null
+     * @return mixed|null
      */
     private function parseBody(Request $request)
     {

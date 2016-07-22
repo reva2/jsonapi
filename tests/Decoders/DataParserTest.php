@@ -12,11 +12,13 @@
 namespace Reva2\JsonApi\Tests\Decoders;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
+use Reva2\JsonApi\Http\Query\ListQueryParameters;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetsList;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
@@ -319,6 +321,45 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
             $this->assertSame("Value must contain resource of type 'stores'", $error->getDetail());
             $this->assertSame(['pointer' => '/data/0/relationships/store'], $error->getSource());
         }
+    }
+
+    /**
+     * @test
+     */
+    public function shouldParseQueryParams()
+    {
+        $data = [
+            'include' => 'store,store.owner',
+            'fields' => [
+                'pets' => 'name,family',
+                'stores' => 'name'
+            ],
+            'page' => [
+                'number' => '2',
+                'size' => '15'
+            ],
+            'sort' => '-store.id,name'
+        ];
+
+        $query = $this->parser->parseQueryParams($data, ListQueryParameters::class);
+
+        $this->assertInstanceOf(ListQueryParameters::class, $query);
+        $this->assertSame(['store', 'store.owner'], $query->getIncludePaths());
+        $this->assertSame(['name', 'family'], $query->getFieldSet('pets'));
+        $this->assertSame(['name'], $query->getFieldSet('stores'));
+        $this->assertSame(['number' => 2, 'size' => 15], $query->getPaginationParameters());
+
+        $sort = $query->getSortParameters();
+        $this->assertInternalType('array', $sort);
+        $this->assertCount(2, $sort);
+
+        $this->assertInstanceOf(SortParameterInterface::class, $sort[0]);
+        $this->assertSame('store.id', $sort[0]->getField());
+        $this->assertFalse($sort[0]->isAscending());
+
+        $this->assertInstanceOf(SortParameterInterface::class, $sort[1]);
+        $this->assertSame('name', $sort[1]->getField());
+        $this->assertTrue($sort[1]->isAscending());
     }
 
     /**

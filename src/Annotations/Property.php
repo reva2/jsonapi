@@ -46,10 +46,5 @@ class Property
     /**
      * @var string
      */
-    public $ormEntity;
-
-    /**
-     * @var string
-     */
     public $setter;
 }

@@ -52,11 +52,4 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
      * @return string|null
      */
     public function getSetter();
-
-    /**
-     * Returns name of ORM entity class
-     *
-     * @return string|null
-     */
-    public function getOrmEntityClass();
 }
