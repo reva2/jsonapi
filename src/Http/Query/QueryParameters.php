@@ -21,8 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @package Reva2\JsonApi\Http\Query
  * @author Sergey Revenko <reva2@orbita1.ru>
- *
- * @Reva2\JsonApi\Annotations\ApiObject()
  */
 class QueryParameters implements EncodingParametersInterface
 {
