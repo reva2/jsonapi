@@ -13,6 +13,8 @@ namespace Reva2\JsonApi\Http\Query;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Reva2\JsonApi\Annotations as API;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * JSON API single resource query parameters
@@ -29,21 +31,17 @@ class QueryParameters implements EncodingParametersInterface
 
     /**
      * @var string[]|null
-     * @Reva2\JsonApi\Annotations\Property(path="[include]", parser="parseIncludePaths")
-     * @Symfony\Component\Validator\Constraints\Type(type="array")
-     * @Symfony\Component\Validator\Constraints\All({
-     *     @Symfony\Component\Validator\Constraints\Type(type="string")
-     * })
+     * @API\Property(path="[include]", parser="parseIncludePaths")
+     * @Assert\Type(type="array")
+     * @Assert\All({@Assert\Type(type="string")})
      */
     protected $includePaths;
 
     /**
      * @var array[]|null
-     * @Reva2\JsonApi\Annotations\Property(path="[fields]", parser="parseFieldSets")
-     * @Symfony\Component\Validator\Constraints\Type(type="array")
-     * @Symfony\Component\Validator\Constraints\All({
-     *     @Symfony\Component\Validator\Constraints\Type(type="string")
-     * })
+     * @API\Property(path="[fields]", parser="parseFieldSets")
+     * @Assert\Type(type="array")
+     * @Assert\All({@Assert\Type(type="string")})
      */
     protected $fieldSets;
 
@@ -190,7 +188,7 @@ class QueryParameters implements EncodingParametersInterface
      * Validate specified include paths
      *
      * @param ExecutionContextInterface $context
-     * @Symfony\Component\Validator\Constraints\Callback()
+     * @Assert\Callback()
      */
     public function validateIncludePaths(ExecutionContextInterface $context)
     {
@@ -215,7 +213,7 @@ class QueryParameters implements EncodingParametersInterface
      * Validate specified fields sets
      *
      * @param ExecutionContextInterface $context
-     * @Symfony\Component\Validator\Constraints\Callback()
+     * @Assert\Callback()
      */
     public function validateFieldSets(ExecutionContextInterface $context)
     {

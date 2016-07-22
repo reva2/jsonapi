@@ -15,6 +15,8 @@ use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
 use Neomerx\JsonApi\Encoder\Parameters\SortParameter;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Reva2\JsonApi\Annotations as API;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * JSON API resources list parameters
@@ -29,24 +31,24 @@ class ListQueryParameters extends QueryParameters
 
     /**
      * @var integer|null
-     * @Reva2\JsonApi\Annotations\Property(type="integer", path="[page][number]")
-     * @Symfony\Component\Validator\Constraints\Type(type="integer")
-     * @Symfony\Component\Validator\Constraints\GreaterThan(value=0)
+     * @API\Property(type="integer", path="[page][number]")
+     * @Assert\Type(type="integer")
+     * @Assert\GreaterThan(value=0)
      */
     protected $pageNumber;
 
     /**
      * @var integer|null
-     * @Reva2\JsonApi\Annotations\Property(type="integer", path="[page][size]")
-     * @Symfony\Component\Validator\Constraints\Type(type="integer")
-     * @Symfony\Component\Validator\Constraints\GreaterThan(value=0)
+     * @API\Property(type="integer", path="[page][size]")
+     * @Assert\Type(type="integer")
+     * @Assert\GreaterThan(value=0)
      */
     protected $pageSize;
 
     /**
      * @var SortParameterInterface[]|null
-     * @Reva2\JsonApi\Annotations\Property(path="[sort]", parser="parseSortingParameters")
-     * @Symfony\Component\Validator\Constraints\Type(type="array")
+     * @API\Property(path="[sort]", parser="parseSortingParameters")
+     * @Assert\Type(type="array")
      */
     protected $sortParameters;
 
@@ -139,7 +141,7 @@ class ListQueryParameters extends QueryParameters
      * Validate sort parameters
      *
      * @param ExecutionContextInterface $context
-     * @Symfony\Component\Validator\Constraints\Callback()
+     * @Assert\Callback()
      */
     public function validateSortParameters(ExecutionContextInterface $context)
     {
@@ -169,7 +171,7 @@ class ListQueryParameters extends QueryParameters
      * Validate page size
      *
      * @param ExecutionContextInterface $context
-     * @Symfony\Component\Validator\Constraints\Callback()
+     * @Assert\Callback()
      */
     public function validatePageSize(ExecutionContextInterface $context)
     {
