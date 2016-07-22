@@ -20,7 +20,7 @@ namespace Reva2\JsonApi\Annotations;
  * @Annotation
  * @Target({"CLASS"})
  */
-class Document
+class ApiDocument
 {
     /**
      * @var bool

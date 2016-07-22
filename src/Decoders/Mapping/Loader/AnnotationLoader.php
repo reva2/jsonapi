@@ -13,10 +13,10 @@ namespace Reva2\JsonApi\Decoders\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
 use Reva2\JsonApi\Annotations\Attribute;
-use Reva2\JsonApi\Annotations\Document as ApiDocument;
+use Reva2\JsonApi\Annotations\ApiDocument;
 use Reva2\JsonApi\Annotations\Id;
-use Reva2\JsonApi\Annotations\Resource as ApiResource;
-use Reva2\JsonApi\Annotations\Object as ApiObject;
+use Reva2\JsonApi\Annotations\ApiResource;
+use Reva2\JsonApi\Annotations\ApiObject;
 use Reva2\JsonApi\Annotations\Content as ApiContent;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;

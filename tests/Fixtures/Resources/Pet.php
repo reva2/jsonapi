@@ -20,7 +20,7 @@ use Reva2\JsonApi\Tests\Fixtures as Fixtures;
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
  * @author Sergey Revenko <reva2@orbita1.ru>
  *
- * @API\Resource(
+ * @API\ApiResource(
  *     name="pets",
  *     discField="family",
  *     discMap={

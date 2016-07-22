@@ -12,7 +12,7 @@
 namespace Reva2\JsonApi\Annotations;
 
 /**
- * Object property annotation
+ * ApiObject property annotation
  *
  * @package Reva2\JsonApi\Annotations
  * @author Sergey Revenko <reva2@orbita1.ru>

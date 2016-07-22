@@ -27,7 +27,7 @@ class RequestDecoder implements DecoderInterface
     const INVALID_JSON_ERROR = 'add83393-3bdc-4042-a9c8-ecd5415e1a04';
     
     /**
-     * Document parser
+     * ApiDocument parser
      *
      * @var DataParserInterface
      */

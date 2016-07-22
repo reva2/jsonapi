@@ -19,7 +19,7 @@ use Reva2\JsonApi\Annotations as API;
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
  * @author Sergey Revenko <reva2@orbita1.ru>
  *
- * @API\Resource()
+ * @API\ApiResource()
  */
 class Dog extends Pet
 {

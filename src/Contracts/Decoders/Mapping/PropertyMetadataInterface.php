@@ -11,7 +11,7 @@
 namespace Reva2\JsonApi\Contracts\Decoders\Mapping;
 
 /**
- * Object property metadata
+ * ApiObject property metadata
  *
  * @package Reva2\JsonApi\Contracts\Decoders\Mapping
  * @author Sergey Revenko <dedsemen@gmail.com>

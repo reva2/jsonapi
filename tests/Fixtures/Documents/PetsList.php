@@ -20,7 +20,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
  * @package Reva2\JsonApi\Tests\Fixtures\Documents
  * @author Sergey Revenko <reva2@orbita1.ru>
  *
- * @API\Document(allowEmpty=true)
+ * @API\ApiDocument(allowEmpty=true)
  */
 class PetsList
 {

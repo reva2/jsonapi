@@ -2,37 +2,27 @@
 /*
  * This file is part of the reva2/jsonapi.
  *
- * (c) OrbitScripts LLC <support@orbitscripts.com>
+ * (c) Sergey Revenko <dedsemen@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-
 namespace Reva2\JsonApi\Annotations;
 
 /**
- * Annotation for JSON API decoder object
+ * JSON API Resource
  *
  * @package Reva2\JsonApi\Annotations
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  *
  * @Annotation
  * @Target({"CLASS"})
  */
-class Object
+class ApiResource extends ApiObject
 {
     /**
-     * Name of field that store discriminator value
-     *
      * @var string
      */
-    public $discField;
-
-    /**
-     * Mapping of discriminator values to classes
-     *
-     * @var array
-     */
-    public $discMap;
+    public $name;
 }
