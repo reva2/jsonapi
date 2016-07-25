@@ -22,7 +22,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
  *
  * @API\ApiDocument(allowEmpty=true)
  */
-class PetsList
+class PetsListDocument
 {
     /**
      * @var Pet[]

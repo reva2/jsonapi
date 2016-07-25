@@ -17,7 +17,7 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
-use Reva2\JsonApi\Tests\Fixtures\Documents\PetsList;
+use Reva2\JsonApi\Tests\Fixtures\Documents\PetsListDocument;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
@@ -225,10 +225,10 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldLoadDocumentMetadata()
     {
-        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(PetsList::class));
+        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(PetsListDocument::class));
 
         $this->assertInstanceOf(DocumentMetadataInterface::class, $metadata);
-        $this->assertSame(PetsList::class, $metadata->getClassName());
+        $this->assertSame(PetsListDocument::class, $metadata->getClassName());
         $this->assertTrue($metadata->isAllowEmpty());
 
         $content = $metadata->getContentMetadata();

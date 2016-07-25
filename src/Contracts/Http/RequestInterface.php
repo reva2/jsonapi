@@ -11,6 +11,7 @@
 namespace Reva2\JsonApi\Contracts\Http;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 
 /**
  * JSON API request interface
@@ -21,9 +22,16 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 interface RequestInterface
 {
     /**
+     * Request request environment
+     *
+     * @return EnvironmentInterface
+     */
+    public function getEnvironment();
+
+    /**
      * Returns query parameters
      *
-     * @return EncodingParametersInterface
+     * @return EncodingParametersInterface|null
      */
     public function getQuery();
 

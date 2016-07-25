@@ -19,7 +19,7 @@ use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
 use Reva2\JsonApi\Http\Query\ListQueryParameters;
-use Reva2\JsonApi\Tests\Fixtures\Documents\PetsList;
+use Reva2\JsonApi\Tests\Fixtures\Documents\PetsListDocument;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
@@ -288,10 +288,10 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->getDataFromFile('document.json');
 
-        $doc = $this->parser->parseDocument($data, PetsList::class);
+        $doc = $this->parser->parseDocument($data, PetsListDocument::class);
 
-        $this->assertInstanceOf(PetsList::class, $doc);
-        /* @var $doc PetsList */
+        $this->assertInstanceOf(PetsListDocument::class, $doc);
+        /* @var $doc PetsListDocument */
 
         $this->assertInternalType('array', $doc->data);
         $this->assertCount(2, $doc->data);
@@ -306,7 +306,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $data = $this->getDataFromFile('invalid-document.json');
-            $this->parser->parseDocument($data, PetsList::class);
+            $this->parser->parseDocument($data, PetsListDocument::class);
 
             $this->fail("Should throw exception on invalid document");
         } catch (JsonApiException $e) {

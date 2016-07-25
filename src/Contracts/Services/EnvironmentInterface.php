@@ -14,7 +14,6 @@ use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Reva2\JsonApi\Contracts\Decoders\QueryParamsDecoderInterface;
 
 /**
  * JSON API request environment
@@ -65,11 +64,4 @@ interface EnvironmentInterface
      * @return string
      */
     public function getUrlPrefix();
-
-    /**
-     * Returns decoder for request query parameters
-     *
-     * @return QueryParamsDecoderInterface
-     */
-    public function getQueryParamsDecoder();
 }

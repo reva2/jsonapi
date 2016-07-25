@@ -12,6 +12,7 @@ namespace Reva2\JsonApi\Http;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
+use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 
 /**
  * JSON API request
@@ -21,6 +22,11 @@ use Reva2\JsonApi\Contracts\Http\RequestInterface;
  */
 class Request implements RequestInterface
 {
+    /**
+     * @var EnvironmentInterface
+     */
+    protected $environment;
+
     /**
      * @var EncodingParametersInterface
      */
@@ -34,13 +40,19 @@ class Request implements RequestInterface
     /**
      * Constructor
      *
-     * @param EncodingParametersInterface $query
-     * @param mixed|null $body
+     * @param EnvironmentInterface $environment
      */
-    public function __construct(EncodingParametersInterface $query, $body = null)
+    public function __construct(EnvironmentInterface $environment)
     {
-        $this->query = $query;
-        $this->body = $body;
+        $this->environment = $environment;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEnvironment()
+    {
+        return $this->environment;
     }
 
     /**
@@ -52,10 +64,32 @@ class Request implements RequestInterface
     }
 
     /**
+     * @param EncodingParametersInterface|null $query
+     * @return $this
+     */
+    public function setQuery(EncodingParametersInterface $query = null)
+    {
+        $this->query = $query;
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getBody()
     {
         return $this->body;
+    }
+
+    /**
+     * @param mixed|null $body
+     * @return $this
+     */
+    public function setBody($body = null)
+    {
+        $this->body = $body;
+
+        return $this;
     }
 }
