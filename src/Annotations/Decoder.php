@@ -11,8 +11,6 @@
 
 namespace Reva2\JsonApi\Annotations;
 
-use Doctrine\Common\Annotations\Annotation\Target;
-
 /**
  * JSON API decoder annotation
  *
