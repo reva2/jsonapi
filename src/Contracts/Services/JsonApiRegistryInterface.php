@@ -25,7 +25,7 @@ interface JsonApiRegistryInterface
     /**
      * Register decoder with specified name
      *
-     * @param string $name;
+     * @param string $name
      * @param DecoderInterface|\Closure $decoder
      * @return $this
      */
@@ -44,7 +44,7 @@ interface JsonApiRegistryInterface
      *
      * @param string $name
      * @param EncoderInterface|\Closure $encoder
-     * @return $this;
+     * @return $this
      */
     public function registerEncoder($name, $encoder);
 
