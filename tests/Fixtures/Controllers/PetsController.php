@@ -43,7 +43,8 @@ class PetsController
     /**
      * @API\ApiRequest(
      *     query="Reva2\JsonApi\Tests\Fixtures\Query\PetQuery",
-     *     body="Reva2\JsonApi\Tests\Fixtures\Documents\PetDocument"
+     *     body="Reva2\JsonApi\Tests\Fixtures\Documents\PetDocument",
+     *     validation={"Default", "Create"}
      * )
      */
     public function createAction()

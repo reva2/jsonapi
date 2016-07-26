@@ -10,10 +10,8 @@
 
 namespace Reva2\JsonApi\Contracts\Services;
 
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 
 /**
  * JSON API request environment
@@ -24,44 +22,67 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 interface EnvironmentInterface
 {
     /**
-     * Returns response encoder
+     * Returns type of expected query parameters
      *
-     * @return EncoderInterface
+     * @return string|null
      */
-    public function getEncoder();
+    public function getQueryType();
 
     /**
-     * Returns encoder media type
+     * Returns type of excepted body content
      *
-     * @return MediaTypeInterface
+     * @return string|null
      */
-    public function getEncoderMediaType();
+    public function getBodyType();
 
     /**
-     * Returns request decoder
+     * Returns codec matcher configuration
      *
-     * @return DecoderInterface
+     * @return array
      */
-    public function getDecoder();
+    public function getMatcherConfiguration();
 
     /**
-     * Returns decoder media type
-     *
-     * @return MediaTypeInterface
-     */
-    public function getDecoderMediaType();
-
-    /**
-     * Encoder schemas container
-     *
-     * @return ContainerInterface
-     */
-    public function getSchemaContainer();
-
-    /**
-     * Returns prefix for URLs
+     * Returns URLs prefix
      *
      * @return string
      */
     public function getUrlPrefix();
+
+    /**
+     * Returns list of validation groups that should be checked
+     *
+     * @return string[]|null
+     */
+    public function getValidationGroups();
+
+    /**
+     * Sets response encoder
+     *
+     * @param EncoderInterface $encoder
+     * @return $this
+     */
+    public function setEncoder(EncoderInterface $encoder);
+
+    /**
+     * Returns response encoder
+     *
+     * @return EncoderInterface|null
+     */
+    public function getEncoder();
+
+    /**
+     * Sets response encoder media type
+     *
+     * @param MediaTypeInterface $mediaType
+     * @return $this
+     */
+    public function setEncoderMediaType(MediaTypeInterface $mediaType);
+
+    /**
+     * Returns response encoder media type
+     *
+     * @return MediaTypeInterface|null
+     */
+    public function getEncoderMediaType();
 }

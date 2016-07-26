@@ -51,13 +51,21 @@ class ApiRequest
     public $urlPrefix;
 
     /**
+     * List of validation groups that should be
+     * automatically checked on request parsing
+     *
+     * @var array<string>
+     */
+    public $validation = ['Default'];
+
+    /**
      * @return array
      */
     public function toArray()
     {
         $data = [];
 
-        $properties = ['query', 'body', 'urlPrefix'];
+        $properties = ['query', 'body', 'urlPrefix', 'validation'];
         foreach ($properties as $property) {
             $value = $this->{$property};
             if (null !== $value) {

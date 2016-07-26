@@ -11,7 +11,9 @@
 namespace Reva2\JsonApi\Tests\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\EventListener\ApiListener;
+use Reva2\JsonApi\Factories\Factory;
 use Reva2\JsonApi\Tests\Fixtures\Controllers\AnotherController;
 use Reva2\JsonApi\Tests\Fixtures\Controllers\PetsController;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetDocument;
@@ -56,23 +58,22 @@ class ApiListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($request->attributes->has('_jsonapi'));
 
-        $config = $request->attributes->get('_jsonapi');
-        $this->assertInternalType('array', $config);
+        $environment = $request->attributes->get('_jsonapi');
+        $this->assertInstanceOf(EnvironmentInterface::class, $environment);
 
-        $this->assertArrayHasKey('query', $config);
-        $this->assertSame(PetQuery::class, $config['query']);
+        /* @var $environment EnvironmentInterface */
 
-        $this->assertArrayHasKey('body', $config);
-        $this->assertSame(PetDocument::class, $config['body']);
+        $this->assertSame(PetQuery::class, $environment->getQueryType());
+        $this->assertSame(PetDocument::class, $environment->getBodyType());
 
-        $this->assertArrayHasKey('matcher', $config);
-        $this->assertArrayHasKey('decoders', $config['matcher']);
-        $this->assertSame(['application/vnd.json+api' => 'jsonapi.decoders.jsonapi'], $config['matcher']['decoders']);
-        $this->assertArrayHasKey('encoders', $config['matcher']);
-        $this->assertSame(['application/vnd.json+api' => 'jsonapi.encoders.jsonapi'], $config['matcher']['encoders']);
+        $matcherConfig = [
+            'encoders' => ['application/vnd.json+api' => 'jsonapi.encoders.jsonapi'],
+            'decoders' => ['application/vnd.json+api' => 'jsonapi.decoders.jsonapi']
+        ];
+        $this->assertSame($matcherConfig, $environment->getMatcherConfiguration());
 
-        $this->assertArrayHasKey('urlPrefix', $config);
-        $this->assertSame('/myapp', $config['urlPrefix']);
+        $this->assertSame('/myapp', $environment->getUrlPrefix());
+        $this->assertSame(['Default', 'Create'], $environment->getValidationGroups());
     }
 
     /**
@@ -96,7 +97,14 @@ class ApiListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->listener = new ApiListener(new AnnotationReader());
+        $this->listener = new ApiListener(
+            new AnnotationReader(),
+            new Factory(),
+            [
+                'decoders' => ['application/vnd.json+api' => 'jsonapi'],
+                'encoders' => ['application/vnd.json+api' => 'jsonapi']
+            ]
+        );
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Reva2\JsonApi\EventListener;
 
 use Doctrine\Common\Annotations\Reader;
 use Reva2\JsonApi\Annotations\ApiRequest;
+use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -31,13 +32,29 @@ class ApiListener implements EventSubscriberInterface
     protected $reader;
 
     /**
+     * @var FactoryInterface
+     */
+    protected $factory;
+
+    /**
+     * Default matcher configuration
+     *
+     * @var array
+     */
+    protected $defMatcher;
+
+    /**
      * Constructor
      *
      * @param Reader $reader
+     * @param FactoryInterface $factory
+     * @param array $defMatcher
      */
-    public function __construct(Reader $reader)
+    public function __construct(Reader $reader, FactoryInterface $factory, array $defMatcher)
     {
         $this->reader = $reader;
+        $this->factory = $factory;
+        $this->defMatcher = $defMatcher;
     }
 
     /**
@@ -70,7 +87,11 @@ class ApiListener implements EventSubscriberInterface
         }
 
         if (null !== $config) {
-            $event->getRequest()->attributes->set('_jsonapi', $config);
+            if (!array_key_exists('matcher', $config)) {
+                $config['matcher'] = $this->defMatcher;
+            }
+
+            $event->getRequest()->attributes->set('_jsonapi', $this->factory->createEnvironment($config));
         }
     }
 

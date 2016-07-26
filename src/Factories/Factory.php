@@ -14,8 +14,12 @@ use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
+use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
+use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Http\Headers\HeadersChecker;
+use Reva2\JsonApi\Http\Request;
+use Reva2\JsonApi\Services\Environment;
 
 /**
  * JSON API factory
@@ -23,7 +27,7 @@ use Reva2\JsonApi\Http\Headers\HeadersChecker;
  * @package Reva2\JsonApi\Factories
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class Factory extends BaseFactory
+class Factory extends BaseFactory implements FactoryInterface
 {
     /**
      * @inheritdoc
@@ -42,5 +46,21 @@ class Factory extends BaseFactory
     public function createHeadersChecker(CodecMatcherInterface $codecMatcher)
     {
         return new HeadersChecker($codecMatcher);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createEnvironment(array $config = null)
+    {
+        return new Environment($config);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createRequest(EnvironmentInterface $environment)
+    {
+        return new Request($environment);
     }
 }
