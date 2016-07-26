@@ -11,10 +11,10 @@
 
 namespace Reva2\JsonApi\Decoders;
 
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
+use Reva2\JsonApi\Contracts\Decoders\DecoderInterface;
 
 /**
  * JSON API request decoder
@@ -38,31 +38,34 @@ class RequestDecoder implements DecoderInterface
      *
      * @var string
      */
-    protected $docType;
+    protected $contentType;
 
     /**
      * Constructor
      *
      * @param DataParserInterface $parser
-     * @param string $docType
      */
-    public function __construct(DataParserInterface $parser, $docType)
+    public function __construct(DataParserInterface $parser)
     {
         $this->parser = $parser;
-        $this->docType = $docType;
     }
 
     /**
-     * Decode request content
-     *
-     * @param string $content
-     * @return mixed
+     * @inheritdoc
+     */
+    public function setContentType($type)
+    {
+        $this->contentType = $type;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function decode($content)
     {
         $data = $this->decodeJson($content);
 
-        return $this->parser->parseDocument($data, $this->docType);
+        return (null !== $this->contentType) ? $this->parser->parseDocument($data, $this->contentType) : $data;
     }
 
     /**

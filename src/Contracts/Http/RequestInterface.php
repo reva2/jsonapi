@@ -29,11 +29,27 @@ interface RequestInterface
     public function getEnvironment();
 
     /**
+     * Sets request query parameters
+     *
+     * @param EncodingParametersInterface|null $query
+     * @return $this
+     */
+    public function setQuery(EncodingParametersInterface $query = null);
+
+    /**
      * Returns query parameters
      *
      * @return EncodingParametersInterface|null
      */
     public function getQuery();
+
+    /**
+     * Sets request body
+     *
+     * @param mixed|null $body
+     * @return $this
+     */
+    public function setBody($body = null);
 
     /**
      * Returns request body

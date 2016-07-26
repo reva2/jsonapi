@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Http;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Http\Responses;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,11 @@ use Symfony\Component\HttpFoundation\Response;
 class ResponseFactory extends Responses
 {
     /**
+     * @var ContainerInterface
+     */
+    protected $schemas;
+
+    /**
      * @var EnvironmentInterface
      */
     protected $environment;
@@ -37,11 +43,16 @@ class ResponseFactory extends Responses
     /**
      * Constructor
      *
+     * @param ContainerInterface $schemas
      * @param EnvironmentInterface $environment
      * @param EncodingParametersInterface|null $params
      */
-    public function __construct(EnvironmentInterface $environment, EncodingParametersInterface $params = null)
-    {
+    public function __construct(
+        ContainerInterface $schemas,
+        EnvironmentInterface $environment,
+        EncodingParametersInterface $params = null
+    ) {
+        $this->schemas = $schemas;
         $this->environment = $environment;
         $this->params = $params;
     }
@@ -83,7 +94,7 @@ class ResponseFactory extends Responses
      */
     protected function getSchemaContainer()
     {
-        return $this->environment->getSchemaContainer();
+        return $this->schemas;
     }
 
     /**

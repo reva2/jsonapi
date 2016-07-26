@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Tests\Http;
 
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Http\ResponseFactory;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +30,7 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldCreateSymfonyResponseObject()
     {
-        $factory = new ResponseFactory($this->getEnvironment());
+        $factory = new ResponseFactory($this->getSchemas(), $this->getEnvironment());
 
         $response = $factory->getCodeResponse(200);
         /* @var $response Response */
@@ -50,5 +51,13 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
         $environment->expects($this->once())->method('getEncoderMediaType')->willReturn($encoderMediaType);
 
         return $environment;
+    }
+
+    /**
+     * @return ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getSchemas()
+    {
+        return $this->getMockBuilder(ContainerInterface::class)->getMock();
     }
 }

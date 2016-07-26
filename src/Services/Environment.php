@@ -13,6 +13,7 @@ namespace Reva2\JsonApi\Services;
 
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Reva2\JsonApi\Contracts\Decoders\DecoderInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 
 /**
@@ -57,6 +58,13 @@ class Environment implements EnvironmentInterface
      * @var string[]|null
      */
     protected $validationGroups;
+
+    /**
+     * Request decoder
+     *
+     * @var DecoderInterface|null
+     */
+    protected $decoder;
 
     /**
      * Response encoder
@@ -229,6 +237,24 @@ class Environment implements EnvironmentInterface
         $this->encoderMediaType = $encoderMediaType;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setDecoder(DecoderInterface $decoder)
+    {
+        $this->decoder = $decoder;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDecoder()
+    {
+        return $this->decoder;
     }
 
     /**

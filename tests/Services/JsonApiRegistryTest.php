@@ -40,30 +40,7 @@ class JsonApiRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->registerDecoder('test', $factory);
 
-        $this->assertSame($decoder, $this->registry->getDecoder('test'));
-    }
-
-    /**
-     * @test
-     * @expectedException \InvalidArgumentException
-     */
-    public function shouldThrowOnInvalidDecoderParams()
-    {
-        $this->registry->registerDecoder('invalid', []);
-    }
-
-    /**
-     * @test
-     * @expectedException \LogicException
-     */
-    public function shouldThrowOnInvalidDecoder()
-    {
-        $decoder = false;
-        $factory = function () use ($decoder) {
-            return $decoder;
-        };
-
-        $this->registry->registerDecoder('invalid', $factory)->getDecoder('invalid');
+        $this->assertSame($factory, $this->registry->getDecoder('test'));
     }
 
     /**
@@ -87,30 +64,7 @@ class JsonApiRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->registerEncoder('test', $factory);
 
-        $this->assertSame($encoder, $this->registry->getEncoder('test'));
-    }
-
-    /**
-     * @test
-     * @expectedException \InvalidArgumentException
-     */
-    public function shouldThrowOnInvalidEncoderParams()
-    {
-        $this->registry->registerEncoder('invalid', []);
-    }
-
-    /**
-     * @test
-     * @expectedException \LogicException
-     */
-    public function shouldThrowOnInvalidEncoder()
-    {
-        $encoder = false;
-        $factory = function () use ($encoder) {
-            return $encoder;
-        };
-
-        $this->registry->registerEncoder('invalid', $factory)->getEncoder('invalid');
+        $this->assertSame($factory, $this->registry->getEncoder('test'));
     }
 
     /**

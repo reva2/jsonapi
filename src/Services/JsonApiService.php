@@ -10,16 +10,23 @@
 
 namespace Reva2\JsonApi\Services;
 
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
+use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
+use Reva2\JsonApi\Contracts\Decoders\DecoderInterface;
+use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
+use Reva2\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
+use Reva2\JsonApi\Contracts\Services\JsonApiRegistryInterface;
 use Reva2\JsonApi\Contracts\Services\JsonApiServiceInterface;
 use Reva2\JsonApi\Contracts\Services\ValidationServiceInterface;
 use Reva2\JsonApi\Http\ResponseFactory;
-use Reva2\JsonApi\Http\Request as ApiRequest;
 use Symfony\Component\HttpFoundation\Request;
+use Neomerx\JsonApi\Http\Request as Psr7Request;
 
 /**
  * Service for JSON API requests processing
@@ -30,154 +37,300 @@ use Symfony\Component\HttpFoundation\Request;
 class JsonApiService implements JsonApiServiceInterface
 {
     /**
-     * Current JSON API environment
-     *
-     * @var EnvironmentInterface
+     * @var FactoryInterface
      */
-    protected $environment;
+    protected $factory;
 
     /**
-     * Validation service
-     *
+     * @var JsonApiRegistryInterface
+     */
+    protected $registry;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $schemas;
+
+    /**
      * @var ValidationServiceInterface
      */
     protected $validator;
 
     /**
+     * @var DataParserInterface
+     */
+    protected $parser;
+
+    /**
      * Constructor
      *
+     * @param FactoryInterface $factory
+     * @param JsonApiRegistryInterface $registry
+     * @param ContainerInterface $schemas
+     * @param DataParserInterface $parser
      * @param ValidationServiceInterface $validator
      */
-    public function __construct(ValidationServiceInterface $validator)
-    {
+    public function __construct(
+        FactoryInterface $factory,
+        JsonApiRegistryInterface $registry,
+        ContainerInterface $schemas,
+        DataParserInterface $parser,
+        ValidationServiceInterface $validator
+    ) {
+        $this->factory = $factory;
+        $this->registry = $registry;
+        $this->parser = $parser;
+        $this->schemas = $schemas;
         $this->validator = $validator;
     }
 
     /**
      * @inheritdoc
      */
-    public function setEnvironment(EnvironmentInterface $environment)
+    public function getFactory()
     {
-        $this->environment = $environment;
-
-        return $this;
+        return $this->factory;
     }
 
     /**
      * @inheritdoc
      */
-    public function getRequestMediaType()
+    public function parseRequest(Request $request, EnvironmentInterface $environment = null)
     {
-        return $this->getEnvironment()->getDecoderMediaType();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getResponseMediaType()
-    {
-        return $this->getEnvironment()->getEncoderMediaType();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function parseRequest(Request $httpRequest, $validate = true)
-    {
-        $request = new ApiRequest(
-            $this->parseQuery($httpRequest),
-            $this->parseBody($httpRequest)
-        );
-
-        $validationGroups = null;
-        if (is_array($validate)) {
-            $validationGroups = $validate;
-            $validate = true;
-        } elseif (!is_bool($validate)) {
-            throw new \InvalidArgumentException(
-                'Parameter $validate must be a boolean or array containing validation groups'
-            );
+        if (null === $environment) {
+            $environment = $this->getRequestEnvironment($request);
         }
-        
-        if (true === $validate) {
-            $this->validateRequest($request, $validationGroups);
+
+        $this->initializeEnvironment($environment, $request);
+
+        $apiRequest = $this->factory->createRequest($environment);
+        $apiRequest
+            ->setQuery($this->parseQuery($request, $environment))
+            ->setBody($this->parseBody($request, $environment));
+
+        if (null !== $environment->getValidationGroups()) {
+            $this->validateRequest($apiRequest);
         }
-        
+
         return $request;
     }
 
     /**
      * @inheritdoc
      */
-    public function validateRequest(RequestInterface $request, array $groups = null)
+    public function validateRequest(RequestInterface $request)
     {
-        $errors = $this->validator->validate($request->getQuery(), $groups);
-        $errors = array_merge($errors, $this->validator->validate($request->getBody(), $groups));
-
-        if (count($errors) > 0) {
-            $code = null;
-
-            foreach ($errors as $error) {
-                /* @var $error ErrorInterface */
-
-                if (null === $code) {
-                    $code = $error->getStatus();
-                } elseif ($code !== $error->getStatus()) {
-                    $code = 400;
-                    break;
-                }
+        $validationGroups = $request->getEnvironment()->getValidationGroups();
+        if (is_bool($validationGroups)) {
+            if (false == $validationGroups) {
+                return;
+            } else {
+                $validationGroups = null;
             }
-
-            throw new JsonApiException($errors, $code);
         }
+
+        $errors = [];
+
+        if (null !== ($query = $request->getQuery())) {
+            $errors = array_merge($errors, $this->validator->validate($query, $validationGroups));
+        }
+
+        if (null !== ($body = $request->getBody())) {
+            $errors = array_merge($errors, $this->validator->validate($body, $validationGroups));
+        }
+
+        if (0 === count($errors)) {
+            return;
+        }
+
+        $code = null;
+        foreach ($errors as $error) {
+            /* @var $error Error */
+            if (null === $code) {
+                $code = $error->getStatus();
+            } elseif ($code !== $error->getStatus()) {
+                $code = 400;
+                break;
+            }
+        }
+
+        throw new JsonApiException($errors, $code);
     }
 
     /**
      * @inheritdoc
      */
-    public function getResponseFactory(EncodingParametersInterface $encodingParams)
+    public function getResponseFactory(RequestInterface $request)
     {
-        return new ResponseFactory($this->getEnvironment(), $encodingParams);
+        return new ResponseFactory($this->schemas, $request->getEnvironment(), $request->getQuery());
     }
 
     /**
-     * Parse query parameters
+     * Returns JSON API environment configured in request
      *
      * @param Request $request
-     * @return EncodingParametersInterface
-     */
-    private function parseQuery(Request $request)
-    {
-        return $this->getEnvironment()->getQueryParamsDecoder()->decode($request->query->all());
-    }
-
-    /**
-     * Parse body parameters
-     *
-     * @param Request $request
-     * @return mixed|null
-     */
-    private function parseBody(Request $request)
-    {
-        $body = $request->getContent();
-        if (is_resource($body)) {
-            $body = stream_get_contents($body);
-        }
-
-        return $this->environment->getDecoder()->decode($body);
-    }
-
-    /**
-     * Returns environment for current request
-     *
      * @return EnvironmentInterface
      */
-    private function getEnvironment()
+    protected function getRequestEnvironment(Request $request)
     {
-        if (null === $this->environment) {
-            throw new \RuntimeException('JSON API environment not specified');
-        };
+        if (false === $request->attributes->has('_jsonapi')) {
+            throw new \RuntimeException('JSON API environment is not provided');
+        }
 
-        return $this->environment;
+        $environment = $request->attributes->get('_jsonapi');
+        if (!$environment instanceof EnvironmentInterface) {
+            throw new \InvalidArgumentException(sprintf(
+                "JSON API environment should implement %s interface",
+                EnvironmentInterface::class
+            ));
+        }
+
+        return $environment;
+    }
+
+    /**
+     * Initialize JSON API environment for specified request
+     *
+     * @param EnvironmentInterface $environment
+     * @param Request $request
+     */
+    private function initializeEnvironment(EnvironmentInterface $environment, Request $request)
+    {
+        $matcher = $this->createMatcher($environment);
+
+        $this->parseRequestHeaders($request, $matcher);
+
+        $environment
+            ->setDecoder($matcher->getDecoder())
+            ->setEncoder($matcher->getEncoder())
+            ->setEncoderMediaType($matcher->getEncoderRegisteredMatchedType());
+    }
+
+    /**
+     * Create codec matcher for specified environment
+     *
+     * @param EnvironmentInterface $environment
+     * @return \Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface
+     */
+    private function createMatcher(EnvironmentInterface $environment)
+    {
+        $matcher = $this->factory->createCodecMatcher();
+
+        $config = $environment->getMatcherConfiguration();
+        if ((array_key_exists('decoders', $config)) && (is_array($config['decoders']))) {
+            foreach ($config['decoders'] as $mediaTypeStr => $decoderType) {
+                $matcher->registerDecoder(
+                    $this->parseMediaTypeString($mediaTypeStr),
+                    $this->registry->getDecoder($decoderType)
+                );
+            }
+        }
+
+        if ((array_key_exists('encoders', $config)) && (is_array($config['encoders']))) {
+            foreach ($config['encoders'] as $mediaTypeStr => $encoderType) {
+                $matcher->registerEncoder(
+                    $this->parseMediaTypeString($mediaTypeStr),
+                    $this->registry->getEncoder($encoderType)
+                );
+            }
+        }
+
+        return $matcher;
+    }
+
+    /**
+     * Convert media type string to media type object
+     *
+     * @param string $type
+     * @return \Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface
+     */
+    private function parseMediaTypeString($type)
+    {
+        $parts = explode('/', $type);
+        if (2 !== $parts) {
+            throw new InvalidArgumentException(sprintf("Invalid media type '%s' specified", $type));
+        }
+
+        return $this->factory->createMediaType($parts[0], $parts[1]);
+    }
+
+    /**
+     * Parse request headers and detect appropriate decoder and encoder
+     *
+     * @param Request $request
+     * @param CodecMatcherInterface $matcher
+     */
+    private function parseRequestHeaders(Request $request, CodecMatcherInterface $matcher)
+    {
+        $psr7Request = $this->createPsr7Request($request);
+        $headers = $this->factory->createHeaderParametersParser()->parse($psr7Request);
+        $checker = $this->factory->createHeadersChecker($matcher);
+
+        $checker->checkHeaders($headers);
+    }
+
+    /**
+     * Create PSR7 request from symfony http foundation request
+     *
+     * @param Request $request
+     * @return Psr7Request
+     */
+    private function createPsr7Request(Request $request)
+    {
+        return new Psr7Request(
+            function () use ($request) {
+                return $request->getMethod();
+            },
+            function ($name) use ($request) {
+                return $request->headers->get($name);
+            },
+            function () use ($request) {
+                return $request->query->all();
+            }
+        );
+    }
+
+    /**
+     * Parse request query parameters
+     *
+     * @param Request $request
+     * @param EnvironmentInterface $environment
+     * @return \Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface|null
+     */
+    private function parseQuery(Request $request, EnvironmentInterface $environment)
+    {
+        if (null === $environment->getQueryType()) {
+            return null;
+        }
+
+        $queryParser = $this->factory->createQueryParametersParser();
+        if ($queryParser instanceof QueryParametersParserInterface) {
+            $queryParser
+                ->setDataParser($this->parser)
+                ->setQueryType($environment->getQueryType());
+        }
+
+        return $queryParser->parse($this->createPsr7Request($request));
+    }
+
+    /**
+     * Parse request body
+     *
+     * @param Request $request
+     * @param EnvironmentInterface $environment
+     * @return mixed|null
+     */
+    private function parseBody(Request $request, EnvironmentInterface $environment)
+    {
+        if (null === $environment->getBodyType()) {
+            return null;
+        }
+
+        $decoder = $environment->getDecoder();
+        if ($decoder instanceof DecoderInterface) {
+            $decoder->setContentType($environment->getBodyType());
+        }
+
+        return $decoder->decode($request->getContent());
     }
 }

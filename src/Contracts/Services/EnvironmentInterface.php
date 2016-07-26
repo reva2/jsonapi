@@ -12,6 +12,7 @@ namespace Reva2\JsonApi\Contracts\Services;
 
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Reva2\JsonApi\Contracts\Decoders\DecoderInterface;
 
 /**
  * JSON API request environment
@@ -55,6 +56,21 @@ interface EnvironmentInterface
      * @return string[]|null
      */
     public function getValidationGroups();
+
+    /**
+     * Sets request decoders
+     *
+     * @param DecoderInterface $decoder
+     * @return $this
+     */
+    public function setDecoder(DecoderInterface $decoder);
+
+    /**
+     * Returns request decoder
+     *
+     * @return DecoderInterface|null
+     */
+    public function getDecoder();
 
     /**
      * Sets response encoder

@@ -18,6 +18,7 @@ use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Http\Headers\HeadersChecker;
+use Reva2\JsonApi\Http\Query\QueryParametersParser;
 use Reva2\JsonApi\Http\Request;
 use Reva2\JsonApi\Services\Environment;
 
@@ -62,5 +63,13 @@ class Factory extends BaseFactory implements FactoryInterface
     public function createRequest(EnvironmentInterface $environment)
     {
         return new Request($environment);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createQueryParametersParser()
+    {
+        return new QueryParametersParser();
     }
 }

@@ -10,10 +10,9 @@
 
 namespace Reva2\JsonApi\Contracts\Services;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,52 +25,36 @@ use Symfony\Component\HttpFoundation\Request;
 interface JsonApiServiceInterface
 {
     /**
-     * Sets current environment
+     * Returns JSON API factory
      *
-     * @param EnvironmentInterface $environment
-     * @return $this
+     * @return FactoryInterface
      */
-    public function setEnvironment(EnvironmentInterface $environment);
-
-    /**
-     * Returns request media type
-     *
-     * @return MediaTypeInterface
-     */
-    public function getRequestMediaType();
-
-    /**
-     * Returns response media type
-     *
-     * @return MediaTypeInterface
-     */
-    public function getResponseMediaType();
+    public function getFactory();
 
     /**
      * Parse and return API request object
      *
-     * @param Request $httpRequest
-     * @param bool|array $validate Bool or array of validation groups that should be checked
+     * @param Request $request
+     * @param EnvironmentInterface|null $environment
      * @return RequestInterface
      * @throws JsonApiException
      */
-    public function parseRequest(Request $httpRequest, $validate = true);
+    public function parseRequest(Request $request, EnvironmentInterface $environment = null);
 
     /**
      * Validates specified request
      *
      * @param RequestInterface $request
-     * @param array|null $groups Array of validation groups that should be checked
      * @return $this
      * @throws JsonApiException
      */
-    public function validateRequest(RequestInterface $request, array $groups = null);
+    public function validateRequest(RequestInterface $request);
 
     /**
      * Returns response factory
      *
-     * @param EncodingParametersInterface $encodingParams
+     * @param RequestInterface $encodingParams
      * @return ResponsesInterface
      */
-    public function getResponseFactory(EncodingParametersInterface $encodingParams);
+    public function getResponseFactory(RequestInterface $request);
 }

@@ -47,7 +47,11 @@ class RequestDecoderTest extends \PHPUnit_Framework_TestCase
             ->with($request, 'resource1')
             ->willReturn($request);
 
-        $decoder = new RequestDecoder($parser, 'resource1');
+        $decoder = new RequestDecoder($parser);
+
+        $this->assertInstanceOf(\stdClass::class, $decoder->decode($content));
+
+        $decoder->setContentType('resource1');
         $result = $decoder->decode($content);
 
         $this->assertEquals($request, $result);
