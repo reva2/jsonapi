@@ -122,7 +122,7 @@ class JsonApiService implements JsonApiServiceInterface
     {
         $validationGroups = $request->getEnvironment()->getValidationGroups();
         if (is_bool($validationGroups)) {
-            if (false == $validationGroups) {
+            if (false === $validationGroups) {
                 return;
             } else {
                 $validationGroups = null;

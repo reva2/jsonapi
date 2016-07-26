@@ -12,7 +12,6 @@
 namespace Reva2\JsonApi\Contracts\Services;
 
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
-use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 
 /**
  * JSON API decoders/encoders registry interface
@@ -26,7 +25,7 @@ interface JsonApiRegistryInterface
      * Register decoder with specified name
      *
      * @param string $name
-     * @param DecoderInterface|\Closure $decoder
+     * @param \Closure $decoder
      * @return $this
      */
     public function registerDecoder($name, \Closure $decoder);
