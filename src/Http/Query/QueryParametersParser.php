@@ -11,7 +11,6 @@
 
 namespace Reva2\JsonApi\Http\Query;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
@@ -34,19 +33,39 @@ class QueryParametersParser implements QueryParametersParserInterface
      */
     protected $queryType;
 
-
+    /**
+     * @inheritdoc
+     */
     public function parse(ServerRequestInterface $request)
     {
-        // TODO: Implement parse() method.
+        if (null === $this->parser) {
+            throw new \RuntimeException('Data parser not specified');
+        }
+
+        if (null === $this->queryType) {
+            throw new \RuntimeException('Query type not specified');
+        }
+
+        return $this->parser->parseQueryParams($request->getQueryParams(), $this->queryType);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setDataParser(DataParserInterface $parser)
     {
-        // TODO: Implement setDataParser() method.
+        $this->parser = $parser;
+
+        return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setQueryType($type)
     {
-        // TODO: Implement setQueryType() method.
+        $this->queryType = $type;
+
+        return $this;
     }
 }

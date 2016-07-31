@@ -11,8 +11,6 @@
 
 namespace Reva2\JsonApi\Contracts\Services;
 
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
-
 /**
  * JSON API decoders/encoders registry interface
  *
