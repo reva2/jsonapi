@@ -321,10 +321,10 @@ class JsonApiService implements JsonApiServiceInterface
      * Validate specified data
      *
      * @param mixed $data
-     * @param array $validationGroups
+     * @param array|null $validationGroups
      * @return Error[]
      */
-    private function validateData($data = null, array $validationGroups = [])
+    private function validateData($data = null, array $validationGroups = null)
     {
         return (null !== $data) ? $this->validator->validate($data, $validationGroups) : [];
     }

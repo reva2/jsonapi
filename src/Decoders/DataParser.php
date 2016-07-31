@@ -14,6 +14,7 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Factory\MetadataFactoryInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
@@ -314,14 +315,11 @@ class DataParser implements DataParserInterface
             $metadata = $this->factory->getMetadataFor($resType);
             /* @var $metadata ResourceMetadataInterface */
 
-            if ((null !== ($discField = $metadata->getDiscriminatorField()))) {
-                $discValue = $this->parseString($value, $discField->getDataPath());
-                $discClass = $metadata->getDiscriminatorClass($discValue);
-                if ($discClass !== $resType) {
-                    $this->restorePath();
+            $discClass = $this->getClassByDiscriminator($metadata, $value);
+            if ((null !== $discClass) && ($discClass !== $resType)) {
+                $this->restorePath();
 
-                    return $this->parseResource($data, $path, $discClass);
-                }
+                return $this->parseResource($data, $path, $discClass);
             }
 
             $name = $this->parseString($value, 'type');
@@ -553,12 +551,9 @@ class DataParser implements DataParserInterface
             throw new \InvalidArgumentException('Invalid object metadata');
         }
 
-        if (null !== ($discField = $metadata->getDiscriminatorField())) {
-            $discValue = $this->parseString($data, $discField->getDataPath());
-            $discClass = $metadata->getDiscriminatorClass($discValue);
-            if ($discClass !== $objType) {
-                return $this->parseObjectValue($data, $discClass);
-            }
+        $discClass = $this->getClassByDiscriminator($metadata, $data);
+        if ((null !== $discClass) && ($discClass !== $objType)) {
+            return $this->parseObjectValue($data, $discClass);
         }
 
         $objClass = $metadata->getClassName();
@@ -681,7 +676,7 @@ class DataParser implements DataParserInterface
     private function convertToApiException(\Exception $e, $objType)
     {
         $status = $e->getCode();
-        $message = 'Failed to parse document';
+        $message = 'Failed to parse request';
         if (empty($status)) {
             $message = 'Internal server error';
             $status = 500;
@@ -701,5 +696,23 @@ class DataParser implements DataParserInterface
         $error = new Error(rand(), null, $status, self::ERROR_CODE, $message, $e->getMessage(), $source);
 
         return new JsonApiException($error, $status, $e);
+    }
+
+    /**
+     * Returns appropriate discriminator class for specified data
+     *
+     * @param ClassMetadataInterface $metadata
+     * @param array|object $data
+     * @return string|null
+     */
+    private function getClassByDiscriminator(ClassMetadataInterface $metadata, $data)
+    {
+        if (null === ($discField = $metadata->getDiscriminatorField())) {
+            return null;
+        }
+
+        $discValue = $this->parseString($data, $discField->getDataPath());
+
+        return $metadata->getDiscriminatorClass($discValue);
     }
 }
