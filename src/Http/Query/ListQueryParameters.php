@@ -156,14 +156,15 @@ class ListQueryParameters extends QueryParameters
 
         $invalidFields = array_diff($fields, $this->getSortableFields());
         if (count($invalidFields) > 0) {
-            $context
-                ->buildViolation('Sorting by following fields is not supported: %fields%')
-                ->setParameter('%fields%', sprintf("'%s'", implode("', '", $invalidFields)))
-                ->setPlural(count($invalidFields))
-                ->setInvalidValue($invalidFields)
-                ->setCode(self::INVALID_SORTING)
-                ->atPath('sortParameters')
-                ->addViolation();
+            $this->addViolation(
+                $context,
+                'Sorting by following fields is not supported: %fields%',
+                ['%fields%' => sprintf("'%s'", implode("', '", $invalidFields))],
+                $invalidFields,
+                self::INVALID_SORTING,
+                'sortParameters',
+                count($invalidFields)
+            );
         }
     }
 
@@ -179,13 +180,14 @@ class ListQueryParameters extends QueryParameters
             (null !== ($maxSize = $this->getMaxPageSize())) &&
             ($this->pageSize > $maxSize)
         ) {
-            $context
-                ->buildViolation('Page size must be leas or equal than %size%')
-                ->setParameter('%size%', $maxSize)
-                ->setInvalidValue($this->pageSize)
-                ->setCode(self::INVALID_PAGE_SIZE)
-                ->atPath('pageSize')
-                ->addViolation();
+            $this->addViolation(
+                $context,
+                'Page size must be leas or equal than %size%',
+                ['%size%' => $maxSize],
+                $this->pageSize,
+                self::INVALID_PAGE_SIZE,
+                'pageSize'
+            );
         }
     }
 

@@ -112,7 +112,7 @@ class JsonApiService implements JsonApiServiceInterface
             $this->validateRequest($apiRequest);
         }
 
-        return $request;
+        return $apiRequest;
     }
 
     /**
@@ -129,15 +129,8 @@ class JsonApiService implements JsonApiServiceInterface
             }
         }
 
-        $errors = [];
-
-        if (null !== ($query = $request->getQuery())) {
-            $errors = array_merge($errors, $this->validator->validate($query, $validationGroups));
-        }
-
-        if (null !== ($body = $request->getBody())) {
-            $errors = array_merge($errors, $this->validator->validate($body, $validationGroups));
-        }
+        $errors = $this->validateData($request->getQuery(), $validationGroups);
+        $errors = array_merge($errors, $this->validateData($request->getBody(), $validationGroups));
 
         if (0 === count($errors)) {
             return;
@@ -218,21 +211,11 @@ class JsonApiService implements JsonApiServiceInterface
 
         $config = $environment->getMatcherConfiguration();
         if ((array_key_exists('decoders', $config)) && (is_array($config['decoders']))) {
-            foreach ($config['decoders'] as $mediaTypeStr => $decoderType) {
-                $matcher->registerDecoder(
-                    $this->parseMediaTypeString($mediaTypeStr),
-                    $this->registry->getDecoder($decoderType)
-                );
-            }
+            $this->registerDecoders($config['decoders'], $matcher);
         }
 
         if ((array_key_exists('encoders', $config)) && (is_array($config['encoders']))) {
-            foreach ($config['encoders'] as $mediaTypeStr => $encoderType) {
-                $matcher->registerEncoder(
-                    $this->parseMediaTypeString($mediaTypeStr),
-                    $this->registry->getEncoder($encoderType)
-                );
-            }
+            $this->registerEncoders($config['encoders'], $matcher);
         }
 
         return $matcher;
@@ -332,5 +315,49 @@ class JsonApiService implements JsonApiServiceInterface
         }
 
         return $decoder->decode($request->getContent());
+    }
+
+    /**
+     * Validate specified data
+     *
+     * @param mixed $data
+     * @param array $validationGroups
+     * @return Error[]
+     */
+    private function validateData($data = null, array $validationGroups = [])
+    {
+        return (null !== $data) ? $this->validator->validate($data, $validationGroups) : [];
+    }
+
+    /**
+     * Register specified decoders
+     *
+     * @param array $decoders
+     * @param CodecMatcherInterface $matcher
+     */
+    private function registerDecoders(array $decoders, CodecMatcherInterface $matcher)
+    {
+        foreach ($decoders as $mediaType => $decoderType) {
+            $matcher->registerDecoder(
+                $this->parseMediaTypeString($mediaType),
+                $this->registry->getDecoder($decoderType)
+            );
+        }
+    }
+
+    /**
+     * Register specified encoders
+     *
+     * @param array $encoders
+     * @param CodecMatcherInterface $matcher
+     */
+    private function registerEncoders(array $encoders, CodecMatcherInterface $matcher)
+    {
+        foreach ($encoders as $mediaType => $encoderType) {
+            $matcher->registerEncoder(
+                $this->parseMediaTypeString($mediaType),
+                $this->registry->getEncoder($encoderType)
+            );
+        }
     }
 }

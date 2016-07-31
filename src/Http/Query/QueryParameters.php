@@ -81,7 +81,7 @@ class QueryParameters implements EncodingParametersInterface
     }
 
     /**
-     * @param \array[]|null $fieldSets
+     * @param array[]|null $fieldSets
      * @return $this
      */
     public function setFieldSets(array $fieldSets = null)
@@ -223,14 +223,15 @@ class QueryParameters implements EncodingParametersInterface
             $invalidFields = array_diff($fields, $this->getAllowedFields($resource));
 
             if (count($invalidFields) > 0) {
-                $context
-                    ->buildViolation('Invalid fields: %fields%')
-                    ->setParameter('%fields%', sprintf("'%s'", implode("', '", $invalidFields)))
-                    ->setPlural(count($invalidFields))
-                    ->setInvalidValue($invalidFields)
-                    ->setCode(self::INVALID_FIELD_SET)
-                    ->atPath('fieldSets.' . $resource)
-                    ->addViolation();
+                $this->addViolation(
+                    $context,
+                    'Invalid fields: %fields%',
+                    ['%fields%' => sprintf("'%s'", implode("', '", $invalidFields))],
+                    $invalidFields,
+                    self::INVALID_FIELD_SET,
+                    'fieldSets.' . $resource,
+                    count($invalidFields)
+                );
             }
         }
     }
@@ -253,6 +254,43 @@ class QueryParameters implements EncodingParametersInterface
      */
     protected function getAllowedFields($resource)
     {
-        return [];
+        switch ($resource) {
+            default:
+                return [];
+        }
+    }
+
+    /**
+     * Add specified violation
+     *
+     * @param ExecutionContextInterface $context
+     * @param string $message
+     * @param array $params
+     * @param int $plural
+     * @param mixed $invalidValue
+     * @param string $code
+     * @param string $path
+     */
+    protected function addViolation(
+        ExecutionContextInterface $context,
+        $message,
+        array $params,
+        $invalidValue,
+        $code,
+        $path,
+        $plural = null
+    ) {
+        $builder = $context
+            ->buildViolation($message)
+            ->setParameters($params)
+            ->setInvalidValue($invalidValue)
+            ->setCode($code)
+            ->atPath($path);
+
+        if (null !== $plural) {
+            $builder->setPlural($plural);
+        }
+
+        $builder->addViolation();
     }
 }

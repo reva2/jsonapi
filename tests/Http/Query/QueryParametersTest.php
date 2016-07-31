@@ -23,6 +23,15 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  */
 class QueryParametersTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @test
+     */
+    public function shouldIgnoreUnrecognizedParameters()
+    {
+        $query = new QueryParameters();
+
+        $this->assertNull($query->getUnrecognizedParameters());
+    }
 
     /**
      * @test
@@ -107,8 +116,8 @@ class QueryParametersTest extends \PHPUnit_Framework_TestCase
         $violation = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)->getMock();
         $violation
             ->expects($this->once())
-            ->method('setParameter')
-            ->with('%fields%', "'name', 'family'")
+            ->method('setParameters')
+            ->with(['%fields%' => "'name', 'family'"])
             ->willReturnSelf();
 
         $violation

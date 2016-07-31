@@ -42,7 +42,7 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
     /**
      * Returns property data type additional parameters
      * 
-     * @return string|array
+     * @return mixed
      */
     public function getDataTypeParams();
 

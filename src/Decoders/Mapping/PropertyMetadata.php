@@ -46,7 +46,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public $dataType;
 
     /**
-     * @var null|string|array
+     * @var mixed
      * @internal
      */
     public $dataTypeParams;
@@ -137,7 +137,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * Returns additional data type params
      *
-     * @return array|null|string
+     * @return mixed
      */
     public function getDataTypeParams()
     {
@@ -147,7 +147,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * Sets additional data type params
      *
-     * @param array|null|string $dataTypeParams
+     * @param mixed $dataTypeParams
      * @return $this
      */
     public function setDataTypeParams($dataTypeParams = null)

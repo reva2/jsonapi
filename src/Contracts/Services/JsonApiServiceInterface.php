@@ -53,7 +53,7 @@ interface JsonApiServiceInterface
     /**
      * Returns response factory
      *
-     * @param RequestInterface $encodingParams
+     * @param RequestInterface $request
      * @return ResponsesInterface
      */
     public function getResponseFactory(RequestInterface $request);

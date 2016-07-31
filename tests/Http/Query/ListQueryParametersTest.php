@@ -23,6 +23,17 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  */
 class ListQueryParametersTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @test
+     */
+    public function shouldHaveDefaultPaginationParameters()
+    {
+        $query = new ListQueryParameters();
+
+        $this->assertSame(['number' => 1, 'size' => 10], $query->getPaginationParameters());
+    }
+
     /**
      * @test
      * @expectedException \InvalidArgumentException
@@ -43,8 +54,8 @@ class ListQueryParametersTest extends \PHPUnit_Framework_TestCase
         $violation = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)->getMock();
         $violation
             ->expects($this->once())
-            ->method('setParameter')
-            ->with('%size%', 100)
+            ->method('setParameters')
+            ->with(['%size%' => 100])
             ->willReturnSelf();
 
         $violation
@@ -78,7 +89,6 @@ class ListQueryParametersTest extends \PHPUnit_Framework_TestCase
         $query->validatePageSize($context);
 
         $query->setPageSize(125)->validatePageSize($context);
-
     }
 
     /**
@@ -89,8 +99,8 @@ class ListQueryParametersTest extends \PHPUnit_Framework_TestCase
         $violation = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)->getMock();
         $violation
             ->expects($this->once())
-            ->method('setParameter')
-            ->with('%fields%', "'store.name', 'name'")
+            ->method('setParameters')
+            ->with(['%fields%' => "'store.name', 'name'"])
             ->willReturnSelf();
 
         $violation
