@@ -15,7 +15,6 @@ use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
-use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Factory\MetadataFactoryInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
@@ -358,7 +357,7 @@ class DataParser implements DataParserInterface
             $this->initPathStack();
 
             $metadata = $this->factory->getMetadataFor($docType);
-            /* @var $metadata DocumentMetadataInterface */
+            /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface */
 
             $docClass = $metadata->getClassName();
             $doc = new $docClass();
