@@ -107,7 +107,6 @@ class RequestDecoder implements DecoderInterface
                 'Unable to parse JSON data',
                 $error
             );
-            
 
             throw new JsonApiException($apiError, 400);
         }

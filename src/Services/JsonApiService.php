@@ -230,7 +230,7 @@ class JsonApiService implements JsonApiServiceInterface
     private function parseMediaTypeString($type)
     {
         $parts = explode('/', $type);
-        if (2 !== $parts) {
+        if (2 !== count($parts)) {
             throw new InvalidArgumentException(sprintf("Invalid media type '%s' specified", $type));
         }
 
@@ -265,7 +265,12 @@ class JsonApiService implements JsonApiServiceInterface
                 return $request->getMethod();
             },
             function ($name) use ($request) {
-                return $request->headers->get($name);
+                $header = $request->headers->get($name);
+                if (!is_array($header)) {
+                    $header = array($header);
+                }
+
+                return $header;
             },
             function () use ($request) {
                 return $request->query->all();

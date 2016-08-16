@@ -26,7 +26,7 @@ class PetDocument
 {
     /**
      * @var Pet
-     * @API\Property()
+     * @API\Content(type="Reva2\JsonApi\Tests\Fixtures\Resources\Pet")
      */
     public $data;
 }

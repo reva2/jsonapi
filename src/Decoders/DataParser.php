@@ -712,6 +712,9 @@ class DataParser implements DataParserInterface
         }
 
         $discValue = $this->parseString($data, $discField->getDataPath());
+        if (null === $discValue) {
+            return null;
+        }
 
         return $metadata->getDiscriminatorClass($discValue);
     }

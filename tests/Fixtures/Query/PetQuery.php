@@ -45,18 +45,4 @@ class PetQuery extends QueryParameters
                 return parent::getAllowedFields($resource);
         }
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getSortableFields()
-    {
-        return [
-            'id',
-            'name',
-            'family',
-            'store.id',
-            'store.name'
-        ];
-    }
 }

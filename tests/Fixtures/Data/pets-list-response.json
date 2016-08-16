@@ -1,0 +1,42 @@
+{
+  "data":[
+    {
+      "type":"pets",
+      "id":"my-cat",
+      "attributes": {
+        "family":"cats"
+      },
+      "relationships":{
+        "store":{
+          "data":{"type":"stores","id":"my-store"},
+          "links":{"related":"\/pets\/my-cat\/store"}}
+      },
+      "links":{
+        "self":"\/pets\/my-cat"
+      }
+    },
+    {
+      "type":"pets",
+      "id":"my-dog",
+      "attributes":{
+        "family":"dogs"
+      },
+      "relationships":{
+        "store":{
+          "data":{"type":"stores","id":"my-store"},
+          "links":{"related":"\/pets\/my-dog\/store"}
+        }
+      },
+      "links":{"self":"\/pets\/my-dog"}
+    }
+  ],
+  "included":[
+    {
+      "type":"stores",
+      "id":"my-store",
+      "attributes":{
+        "name":"My store"
+      }
+    }
+  ]
+}
