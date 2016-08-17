@@ -333,7 +333,9 @@ class DataParser implements DataParserInterface
             $objClass = $metadata->getClassName();
             $pathValue = new $objClass();
 
-            $this->parseProperty($value, $pathValue, $metadata->getIdMetadata());
+            if (null !== ($idMetadata = $metadata->getIdMetadata())) {
+                $this->parseProperty($value, $pathValue, $idMetadata);
+            }
 
             foreach ($metadata->getAttributes() as $attribute) {
                 $this->parseProperty($value, $pathValue, $attribute);
