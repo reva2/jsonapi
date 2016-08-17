@@ -265,6 +265,20 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Field value required and can not be empty
+     * @expectedExceptionCode 422
+     */
+    public function shouldThrowIfObjectDiscriminatorFieldEmpty()
+    {
+        $data = $this->getDataFromFile('resource.json');
+        unset($data->pet->attributes->family);
+
+        $this->parser->parseResource($data, 'pet', Pet::class);
+    }
+
+    /**
+     * @test
      */
     public function shouldParseResource()
     {
@@ -297,6 +311,26 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $doc->data);
         $this->assertInstanceOf(Cat::class, $doc->data[0]);
         $this->assertInstanceOf(Dog::class, $doc->data[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowOnInvalidDocumentType()
+    {
+        $data = $this->getDataFromFile('document.json');
+
+        try {
+            $this->parser->parseDocument($data, Pet::class);
+
+            $this->fail('Should throw exception on invalid document type');
+        } catch (JsonApiException $e) {
+            $this->assertSame(500, $e->getHttpCode());
+
+            $errors = $e->getErrors();
+            /* @var $errors Error[] */
+            $this->assertRegExp('~Failed to parse .* as JSON API document~si', $errors[0]->getDetail());
+        }
     }
 
     /**

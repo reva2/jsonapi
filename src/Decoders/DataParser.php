@@ -15,6 +15,7 @@ use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Factory\MetadataFactoryInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
@@ -357,6 +358,10 @@ class DataParser implements DataParserInterface
             $this->initPathStack();
 
             $metadata = $this->factory->getMetadataFor($docType);
+            if (!$metadata instanceof DocumentMetadataInterface) {
+                throw new \InvalidArgumentException(sprintf("Failed to parse %s as JSON API document", $docType));
+            }
+
             /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface */
 
             $docClass = $metadata->getClassName();
@@ -711,8 +716,10 @@ class DataParser implements DataParserInterface
         }
 
         $discValue = $this->parseString($data, $discField->getDataPath());
-        if (null === $discValue) {
-            return null;
+        if (empty($discValue)) {
+            $this->setPath($discField->getDataPath());
+
+            throw new \InvalidArgumentException("Field value required and can not be empty", 422);
         }
 
         return $metadata->getDiscriminatorClass($discValue);
