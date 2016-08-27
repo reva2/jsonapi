@@ -21,7 +21,7 @@ use Reva2\JsonApi\Http\Headers\HeadersChecker;
  * Tests for JSON API factory
  *
  * @package Reva2\JsonApi\Tests\Factories
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {

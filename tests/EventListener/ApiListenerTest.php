@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Test for JSON API event listener
  *
  * @package Reva2\JsonApi\Tests\EventListener
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class ApiListenerTest extends \PHPUnit_Framework_TestCase
 {

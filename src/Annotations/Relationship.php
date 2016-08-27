@@ -15,7 +15,7 @@ namespace Reva2\JsonApi\Annotations;
  * JSON API relationship annotation
  *
  * @package Reva2\JsonApi\Annotations
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  *
  * @Annotation
  * @Target({"PROPERTY"})

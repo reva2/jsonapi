@@ -13,6 +13,7 @@ namespace Reva2\JsonApi\Decoders;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Reva2\JsonApi\Contracts\Decoders\CallbackResolverInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
@@ -53,13 +54,20 @@ class DataParser implements DataParserInterface
     protected $accessor;
 
     /**
+     * @var CallbackResolverInterface
+     */
+    protected $callbackResolver;
+
+    /**
      * Constructor
      *
      * @param MetadataFactoryInterface $factory
+     * @param CallbackResolverInterface $callbackResolver
      */
-    public function __construct(MetadataFactoryInterface $factory)
+    public function __construct(MetadataFactoryInterface $factory, CallbackResolverInterface $callbackResolver)
     {
         $this->factory = $factory;
+        $this->callbackResolver = $callbackResolver;
         $this->accessor = PropertyAccess::createPropertyAccessor();
         
         $this->initPathStack();
@@ -474,6 +482,12 @@ class DataParser implements DataParserInterface
             $value = $this->parseCallback($data, $path, [$obj, $metadata->getDataTypeParams()]);
         } else {
             $value = $this->parsePropertyValue($data, $path, $metadata);
+        }
+
+        if (null !== ($converter = $metadata->getConverter())) {
+            $callback = $this->callbackResolver->resolveCallback($converter);
+
+            $value = call_user_func($callback, $value);
         }
 
         $setter = $metadata->getSetter();

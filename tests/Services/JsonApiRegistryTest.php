@@ -19,7 +19,7 @@ use Reva2\JsonApi\Services\JsonApiRegistry;
  * Test for JSON API decoders/encoders registry
  *
  * @package Reva2\JsonApi\Tests\Services
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class JsonApiRegistryTest extends \PHPUnit_Framework_TestCase
 {

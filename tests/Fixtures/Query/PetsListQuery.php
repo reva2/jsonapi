@@ -18,7 +18,7 @@ use Reva2\JsonApi\Annotations as API;
  * Query parameters for pets list API request
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Query
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class PetsListQuery extends ListQueryParameters
 {

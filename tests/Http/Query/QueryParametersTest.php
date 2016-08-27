@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * Test for JSON API query parameters
  *
  * @package Reva2\JsonApi\Tests\Http\Query
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class QueryParametersTest extends \PHPUnit_Framework_TestCase
 {

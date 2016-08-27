@@ -18,7 +18,7 @@ use Reva2\JsonApi\Tests\Fixtures as Fixtures;
  * Example JSON API resource that represent pet
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  *
  * @API\ApiResource(
  *     name="pets",
@@ -51,7 +51,10 @@ class Pet
 
     /**
      * @var Store
-     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Store")
+     * @API\Relationship(
+     *     type="Reva2\JsonApi\Tests\Fixtures\Resources\Store",
+     *     converter="Reva2\JsonApi\Tests\Fixtures\Converters\StoreConverter::convert"
+     * )
      */
     public $store;
 

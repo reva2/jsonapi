@@ -32,7 +32,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
  * Test for metadata loader that use doctrine annotations
  *
  * @package Reva2\JsonApi\Tests\Decoders\Mapping\Loader
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {

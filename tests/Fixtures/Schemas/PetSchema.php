@@ -17,7 +17,7 @@ use Neomerx\JsonApi\Schema\SchemaProvider;
  * JSON API schema for pets resource
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Schemas
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class PetSchema extends SchemaProvider
 {

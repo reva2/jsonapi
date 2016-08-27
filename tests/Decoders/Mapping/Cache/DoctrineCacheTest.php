@@ -20,7 +20,7 @@ use Reva2\JsonApi\Decoders\Mapping\GenericMetadata;
  * Test for metadata cache implementation that use doctrine cache
  *
  * @package Reva2\JsonApi\Tests\Decoders\Mapping\Cache
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class DoctrineCacheTest extends \PHPUnit_Framework_TestCase
 {

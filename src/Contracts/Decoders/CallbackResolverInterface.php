@@ -11,20 +11,20 @@
 
 namespace Reva2\JsonApi\Contracts\Decoders;
 
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface as BaseDecoderInterface;
-
 /**
- * Response decoder interface
+ * Callback resolver
  *
  * @package Reva2\JsonApi\Contracts\Decoders
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-interface DecoderInterface extends BaseDecoderInterface
+interface CallbackResolverInterface
 {
     /**
-     * Sets content type
+     * Returns a callable given its string representation
      *
-     * @param string $type
+     * @param string $name
+     * @return mixed
+     * @throws \InvalidArgumentException
      */
-    public function setContentType($type);
+    public function resolveCallback($name);
 }

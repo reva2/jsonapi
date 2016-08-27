@@ -17,7 +17,7 @@ use Reva2\JsonApi\Annotations as API;
  * Example JSON API resource that represent dog
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  *
  * @API\ApiResource()
  */

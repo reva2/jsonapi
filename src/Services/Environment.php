@@ -2,7 +2,7 @@
 /*
  * This file is part of the reva2/jsonapi.
  *
- * (c) OrbitScripts LLC <support@orbitscripts.com>
+ * (c) Sergey Revenko <dedsemen@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@ use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
  * JSON API environment
  *
  * @package Reva2\JsonApi\Services
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class Environment implements EnvironmentInterface
 {

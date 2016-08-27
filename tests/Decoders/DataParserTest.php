@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Reva2\JsonApi\Decoders\CallbackResolver;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
@@ -47,8 +48,9 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $reader = new AnnotationReader();
         $loader = new AnnotationLoader($reader);
         $factory = new LazyMetadataFactory($loader);
+        $resolver = new CallbackResolver();
 
-        $this->parser = new DataParser($factory);
+        $this->parser = new DataParser($factory, $resolver);
     }
 
     /**
@@ -293,6 +295,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Kitty', $result->name);
         $this->assertInstanceOf(Store::class, $result->store);
         $this->assertSame('mystore', $result->store->getId());
+        $this->assertTrue($result->store->isConverted());
     }
 
     /**

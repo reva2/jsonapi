@@ -52,4 +52,11 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
      * @return string|null
      */
     public function getSetter();
+
+    /**
+     * Returns converter for value
+     *
+     * @return string|null
+     */
+    public function getConverter();
 }

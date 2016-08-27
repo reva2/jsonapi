@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Test for response factory
  *
  * @package Reva2\JsonApi\Tests\Http
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
 {

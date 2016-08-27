@@ -17,7 +17,7 @@ use Reva2\JsonApi\Annotations as API;
  * Another invalid JSON API object
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Objects
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class InvalidObject2
 {

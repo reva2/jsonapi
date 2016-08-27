@@ -18,7 +18,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
  * JSON API document that contains pets list
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Documents
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  *
  * @API\ApiDocument(allowEmpty=true)
  */

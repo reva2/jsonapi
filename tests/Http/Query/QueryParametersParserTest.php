@@ -19,7 +19,7 @@ use Reva2\JsonApi\Http\Query\QueryParametersParser;
  * Test for query parameters parser
  *
  * @package Reva2\JsonApi\Tests\Http\Query
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class QueryParametersParserTest extends \PHPUnit_Framework_TestCase
 {

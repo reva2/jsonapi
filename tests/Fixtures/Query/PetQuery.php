@@ -17,7 +17,7 @@ use Reva2\JsonApi\Http\Query\QueryParameters;
  * Query parameters for pets API
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Query
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class PetQuery extends QueryParameters
 {

@@ -19,7 +19,7 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface;
  * Adapts doctrine cache to CacheInterface
  *
  * @package Reva2\JsonApi\Contracts\Decoders\Mapping\Cache
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class DoctrineCache implements CacheInterface
 {

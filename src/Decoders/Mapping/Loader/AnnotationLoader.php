@@ -174,7 +174,8 @@ class AnnotationLoader implements LoaderInterface
         $metadata
             ->setDataType($dataType)
             ->setDataTypeParams($dataTypeParams)
-            ->setDataPath($this->getDataPath($annotation, $property));
+            ->setDataPath($this->getDataPath($annotation, $property))
+            ->setConverter($annotation->converter);
 
         if ($annotation->setter) {
             $metadata->setSetter($annotation->setter);

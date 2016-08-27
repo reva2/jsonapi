@@ -17,7 +17,7 @@ use Reva2\JsonApi\Encoder\Encoder;
  * Tests for JSON API encoder
  *
  * @package Reva2\JsonApi\Tests\Encoder
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class EncoderTest extends \PHPUnit_Framework_TestCase
 {

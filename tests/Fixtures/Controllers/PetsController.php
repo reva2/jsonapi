@@ -16,7 +16,7 @@ use Reva2\JsonApi\Annotations as API;
  * PetsController
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Controllers
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  *
  * @API\ApiRequest(
  *     urlPrefix="/myapp",

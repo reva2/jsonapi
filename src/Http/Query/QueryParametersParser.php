@@ -2,7 +2,7 @@
 /*
  * This file is part of the reva2/jsonapi.
  *
- * (c) OrbitScripts LLC <support@orbitscripts.com>
+ * (c) Sergey Revenko <dedsemen@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@ use Reva2\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
  * Query parameters parser
  *
  * @package Reva2\JsonApi\Http\Query
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class QueryParametersParser implements QueryParametersParserInterface
 {

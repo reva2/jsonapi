@@ -17,6 +17,7 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
+use Reva2\JsonApi\Decoders\CallbackResolver;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
@@ -44,7 +45,7 @@ use Symfony\Component\Validator\Validation;
  * Tests for JSON API service
  *
  * @package Reva2\JsonApi\Tests\Services
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class JsonApiServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -361,7 +362,7 @@ class JsonApiServiceTest extends \PHPUnit_Framework_TestCase
     private function getDataParser()
     {
         if (null === $this->parser) {
-            $this->parser = new DataParser($this->getMetadataFactory());
+            $this->parser = new DataParser($this->getMetadataFactory(), new CallbackResolver());
         }
 
         return $this->parser;

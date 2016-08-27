@@ -52,6 +52,12 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public $dataTypeParams;
 
     /**
+     * @var string|null
+     * @internal
+     */
+    public $converter;
+
+    /**
      * Constructor
      *
      * @param string $property
@@ -153,6 +159,25 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public function setDataTypeParams($dataTypeParams = null)
     {
         $this->dataTypeParams = $dataTypeParams;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getConverter()
+    {
+        return $this->converter;
+    }
+
+    /**
+     * @param string|null $converter
+     * @return $this
+     */
+    public function setConverter($converter)
+    {
+        $this->converter = $converter;
 
         return $this;
     }

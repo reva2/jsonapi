@@ -23,7 +23,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
  * Tests for lazy metadata factory
  *
  * @package Reva2\JsonApi\Tests\Decoders\Mapping\Factory
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class LazyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {

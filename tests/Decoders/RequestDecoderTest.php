@@ -19,7 +19,7 @@ use Reva2\JsonApi\Decoders\RequestDecoder;
  * Tests for request decoder
  *
  * @package Reva2\JsonApi\Tests\Decoders
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class RequestDecoderTest extends \PHPUnit_Framework_TestCase
 {

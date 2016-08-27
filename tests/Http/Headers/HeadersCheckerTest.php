@@ -24,7 +24,7 @@ use Reva2\JsonApi\Http\Headers\HeadersChecker;
  * Test for headers checker
  *
  * @package Reva2\JsonApi\Tests\Http\Headers
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class HeadersCheckerTest extends \PHPUnit_Framework_TestCase
 {

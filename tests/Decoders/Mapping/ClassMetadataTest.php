@@ -17,7 +17,7 @@ use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
  * Tests for JSON API class metadata
  *
  * @package Reva2\JsonApi\Tests\Decoders\Mapping
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
