@@ -17,7 +17,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
  * Simple demo converter
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Converters
- * @author Sergey Revenko <reva2@orbita1.ru>
+ * @author Sergey Revenko <dedsemen@gmail.com>
  */
 class StoreConverter
 {
