@@ -32,7 +32,7 @@ class QueryParameters implements EncodingParametersInterface
      * @API\Property(path="[include]", parser="parseIncludePaths")
      * @Assert\Type(type="array")
      * @Assert\All({
-     *     @Assert\Type(type="array")
+     *     @Assert\Type(type="string")
      * })
      */
     protected $includePaths;
@@ -41,7 +41,9 @@ class QueryParameters implements EncodingParametersInterface
      * @var array[]|null
      * @API\Property(path="[fields]", parser="parseFieldSets")
      * @Assert\Type(type="array")
-     * @Assert\All({@Assert\Type(type="string")})
+     * @Assert\All({
+     *     @Assert\Type(type="array")
+     * })
      */
     protected $fieldSets;
 
