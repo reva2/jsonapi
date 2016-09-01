@@ -31,7 +31,9 @@ class QueryParameters implements EncodingParametersInterface
      * @var string[]|null
      * @API\Property(path="[include]", parser="parseIncludePaths")
      * @Assert\Type(type="array")
-     * @Assert\All({@Assert\Type(type="string")})
+     * @Assert\All({
+     *     @Assert\Type(type="array")
+     * })
      */
     protected $includePaths;
 
