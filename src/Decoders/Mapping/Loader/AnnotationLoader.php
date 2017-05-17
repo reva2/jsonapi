@@ -233,7 +233,10 @@ class AnnotationLoader implements LoaderInterface
     {
         $params = null;
 
-        if ($this->isScalarDataType($type)) {
+        if ('raw' === $type) {
+            $dataType = 'raw';
+            $params = null;
+        } elseif ($this->isScalarDataType($type)) {
             $dataType = 'scalar';
             $params = $type;
         } elseif (preg_match('~^DateTime(<(.*?)>)?$~', $type, $matches)) {
@@ -278,7 +281,7 @@ class AnnotationLoader implements LoaderInterface
      */
     private function isScalarDataType($type)
     {
-        return in_array($type, ['raw', 'string', 'bool', 'boolean', 'int', 'integer', 'float', 'double']);
+        return in_array($type, ['string', 'bool', 'boolean', 'int', 'integer', 'float', 'double']);
     }
 
     /**
