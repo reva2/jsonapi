@@ -135,6 +135,12 @@ class ExampleObject extends BaseObject
     public $objProp;
 
     /**
+     * @var int
+     * @API\Property(type="raw")
+     */
+    public $rawPropWithDockblock;
+
+    /**
      * Parse value of customProp field
      *
      * @param mixed $value

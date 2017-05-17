@@ -278,7 +278,7 @@ class AnnotationLoader implements LoaderInterface
      */
     private function isScalarDataType($type)
     {
-        return in_array($type, ['string', 'bool', 'boolean', 'int', 'integer', 'float', 'double']);
+        return in_array($type, ['raw', 'string', 'bool', 'boolean', 'int', 'integer', 'float', 'double']);
     }
 
     /**

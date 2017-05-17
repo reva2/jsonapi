@@ -156,6 +156,12 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PropertyMetadataInterface::class, $prop);
         $this->assertSame('object', $prop->getDataType());
         $this->assertSame(AnotherObject::class, $prop->getDataTypeParams());
+
+        $this->assertArrayHasKey('rawPropWithDockblock', $properties);
+        $prop = $properties['rawPropWithDockblock'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $prop);
+        $this->assertSame('raw', $prop->getDataType());
+        $this->assertNull($prop->getDataTypeParams());
     }
 
     /**
