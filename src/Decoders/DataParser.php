@@ -68,7 +68,9 @@ class DataParser implements DataParserInterface
     {
         $this->factory = $factory;
         $this->callbackResolver = $callbackResolver;
-        $this->accessor = PropertyAccess::createPropertyAccessor();
+        $this->accessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
         
         $this->initPathStack();
     }
