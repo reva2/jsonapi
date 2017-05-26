@@ -164,7 +164,7 @@ class JsonApiService implements JsonApiServiceInterface
      * @param Request $request
      * @return EnvironmentInterface
      */
-    protected function getRequestEnvironment(Request $request)
+    public function getRequestEnvironment(Request $request)
     {
         if (false === $request->attributes->has('_jsonapi')) {
             throw new \RuntimeException('JSON API environment is not provided');
