@@ -57,4 +57,12 @@ interface JsonApiServiceInterface
      * @return ResponsesInterface
      */
     public function getResponseFactory(RequestInterface $request);
+
+    /**
+     * Returns JSON API environment configured in request
+     *
+     * @param Request $request
+     * @return EnvironmentInterface
+     */
+    public function getRequestEnvironment(Request $request);
 }
