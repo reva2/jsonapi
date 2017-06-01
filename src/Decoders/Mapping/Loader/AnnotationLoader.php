@@ -78,6 +78,7 @@ class AnnotationLoader implements LoaderInterface
     {
         $metadata = new ResourceMetadata($class->name);
         $metadata->setName($resource->name);
+        $metadata->setLoader($resource->loader);
 
         $properties = $class->getProperties();
         foreach ($properties as $property) {

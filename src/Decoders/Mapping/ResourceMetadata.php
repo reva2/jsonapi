@@ -29,6 +29,12 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     public $name;
 
     /**
+     * @var string
+     * @internal
+     */
+    public $loader;
+
+    /**
      * @var PropertyMetadataInterface
      */
     public $idMetadata;
@@ -126,6 +132,25 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     }
 
     /**
+     * @return string
+     */
+    public function getLoader()
+    {
+        return $this->loader;
+    }
+
+    /**
+     * @param string $loader
+     * @return $this
+     */
+    public function setLoader($loader = null)
+    {
+        $this->loader = $loader;
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function mergeMetadata($metadata = null)
@@ -142,6 +167,10 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
 
             if (empty($this->name)) {
                 $this->name = $metadata->getName();
+            }
+
+            if (empty($this->loader)) {
+                $this->loader = $metadata->getLoader();
             }
 
             if (null === $this->idMetadata) {

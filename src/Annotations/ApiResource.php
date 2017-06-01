@@ -25,4 +25,9 @@ class ApiResource extends ApiObject
      * @var string
      */
     public $name;
+
+    /**
+     * @var string
+     */
+    public $loader;
 }
