@@ -21,7 +21,6 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\Factory\MetadataFactoryInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
-use Reva2\JsonApi\Contracts\Decoders\ResourceLoaderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -343,18 +342,10 @@ class DataParser implements DataParserInterface
 
             $pathValue = null;
             if (null !== $metadata->getLoader()) {
-                $loader = $this->callbackResolver->resolveCallback($metadata->getLoader());
-
-                if (!$loader instanceof ResourceLoaderInterface) {
-                    throw new \InvalidArgumentException(
-                        sprintf("Resource loader must implement %s interface", ResourceLoaderInterface::class),
-                        500
-                    );
-                }
-
                 $id = ($this->hasValue($value, 'id')) ? $this->getValue($value, 'id') : null;
                 if (!empty($id)) {
-                    $pathValue = $loader->load($id, $metadata);
+                    $callback = $this->callbackResolver->resolveCallback($metadata->getLoader());
+                    $pathValue = call_user_func($callback, $id, $metadata);
                 }
             }
 
