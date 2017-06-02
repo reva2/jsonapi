@@ -331,14 +331,20 @@ class AnnotationLoader implements LoaderInterface
     private function getDataPath(Property $annotation, \ReflectionProperty $property)
     {
         $prefix = '';
+        $suffix = '';
         if ($annotation instanceof Attribute) {
             $prefix = 'attributes.';
         } elseif ($annotation instanceof Relationship) {
             $prefix = 'relationships.';
+            $suffix = '.data';
         }
 
-        if (!empty($prefix)) {
-            return (null !== $annotation->path) ? $prefix . $annotation->path : $prefix . $property->name;
+        if (!empty($prefix) || !empty($suffix)) {
+            if (null !== $annotation->path) {
+                return $prefix . $annotation->path . $suffix;
+            }
+
+            return $prefix . $property->name . $suffix;
         }
 
         return $annotation->path;

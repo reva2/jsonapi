@@ -7,9 +7,8 @@
       "name":"Kitty"
     },
     "relationships":{
-      "store":{
-        "type":"stores",
-        "id": "my-store"
+      "store": {
+        "data": {"type":"stores", "id": "my-store"}
       }
     }
   }

@@ -343,7 +343,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $data = $this->getDataFromFile('invalid-document.json');
-            $this->parser->parseDocument($data, PetsListDocument::class);
+            $res = $this->parser->parseDocument($data, PetsListDocument::class);
 
             $this->fail("Should throw exception on invalid document");
         } catch (JsonApiException $e) {
@@ -356,7 +356,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(409, $error->getStatus());
             $this->assertSame(DataParser::ERROR_CODE, $error->getCode());
             $this->assertSame("Value must contain resource of type 'stores'", $error->getDetail());
-            $this->assertSame(['pointer' => '/data/0/relationships/store'], $error->getSource());
+            $this->assertSame(['pointer' => '/data/0/relationships/store/data'], $error->getSource());
         }
     }
 

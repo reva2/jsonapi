@@ -8,7 +8,9 @@
         "family": "cats"
       },
       "relationships": {
-        "store": {"id": "my-store", "type": "stores"}
+        "store": {
+          "data": {"id": "my-store", "type": "stores"}
+        }
       }
     },
     {
