@@ -341,12 +341,9 @@ class DataParser implements DataParserInterface
             }
 
             $pathValue = null;
-            if (null !== $metadata->getLoader()) {
-                $id = ($this->hasValue($value, 'id')) ? $this->getValue($value, 'id') : null;
-                if (!empty($id)) {
-                    $callback = $this->callbackResolver->resolveCallback($metadata->getLoader());
-                    $pathValue = call_user_func($callback, $id, $metadata);
-                }
+            if ((null !== $metadata->getLoader()) && (true === $this->hasValue($value, 'id'))) {
+                $callback = $this->callbackResolver->resolveCallback($metadata->getLoader());
+                $pathValue = call_user_func($callback, $this->getValue($value, 'id'), $metadata);
             }
 
             if (null === $pathValue) {
