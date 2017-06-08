@@ -59,4 +59,11 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
      * @return string|null
      */
     public function getConverter();
+
+    /**
+     * Returns serialization groups
+     *
+     * @return string[]
+     */
+    public function getGroups();
 }

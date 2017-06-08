@@ -58,6 +58,12 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public $converter;
 
     /**
+     * @var array
+     * @internal
+     */
+    public $groups = ['Default'];
+
+    /**
      * Constructor
      *
      * @param string $property
@@ -178,6 +184,25 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public function setConverter($converter)
     {
         $this->converter = $converter;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param array $groups
+     * @return $this
+     */
+    public function setGroups(array $groups)
+    {
+        $this->groups = $groups;
 
         return $this;
     }

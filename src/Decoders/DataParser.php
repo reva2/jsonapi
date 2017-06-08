@@ -59,6 +59,13 @@ class DataParser implements DataParserInterface
     protected $callbackResolver;
 
     /**
+     * Serialization groups
+     *
+     * @var string[]
+     */
+    protected $serializationGroups = ['Default'];
+
+    /**
      * Constructor
      *
      * @param MetadataFactoryInterface $factory
@@ -91,6 +98,25 @@ class DataParser implements DataParserInterface
     public function restorePath()
     {
         $this->path->pop();
+
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSerializationGroups()
+    {
+        return $this->serializationGroups;
+    }
+
+    /**
+     * @param string[] $serializationGroups
+     * @return $this
+     */
+    public function setSerializationGroups($serializationGroups)
+    {
+        $this->serializationGroups = $serializationGroups;
 
         return $this;
     }
@@ -484,7 +510,9 @@ class DataParser implements DataParserInterface
     {
         $path = $metadata->getDataPath();
 
-        if (false === $this->hasValue($data, $path)) {
+        if ((false === $this->hasValue($data, $path)) ||
+            (true === $this->isExcludedProperty($metadata))
+        ) {
             return;
         }
 
@@ -749,5 +777,23 @@ class DataParser implements DataParserInterface
         }
 
         return $metadata->getDiscriminatorClass($discValue);
+    }
+
+    /**
+     * Check if specified property should be excluded
+     *
+     * @param PropertyMetadataInterface $metadata
+     * @return bool
+     */
+    private function isExcludedProperty(PropertyMetadataInterface $metadata)
+    {
+        $propertyGroups = $metadata->getGroups();
+        foreach ($propertyGroups as $group) {
+            if (in_array($group, $this->serializationGroups)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

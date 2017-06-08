@@ -51,6 +51,13 @@ interface EnvironmentInterface
     public function getUrlPrefix();
 
     /**
+     * Returns list of serialization groups
+     *
+     * @return string[]
+     */
+    public function getSerializationGroups();
+
+    /**
      * Returns list of validation groups that should be checked
      *
      * @return string[]|null

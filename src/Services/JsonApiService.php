@@ -103,10 +103,16 @@ class JsonApiService implements JsonApiServiceInterface
 
         $this->initializeEnvironment($environment, $request);
 
+        $prevGroups = $this->parser->getSerializationGroups();
+
+        $this->parser->setSerializationGroups($environment->getSerializationGroups());
+
         $apiRequest = $this->factory->createRequest($environment);
         $apiRequest
             ->setQuery($this->parseQuery($request, $environment))
             ->setBody($this->parseBody($request, $environment));
+
+        $this->parser->setSerializationGroups($prevGroups);
 
         if (null !== $environment->getValidationGroups()) {
             $this->validateRequest($apiRequest);

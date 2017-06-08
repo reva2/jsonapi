@@ -39,7 +39,7 @@ class ApiRequest
     /**
      * Code matcher
      *
-     * @var Reva2\JsonApi\Annotations\Matcher
+     * @var Matcher
      */
     public $matcher;
 
@@ -49,6 +49,13 @@ class ApiRequest
      * @var string
      */
     public $urlPrefix;
+
+    /**
+     * List of serialization groups
+     *
+     * @var array
+     */
+    public $serialization = ['Default'];
 
     /**
      * List of validation groups that should be
@@ -65,7 +72,7 @@ class ApiRequest
     {
         $data = [];
 
-        $properties = ['query', 'body', 'urlPrefix', 'validation'];
+        $properties = ['query', 'body', 'urlPrefix', 'validation', 'serialization'];
         foreach ($properties as $property) {
             $value = $this->{$property};
             if (null !== $value) {

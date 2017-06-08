@@ -52,4 +52,9 @@ class Property
      * @var string
      */
     public $converter;
+
+    /**
+     * @var array
+     */
+    public $groups = ['Default'];
 }

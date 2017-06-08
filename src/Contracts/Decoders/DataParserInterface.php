@@ -37,4 +37,19 @@ interface DataParserInterface
      * @return EncodingParametersInterface
      */
     public function parseQueryParams($data, $paramsType);
+
+    /**
+     * Sets serialization groups
+     *
+     * @param string[] $groups
+     * @return DataParserInterface
+     */
+    public function setSerializationGroups(array $groups);
+
+    /**
+     * Returns serialization groups
+     *
+     * @return string[]
+     */
+    public function getSerializationGroups();
 }

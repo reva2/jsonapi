@@ -53,6 +53,13 @@ class Environment implements EnvironmentInterface
     protected $urlPrefix = '';
 
     /**
+     * Serialization groups
+     *
+     * @var string[]
+     */
+    protected $serializationGroups = ['Default'];
+
+    /**
      * Validation groups
      *
      * @var string[]|null
@@ -177,6 +184,25 @@ class Environment implements EnvironmentInterface
     }
 
     /**
+     * @return string[]
+     */
+    public function getSerializationGroups()
+    {
+        return $this->serializationGroups;
+    }
+
+    /**
+     * @param string[] $serializationGroups
+     * @return $this
+     */
+    public function setSerializationGroups(array $serializationGroups)
+    {
+        $this->serializationGroups = $serializationGroups;
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getValidationGroups()
@@ -269,6 +295,7 @@ class Environment implements EnvironmentInterface
             'body' => 'setBodyType',
             'matcher' => 'setMatcherConfiguration',
             'urlPrefix' => 'setUrlPrefix',
+            'serialization' => 'setSerializationGroups',
             'validation' => 'setValidationGroups'
         ];
 
