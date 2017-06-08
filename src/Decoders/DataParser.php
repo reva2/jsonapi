@@ -114,7 +114,7 @@ class DataParser implements DataParserInterface
      * @param string[] $serializationGroups
      * @return $this
      */
-    public function setSerializationGroups($serializationGroups)
+    public function setSerializationGroups(array $serializationGroups)
     {
         $this->serializationGroups = $serializationGroups;
 
