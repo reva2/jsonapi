@@ -35,4 +35,12 @@ class ApiObject
      * @var array
      */
     public $discMap;
+
+    /**
+     * Error message used when invalid discriminator
+     * value specified
+     *
+     * @var string
+     */
+    public $discError = "Discriminator class for value '{{value}}' not specified";
 }

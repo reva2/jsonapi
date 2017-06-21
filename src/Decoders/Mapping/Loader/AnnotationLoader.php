@@ -320,6 +320,7 @@ class AnnotationLoader implements LoaderInterface
 
         $metadata->setDiscriminatorField($fieldMeta);
         $metadata->setDiscriminatorMap($object->discMap);
+        $metadata->setDiscriminatorError($object->discError);
     }
 
     /**

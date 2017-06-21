@@ -11,6 +11,8 @@
 
 namespace Reva2\JsonApi\Decoders\Mapping;
 
+use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 
@@ -22,6 +24,8 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
  */
 class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 {
+    const INVALID_DISCRIMINATOR_VALUE = '19cf8396-0fe1-487f-bd32-d5d34e2b4f68';
+
     /***
      * @var PropertyMetadataInterface|null
      * @internal
@@ -33,6 +37,12 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      * @internal
      */
     public $discMap;
+
+    /**
+     * @var string
+     * @internal
+     */
+    public $discError;
 
     /**
      * @inheritdoc
@@ -69,15 +79,39 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     }
 
     /**
+     * @return string
+     */
+    public function getDiscriminatorError()
+    {
+        return $this->discError;
+    }
+
+    /**
+     * @param string $error
+     * @return $this
+     */
+    public function setDiscriminatorError($error)
+    {
+        $this->discError = $error;
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getDiscriminatorClass($value)
     {
         if (!array_key_exists($value, $this->discMap)) {
-            throw new \InvalidArgumentException(sprintf(
-                "Discriminator class for value '%s' not specified",
-                $value
-            ));
+            $error = new Error(
+                rand(),
+                null,
+                422,
+                self::INVALID_DISCRIMINATOR_VALUE,
+                str_replace('{{value}}',  (string) $value, $this->discError)
+            );
+
+            throw new JsonApiException($error, 422);
         }
 
         return $this->discMap[$value];
