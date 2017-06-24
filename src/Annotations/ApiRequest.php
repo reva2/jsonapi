@@ -39,7 +39,7 @@ class ApiRequest
     /**
      * Code matcher
      *
-     * @var Matcher
+     * @var \Reva2\JsonApi\Annotations\Matcher
      */
     public $matcher;
 

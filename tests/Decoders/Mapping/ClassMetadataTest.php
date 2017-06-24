@@ -11,6 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Decoders\Mapping;
 
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
 
 /**
@@ -23,7 +24,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
      */
     public function shouldThrowIfValueNotConfiguredInDiscriminatorMap()
     {
