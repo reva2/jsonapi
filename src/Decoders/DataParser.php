@@ -292,19 +292,19 @@ class DataParser implements DataParserInterface
         $pathValue = null;
         if ($this->hasValue($data, $path)) {
             $value = $this->getValue($data, $path);
-            if ((null !== $value) && (false === is_array($value))) {
+            if (false === is_array($value)) {
                 throw new \InvalidArgumentException(
                     sprintf("Value expected to be an array, but %s given", gettype($value)),
                     400
                 );
-            } elseif (is_array($value)) {
-                $pathValue = [];
-                $keys = array_keys($value);
-                foreach ($keys as $key) {
-                    $arrayPath = sprintf("[%s]", $key);
+            }
 
-                    $pathValue[$key] = $itemsParser($value, $arrayPath, $this);
-                }
+            $pathValue = [];
+            $keys = array_keys($value);
+            foreach ($keys as $key) {
+                $arrayPath = sprintf("[%s]", $key);
+
+                $pathValue[$key] = $itemsParser($value, $arrayPath, $this);
             }
         }
 
