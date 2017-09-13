@@ -351,13 +351,6 @@ class DataParser implements DataParserInterface
             $metadata = $this->factory->getMetadataFor($resType);
             /* @var $metadata ResourceMetadataInterface */
 
-            $discClass = $this->getClassByDiscriminator($metadata, $value);
-            if ((null !== $discClass) && ($discClass !== $resType)) {
-                $this->restorePath();
-
-                return $this->parseResource($data, $path, $discClass);
-            }
-
             $name = $this->parseString($value, 'type');
             if ($name !== $metadata->getName()) {
                 throw new \InvalidArgumentException(
@@ -373,11 +366,21 @@ class DataParser implements DataParserInterface
             }
 
             if (null === $pathValue) {
+                $discClass = $this->getClassByDiscriminator($metadata, $value);
+                if ((null !== $discClass) && ($discClass !== $resType)) {
+                    $metadata = $this->factory->getMetadataFor($discClass);
+                }
+
                 $objClass = $metadata->getClassName();
                 $pathValue = new $objClass();
 
                 if (null !== ($idMetadata = $metadata->getIdMetadata())) {
                     $this->parseProperty($value, $pathValue, $idMetadata);
+                }
+            } else {
+                $valueClass = get_class($pathValue);
+                if ($valueClass !== $resType) {
+                    $metadata = $this->factory->getMetadataFor($valueClass);
                 }
             }
 
