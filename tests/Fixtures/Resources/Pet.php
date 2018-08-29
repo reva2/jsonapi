@@ -59,10 +59,63 @@ class Pet
     public $store;
 
     /**
+     * Virtual attribute
+     *
+     * @var string
+     */
+    protected $virtualAttr;
+
+    /**
+     * Virtual relationship
+     *
+     * @var Something
+     */
+    protected $virtualRel;
+
+    /**
+     * @return string
+     */
+    public function getVirtualAttr()
+    {
+        return $this->virtualAttr;
+    }
+
+    /**
+     * @param string $virtualAttr
+     * @return Pet
+     * @API\VirtualAttribute(name="virtualAttr", type="string")
+     */
+    public function setVirtualAttr($virtualAttr)
+    {
+        $this->virtualAttr = $virtualAttr;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function whoIAm()
     {
         return 'pet';
+    }
+
+    /**
+     * @return Something
+     */
+    public function getVirtualRel()
+    {
+        return $this->virtualRel;
+    }
+
+    /**
+     * @param Something $virtualRel
+     * @return Pet
+     * @API\VirtualRelationship(name="virtualRel", type="Reva2\JsonApi\Tests\Fixtures\Resources\Something")
+     */
+    public function setVirtualRel(Something $virtualRel)
+    {
+        $this->virtualRel = $virtualRel;
+        return $this;
     }
 }

@@ -26,6 +26,7 @@ use Reva2\JsonApi\Tests\Fixtures\Objects\InvalidObject2;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Something;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
 
 /**
@@ -40,6 +41,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
      * @var AnnotationLoader
      */
     protected $loader;
+
 
     protected function setUp()
     {
@@ -162,6 +164,13 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PropertyMetadataInterface::class, $prop);
         $this->assertSame('raw', $prop->getDataType());
         $this->assertNull($prop->getDataTypeParams());
+
+        $this->assertArrayHasKey('virtual', $properties);
+        $prop = $properties['virtual'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $prop);
+        $this->assertSame('scalar', $prop->getDataType());
+        $this->assertSame('string', $prop->getDataTypeParams());
+        $this->assertSame('setVirtualProperty', $prop->getSetter());
     }
 
     /**
@@ -202,6 +211,13 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('string', $attr->getDataTypeParams());
         $this->assertNull($attr->getSetter());
 
+        $this->assertArrayHasKey('virtualAttr', $attributes);
+        $attr = $attributes['virtualAttr'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $attr);
+        $this->assertSame('scalar', $attr->getDataType());
+        $this->assertSame('string', $attr->getDataTypeParams());
+        $this->assertSame('setVirtualAttr', $attr->getSetter());
+
         $relationships = $metadata->getRelationships();
         $this->assertInternalType('array', $relationships);
 
@@ -211,6 +227,13 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('object', $rel->getDataType());
         $this->assertSame(Store::class, $rel->getDataTypeParams());
         $this->assertNull($rel->getSetter());
+
+        $this->assertArrayHasKey('virtualRel', $relationships);
+        $rel = $relationships['virtualRel'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $rel);
+        $this->assertSame('object', $rel->getDataType());
+        $this->assertSame(Something::class, $rel->getDataTypeParams());
+        $this->assertSame('setVirtualRel', $rel->getSetter());
     }
 
     /**

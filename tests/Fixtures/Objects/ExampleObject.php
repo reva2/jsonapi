@@ -141,6 +141,22 @@ class ExampleObject extends BaseObject
     public $rawPropWithDockblock;
 
     /**
+     * Sets virtual property value
+     *
+     * @param mixed $value
+     * @API\VirtualProperty(name="virtual", type="string")
+     */
+    public function setVirtualProperty($value)
+    {
+        // Nothing to do here
+    }
+
+    public function getVirtualProperty()
+    {
+        return 'virtual';
+    }
+
+    /**
      * Parse value of customProp field
      *
      * @param mixed $value

@@ -27,6 +27,7 @@ use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Something;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -293,9 +294,14 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('mycat', $result->id);
         $this->assertSame('Kitty', $result->name);
+        $this->assertSame('virtual', $result->getVirtualAttr());
+
         $this->assertInstanceOf(Store::class, $result->store);
         $this->assertSame('mystore', $result->store->getId());
         $this->assertTrue($result->store->isConverted());
+
+        $this->assertInstanceOf(Something::class, $result->getVirtualRel());
+        $this->assertSame('test', $result->getVirtualRel()->id);
     }
 
     /**
