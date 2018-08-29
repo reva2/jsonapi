@@ -20,6 +20,9 @@ use Reva2\JsonApi\Annotations\ApiObject;
 use Reva2\JsonApi\Annotations\Content as ApiContent;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;
+use Reva2\JsonApi\Annotations\VirtualAttribute;
+use Reva2\JsonApi\Annotations\VirtualProperty;
+use Reva2\JsonApi\Annotations\VirtualRelationship;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
@@ -57,8 +60,10 @@ class AnnotationLoader implements LoaderInterface
     public function loadClassMetadata(\ReflectionClass $class)
     {
         if (null !== ($resource = $this->reader->getClassAnnotation($class, ApiResource::class))) {
+            /* @var $resource ApiResource */
             return $this->loadResourceMetadata($resource, $class);
         } elseif (null !== ($document = $this->reader->getClassAnnotation($class, ApiDocument::class))) {
+            /* @var $document ApiDocument */
             return $this->loadDocumentMetadata($document, $class);
         } else {
             $object = $this->reader->getClassAnnotation($class, ApiObject::class);
@@ -97,6 +102,21 @@ class AnnotationLoader implements LoaderInterface
             }
         }
 
+        $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
+        foreach ($methods as $method) {
+            if ($method->getDeclaringClass()->name !== $class->name) {
+                continue;
+            }
+
+            foreach ($this->reader->getMethodAnnotations($method) as $annotation) {
+                if ($annotation instanceof VirtualAttribute) {
+                    $metadata->addAttribute($this->loadVirtualMetadata($annotation, $method));
+                } else if ($annotation instanceof VirtualRelationship) {
+                    $metadata->addRelationship($this->loadVirtualMetadata($annotation, $method));
+                }
+            }
+        }
+
         $this->loadDiscriminatorMetadata($resource, $metadata);
 
         return $metadata;
@@ -118,9 +138,27 @@ class AnnotationLoader implements LoaderInterface
             }
 
             $annotation = $this->reader->getPropertyAnnotation($property, Property::class);
-            if (null !== $annotation) {
-                $metadata->addProperty($this->loadPropertyMetadata($annotation, $property));
+            /* @var $annotation Property */
+            if (null === $annotation) {
+                continue;
             }
+
+            $metadata->addProperty($this->loadPropertyMetadata($annotation, $property));
+        }
+
+        $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
+        foreach ($methods as $method) {
+            if ($method->getDeclaringClass()->name !== $class->name) {
+                continue;
+            }
+
+            $annotation = $this->reader->getMethodAnnotation($method, VirtualProperty::class);
+            /* @var $annotation VirtualProperty */
+            if ($annotation === null) {
+                continue;
+            }
+
+            $metadata->addProperty($this->loadVirtualMetadata($annotation, $method));
         }
 
         if (null !== $object) {
@@ -149,6 +187,7 @@ class AnnotationLoader implements LoaderInterface
             }
 
             $annotation = $this->reader->getPropertyAnnotation($property, ApiContent::class);
+            /* @var $annotation ApiContent */
             if (null !== $annotation) {
                 $metadata->setContentMetadata($this->loadPropertyMetadata($annotation, $property));
 
@@ -198,6 +237,37 @@ class AnnotationLoader implements LoaderInterface
     }
 
     /**
+     * Parse virtual property metadata
+     *
+     * @param VirtualProperty $annotation
+     * @param \ReflectionMethod $method
+     * @return PropertyMetadata
+     */
+    private function loadVirtualMetadata(VirtualProperty $annotation, \ReflectionMethod $method)
+    {
+        if (empty($annotation->name)) {
+            throw new \InvalidArgumentException(sprintf(
+                "Virtual property name not specified: %s:%s()",
+                $method->class,
+                $method->name
+            ));
+        }
+
+        list($dataType, $dataTypeParams) = $this->parseVirtualDataType($annotation, $method);
+
+        $metadata = new PropertyMetadata($annotation->name, $method->class);
+        $metadata
+            ->setDataType($dataType)
+            ->setDataTypeParams($dataTypeParams)
+            ->setDataPath($this->getVirtualDataPath($annotation, $method))
+            ->setConverter($annotation->converter)
+            ->setGroups($annotation->groups)
+            ->setSetter($method->name);
+
+        return $metadata;
+    }
+
+    /**
      * Parse property data type
      *
      * @param Property $annotation
@@ -220,6 +290,32 @@ class AnnotationLoader implements LoaderInterface
             return $this->parseDataTypeString($annotation->type);
         } elseif (preg_match('~@var\s(.*?)\s~si', $property->getDocComment(), $matches)) {
             return $this->parseDataTypeString($matches[1]);
+        } else {
+            return ['raw', null];
+        }
+    }
+
+    /**
+     * Parse virtual property data type
+     *
+     * @param VirtualProperty $annotation
+     * @param \ReflectionMethod $method
+     * @return array
+     */
+    private function parseVirtualDataType(VirtualProperty $annotation, \ReflectionMethod $method)
+    {
+        if (!empty($annotation->parser)) {
+            if (!$method->getDeclaringClass()->hasMethod($annotation->parser)) {
+                throw new \InvalidArgumentException(sprintf(
+                    "Custom parser function %s:%s() for virtual property '%s' does not exist",
+                    $method->class,
+                    $annotation->parser,
+                    $annotation->name
+                ));
+            }
+            return ['custom', $annotation->parser];
+        } elseif (!empty($annotation->type)) {
+            return $this->parseDataTypeString($annotation->type);
         } else {
             return ['raw', null];
         }
@@ -347,6 +443,35 @@ class AnnotationLoader implements LoaderInterface
             }
 
             return $prefix . $property->name . $suffix;
+        }
+
+        return $annotation->path;
+    }
+
+    /**
+     * Returns data path for virtual property
+     *
+     * @param VirtualProperty $annotation
+     * @param \ReflectionMethod $method
+     * @return string
+     */
+    private function getVirtualDataPath(VirtualProperty $annotation, \ReflectionMethod $method)
+    {
+        $prefix = '';
+        $suffix = '';
+        if ($annotation instanceof VirtualAttribute) {
+            $prefix = 'attributes.';
+        } elseif ($annotation instanceof VirtualRelationship) {
+            $prefix = 'relationships.';
+            $suffix = '.data';
+        }
+
+        if (!empty($prefix) || !empty($suffix)) {
+            if (null !== $annotation->path) {
+                return $prefix . $annotation->path . $suffix;
+            }
+
+            return $prefix . $annotation->name . $suffix;
         }
 
         return $annotation->path;

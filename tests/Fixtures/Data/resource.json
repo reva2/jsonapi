@@ -4,11 +4,15 @@
     "type": "pets",
     "attributes": {
       "name": "Kitty",
-      "family": "cats"
+      "family": "cats",
+      "virtualAttr": "virtual"
     },
     "relationships": {
       "store": {
         "data": {"id": "mystore", "type": "stores"}
+      },
+      "virtualRel": {
+        "data": {"id": "test", "type": "something"}
       }
     }
   }
