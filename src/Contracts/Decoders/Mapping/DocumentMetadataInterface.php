@@ -26,6 +26,13 @@ interface DocumentMetadataInterface extends GenericMetadataInterface
     public function getContentMetadata();
 
     /**
+     * Returns metadata for document' metadata
+     *
+     * @return PropertyMetadataInterface
+     */
+    public function getMetadata();
+
+    /**
      * Returns whether document can be empty
      * 
      * @return bool

@@ -29,6 +29,12 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
     public $content;
 
     /**
+     * @var PropertyMetadataInterface
+     * @internal
+     */
+    public $metadata;
+
+    /**
      * @var bool
      * @internal
      */
@@ -51,6 +57,25 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
     public function setContentMetadata(PropertyMetadataInterface $metadata)
     {
         $this->content = $metadata;
+
+        return $this;
+    }
+
+    /**
+     * @return PropertyMetadataInterface
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param PropertyMetadataInterface $metadata
+     * @return DocumentMetadata
+     */
+    public function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
 
         return $this;
     }
