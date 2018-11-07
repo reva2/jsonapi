@@ -21,6 +21,7 @@ use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
 use Reva2\JsonApi\Http\Query\ListQueryParameters;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetsListDocument;
+use Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
@@ -320,6 +321,10 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $doc->data);
         $this->assertInstanceOf(Cat::class, $doc->data[0]);
         $this->assertInstanceOf(Dog::class, $doc->data[1]);
+
+        $this->assertInstanceOf(PetsListMetadata::class, $doc->meta);
+        $this->assertSame('test', $doc->meta->someString);
+        $this->assertSame(1, $doc->meta->someInt);
     }
 
     /**

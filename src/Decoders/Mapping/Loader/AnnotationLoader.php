@@ -19,6 +19,7 @@ use Reva2\JsonApi\Annotations\Id;
 use Reva2\JsonApi\Annotations\ApiResource;
 use Reva2\JsonApi\Annotations\ApiObject;
 use Reva2\JsonApi\Annotations\Content as ApiContent;
+use Reva2\JsonApi\Annotations\Metadata;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;
 use Reva2\JsonApi\Annotations\VirtualAttribute;
@@ -191,12 +192,13 @@ class AnnotationLoader implements LoaderInterface
                 continue;
             }
 
-            $annotation = $this->reader->getPropertyAnnotation($property, ApiContent::class);
-            /* @var $annotation ApiContent */
-            if (null !== $annotation) {
-                $metadata->setContentMetadata($this->loadPropertyMetadata($annotation, $property));
 
-                break;
+            foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
+                if ($annotation instanceof ApiContent) {
+                    $metadata->setContentMetadata($this->loadPropertyMetadata($annotation, $property));
+                } elseif ($annotation instanceof Metadata) {
+                    $metadata->setMetadata($this->loadPropertyMetadata($annotation, $property));
+                }
             }
         }
 

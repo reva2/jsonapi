@@ -418,6 +418,11 @@ class DataParser implements DataParserInterface
 
             $this->parseProperty($data, $doc, $metadata->getContentMetadata());
 
+            $docMetadata = $metadata->getMetadata();
+            if ($docMetadata !== null) {
+                $this->parseProperty($data, $doc, $metadata->getMetadata());
+            }
+
             return $doc;
         } catch (JsonApiException $e) {
             throw $e;

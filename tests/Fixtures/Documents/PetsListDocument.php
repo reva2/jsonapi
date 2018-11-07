@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Tests\Fixtures\Documents;
 
 use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
 
 /**
@@ -29,4 +30,10 @@ class PetsListDocument
      * @API\Content(type="Array<Reva2\JsonApi\Tests\Fixtures\Resources\Pet>")
      */
     public $data;
+
+    /**
+     * @var PetsListMetadata
+     * @API\Metadata(type="Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata")
+     */
+    public $meta;
 }
