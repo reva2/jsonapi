@@ -340,7 +340,7 @@ class DataParser implements DataParserInterface
     /**
      * @inheritdoc
      */
-    public function parseResource($data, $path, $resType)
+    public function parseResource($data, $path, $resType, $loader = null)
     {
         $this->setPath($path);
 
@@ -360,7 +360,12 @@ class DataParser implements DataParserInterface
             }
 
             $pathValue = null;
-            if ((null !== $metadata->getLoader()) && (true === $this->hasValue($value, 'id'))) {
+
+            if ($loader === null) {
+                $loader = $metadata->getLoader();
+            }
+
+            if ((null !== $loader) && (true === $this->hasValue($value, 'id'))) {
                 $callback = $this->callbackResolver->resolveCallback($metadata->getLoader());
                 $pathValue = call_user_func($callback, $this->getValue($value, 'id'), $metadata);
             }
@@ -568,10 +573,10 @@ class DataParser implements DataParserInterface
                 return $this->parseDateTime($data, $path, $format);
 
             case 'array':
-                return $this->parseArrayValue($data, $path, $metadata->getDataTypeParams());
+                return $this->parseArrayValue($data, $path, $metadata->getDataTypeParams(), $metadata);
 
             case 'object':
-                return $this->parseResourceOrObject($data, $path, $metadata->getDataTypeParams());
+                return $this->parseResourceOrObject($data, $path, $metadata->getDataTypeParams(), $metadata);
 
             case 'raw':
                 return $this->parseRaw($data, $path);
@@ -590,17 +595,24 @@ class DataParser implements DataParserInterface
      * @param object|array $data
      * @param string $path
      * @param string $objClass
+     * @param PropertyMetadataInterface $propMetadata
      * @return mixed|null
      */
-    public function parseResourceOrObject($data, $path, $objClass)
+    public function parseResourceOrObject($data, $path, $objClass, PropertyMetadataInterface $propMetadata)
     {
-        $metadata = $this->factory->getMetadataFor($objClass);
+        $objMetadata = $this->factory->getMetadataFor($objClass);
+        if ($objMetadata instanceof ResourceMetadataInterface) {
+            $loader = null;
+            foreach ($propMetadata->getLoaders() as $group => $groupLoader) {
+                if (in_array($group, $this->serializationGroups)) {
+                    $loader = $groupLoader;
+                }
+            }
 
-        if ($metadata instanceof ResourceMetadataInterface) {
-            return $this->parseResource($data, $path, $objClass);
-        } else {
-            return $this->parseObject($data, $path, $objClass);
+            return $this->parseResource($data, $path, $objClass, $loader);
         }
+
+        return $this->parseObject($data, $path, $objClass);
     }
 
     /**
@@ -639,9 +651,10 @@ class DataParser implements DataParserInterface
      * @param object|array $data
      * @param string $path
      * @param array $params
+     * @param PropertyMetadataInterface $propMetadata
      * @return array|null
      */
-    public function parseArrayValue($data, $path, array $params)
+    public function parseArrayValue($data, $path, array $params, PropertyMetadataInterface $propMetadata)
     {
         $type = $params[0];
         $typeParams = $params[1];
@@ -670,8 +683,8 @@ class DataParser implements DataParserInterface
                 return $this->parseArray(
                     $data,
                     $path,
-                    function ($data, $path, DataParser $parser) use ($typeParams) {
-                        return $parser->parseResourceOrObject($data, $path, $typeParams);
+                    function ($data, $path, DataParser $parser) use ($typeParams, $propMetadata) {
+                        return $parser->parseResourceOrObject($data, $path, $typeParams, $propMetadata);
                     }
                 );
 
@@ -679,8 +692,8 @@ class DataParser implements DataParserInterface
                 return $this->parseArray(
                     $data,
                     $path,
-                    function ($data, $path, DataParser $parser) use ($typeParams) {
-                        return $parser->parseArrayValue($data, $path, $typeParams);
+                    function ($data, $path, DataParser $parser) use ($typeParams, $propMetadata) {
+                        return $parser->parseArrayValue($data, $path, $typeParams, $propMetadata);
                     }
                 );
 
