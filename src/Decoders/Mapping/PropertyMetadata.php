@@ -64,6 +64,12 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     public $groups = ['Default'];
 
     /**
+     * @var array
+     * @internal
+     */
+    public $loaders = [];
+
+    /**
      * Constructor
      *
      * @param string $property
@@ -205,5 +211,24 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
         $this->groups = $groups;
 
         return $this;
+    }
+
+    /**
+     * @param array $loaders
+     * @return $this
+     */
+    public function setLoaders(array $loaders)
+    {
+        $this->loaders = $loaders;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLoaders()
+    {
+        return $this->loaders;
     }
 }

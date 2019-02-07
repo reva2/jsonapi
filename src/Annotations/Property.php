@@ -57,4 +57,9 @@ class Property
      * @var array
      */
     public $groups = ['Default'];
+
+    /**
+     * @var array<Reva2\JsonApi\Annotations\Loader>
+     */
+    public $loaders = [];
 }

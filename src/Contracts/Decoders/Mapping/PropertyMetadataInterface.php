@@ -66,4 +66,11 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
      * @return string[]
      */
     public function getGroups();
+
+    /**
+     * Returns loaders
+     *
+     * @return array
+     */
+    public function getLoaders();
 }

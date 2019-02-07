@@ -26,6 +26,7 @@ use Reva2\JsonApi\Tests\Fixtures\Objects\InvalidObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\InvalidObject2;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Order;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Something;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
@@ -274,6 +275,33 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('object', $docMetadata->getDataType());
         $this->assertSame(PetsListMetadata::class, $docMetadata->getDataTypeParams());
         $this->assertNull($docMetadata->getSetter());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldLoadCustomLoadersMetadata()
+    {
+        $metadata = $this->loader->loadClassMetadata(new \ReflectionClass(Order::class));
+
+        $this->assertInstanceOf(ResourceMetadataInterface::class, $metadata);
+
+        $relationships = $metadata->getRelationships();
+        $this->assertInternalType('array', $relationships);
+
+        $this->assertArrayHasKey('store', $relationships);
+        $rel = $relationships['store'];
+        $this->assertInstanceOf(PropertyMetadataInterface::class, $rel);
+        $this->assertSame('object', $rel->getDataType());
+        $this->assertSame(Store::class, $rel->getDataTypeParams());
+        $this->assertNull($rel->getSetter());
+
+        $expectedLoaders = [
+            'CreateOrder' => 'store.custom_loader:create',
+            'UpdateOrder' => 'store.custom_loader:load'
+        ];
+
+        $this->assertEquals($expectedLoaders, $rel->getLoaders());
     }
 
     /**

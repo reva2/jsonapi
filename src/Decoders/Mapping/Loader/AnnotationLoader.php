@@ -19,6 +19,7 @@ use Reva2\JsonApi\Annotations\Id;
 use Reva2\JsonApi\Annotations\ApiResource;
 use Reva2\JsonApi\Annotations\ApiObject;
 use Reva2\JsonApi\Annotations\Content as ApiContent;
+use Reva2\JsonApi\Annotations\Loader;
 use Reva2\JsonApi\Annotations\Metadata;
 use Reva2\JsonApi\Annotations\Property;
 use Reva2\JsonApi\Annotations\Relationship;
@@ -223,7 +224,8 @@ class AnnotationLoader implements LoaderInterface
             ->setDataTypeParams($dataTypeParams)
             ->setDataPath($this->getDataPath($annotation, $property))
             ->setConverter($annotation->converter)
-            ->setGroups($annotation->groups);
+            ->setGroups($annotation->groups)
+            ->setLoaders($this->parseLoaders($annotation->loaders));
 
         if ($annotation->setter) {
             $metadata->setSetter($annotation->setter);
@@ -482,5 +484,29 @@ class AnnotationLoader implements LoaderInterface
         }
 
         return $annotation->path;
+    }
+
+    /**
+     * Parse property loaders
+     *
+     * @param array|Loader[] $loaders
+     * @return array
+     */
+    private function parseLoaders(array $loaders)
+    {
+        $propLoaders = [];
+
+        foreach ($loaders as $loader) {
+            if (array_key_exists($loader->group, $propLoaders)) {
+                throw new \InvalidArgumentException(sprintf(
+                    "Only one loader for serialization group '%s' can be specified",
+                    $loader->group
+                ));
+            }
+
+            $propLoaders[$loader->group] = $loader->loader;
+        }
+
+        return $propLoaders;
     }
 }
