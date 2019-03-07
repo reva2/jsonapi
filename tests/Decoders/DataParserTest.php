@@ -27,6 +27,7 @@ use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Person;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Something;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
@@ -319,13 +320,51 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $doc->data);
         $this->assertCount(2, $doc->data);
-        $this->assertInstanceOf(Cat::class, $doc->data[0]);
-        $this->assertInstanceOf(Dog::class, $doc->data[1]);
+
+        $cat = $doc->data[0];
+        $this->assertInstanceOf(Cat::class, $cat);
+        $this->assertEquals($data->data[0]->id, $cat->id);
+        $this->assertEquals($data->data[0]->attributes->name, $cat->name);
+        $this->assertEquals($data->data[0]->attributes->family, $cat->family);
+
+        $store = $cat->store;
+        $this->assertInstanceOf(Store::class, $store);
+        $this->assertEquals($data->included[0]->id, $store->getId());
+        $this->assertEquals($data->included[0]->attributes->name, $store->getName());
+        $this->assertEquals($data->included[0]->attributes->address, $store->getAddress());
+
+        $this->assertInternalType('array', $cat->owners);
+        $this->assertCount(2, $cat->owners);
+
+        $mom = $cat->owners[0];
+        $this->assertInstanceOf(Person::class, $mom);
+        $this->assertEquals($data->included[1]->id, $mom->id);
+        $this->assertEquals($data->included[1]->attributes->firstName, $mom->firstName);
+        $this->assertEquals($data->included[1]->attributes->lastName, $mom->lastName);
+
+        $dad = $cat->owners[1];
+        $this->assertInstanceOf(Person::class, $dad);
+        $this->assertEquals($data->included[2]->id, $dad->id);
+        $this->assertEquals($data->included[2]->attributes->firstName, $dad->firstName);
+        $this->assertEquals($data->included[2]->attributes->lastName, $dad->lastName);
+
+        $dog = $doc->data[1];
+        $this->assertInstanceOf(Dog::class, $dog);
+        $this->assertEquals($data->data[1]->id, $dog->id);
+        $this->assertEquals($data->data[1]->attributes->name, $dog->name);
+        $this->assertEquals($data->data[1]->attributes->family, $dog->family);
+        $this->assertSame($store, $dog->store);
+        $this->assertInternalType('array', $dog->owners);
+        $this->assertCount(2, $dog->owners);
+        $this->assertSame($mom, $dog->owners[0]);
+        $this->assertSame($dad, $dog->owners[1]);
 
         $this->assertInstanceOf(PetsListMetadata::class, $doc->meta);
         $this->assertSame('test', $doc->meta->someString);
         $this->assertSame(1, $doc->meta->someInt);
     }
+
+
 
     /**
      * @test

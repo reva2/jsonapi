@@ -42,6 +42,11 @@ class DataParser implements DataParserInterface
     protected $path;
 
     /**
+     * @var Context
+     */
+    protected $context;
+
+    /**
      * Resource decoders factory
      *
      * @var MetadataFactoryInterface
@@ -80,6 +85,7 @@ class DataParser implements DataParserInterface
             ->getPropertyAccessor();
         
         $this->initPathStack();
+        $this->initContext();
     }
 
     /**
@@ -359,15 +365,17 @@ class DataParser implements DataParserInterface
                 );
             }
 
+            $id = ($this->hasValue($value, 'id')) ? $this->getValue($value, 'id') : null;
+
             $pathValue = null;
 
             if ($loader === null) {
                 $loader = $metadata->getLoader();
             }
 
-            if ((null !== $loader) && (true === $this->hasValue($value, 'id'))) {
+            if ((null !== $loader) && (null !== $id)) {
                 $callback = $this->callbackResolver->resolveCallback($loader);
-                $pathValue = call_user_func($callback, $this->getValue($value, 'id'), $metadata);
+                $pathValue = call_user_func($callback, $id, $metadata);
             }
 
             if (null === $pathValue) {
@@ -394,7 +402,11 @@ class DataParser implements DataParserInterface
             }
 
             foreach ($metadata->getRelationships() as $relationship) {
-                $this->parseProperty($value, $pathValue, $relationship);
+                $this->parseRelationship($value, $pathValue, $relationship);
+            }
+
+            if (null !== $id) {
+                $this->context->registerResource($name, $id, $pathValue);
             }
         }
 
@@ -410,6 +422,7 @@ class DataParser implements DataParserInterface
     {
         try {
             $this->initPathStack();
+            $this->initContext();
 
             $metadata = $this->factory->getMetadataFor($docType);
             if (!$metadata instanceof DocumentMetadataInterface) {
@@ -420,6 +433,8 @@ class DataParser implements DataParserInterface
 
             $docClass = $metadata->getClassName();
             $doc = new $docClass();
+
+            $this->parseLinkedResources($data);
 
             $this->parseProperty($data, $doc, $metadata->getContentMetadata());
 
@@ -443,6 +458,7 @@ class DataParser implements DataParserInterface
     {
         try {
             $this->initPathStack();
+            $this->initContext();
 
             $query = $this->parseObjectValue($data, $paramsType);
             if (!$query instanceof EncodingParametersInterface) {
@@ -477,6 +493,14 @@ class DataParser implements DataParserInterface
     protected function initPathStack()
     {
         $this->path = new \SplStack();
+    }
+
+    /**
+     * Initialize decoder context
+     */
+    protected function initContext()
+    {
+        $this->context = new Context();
     }
 
     /**
@@ -518,10 +542,13 @@ class DataParser implements DataParserInterface
      * @param object|array $data
      * @param object $obj
      * @param PropertyMetadataInterface $metadata
+     * @param string|null $path
      */
-    private function parseProperty($data, $obj, PropertyMetadataInterface $metadata)
+    private function parseProperty($data, $obj, PropertyMetadataInterface $metadata, $path = null)
     {
-        $path = $metadata->getDataPath();
+        if (null === $path) {
+            $path = $metadata->getDataPath();
+        }
 
         if ((false === $this->hasValue($data, $path)) ||
             (true === $this->isExcludedProperty($metadata))
@@ -541,13 +568,7 @@ class DataParser implements DataParserInterface
             $value = call_user_func($callback, $value);
         }
 
-        $setter = $metadata->getSetter();
-        if (null !== $setter) {
-            $obj->{$setter}($value);
-        } else {
-            $setter = $metadata->getPropertyName();
-            $obj->{$setter} = $value;
-        }
+        $this->setProperty($obj, $value, $metadata);
     }
 
     /**
@@ -816,5 +837,160 @@ class DataParser implements DataParserInterface
         }
 
         return true;
+    }
+
+    /**
+     *
+     * @param mixed $data
+     */
+    private function parseLinkedResources($data)
+    {
+        if (false === $this->hasValue($data, 'included')) {
+            return;
+        }
+
+        $linkedData = $this->getValue($data, 'included');
+        if (!is_array($linkedData)) {
+            return;
+        }
+
+        foreach ($linkedData as $idx => $resData) {
+            $id = null;
+            if ($this->hasValue($resData, 'id')) {
+                $id = $this->getValue($resData, 'id');
+            }
+
+            $type = null;
+            if ($this->hasValue($resData, 'type')) {
+                $type = $this->getValue($resData, 'type');
+            }
+
+            if (empty($id) || empty($type) || !is_string($id) || !is_string($type)) {
+                continue;
+            }
+
+            $this->context->addLinkedData($type, $id, $idx, $resData);
+        }
+    }
+
+    /**
+     * Parse specified relationship data
+     *
+     * @param mixed $data
+     * @param mixed $pathValue
+     * @param PropertyMetadataInterface $relationship
+     * @return void
+     */
+    private function parseRelationship($data, $pathValue, PropertyMetadataInterface $relationship)
+    {
+        if ('array' === $relationship->getDataType()) {
+            return $this->parseArrayRelationship($data, $pathValue, $relationship);
+        }
+
+        $resType = null;
+        if ($this->hasValue($data, $relationship->getDataPath() . '.type')) {
+            $resType = $this->parseString($data, $relationship->getDataPath() . '.type');
+        }
+
+        $resId = null;
+        if ($this->hasValue($data, $relationship->getDataPath() . '.id')) {
+            $resId = $this->getValue($data, $relationship->getDataPath() . '.id');
+        }
+
+        if ((null !== $resId) &&
+            (null !== $resType) &&
+            (null !== ($res = $this->context->getResource($resType, $resId)))
+        ) {
+            return $this->setProperty($pathValue, $res, $relationship);
+        }
+
+
+        if (null !== ($linkedData = $this->context->getLinkedData($resType, $resId))) {
+            $idx = $this->context->getLinkedDataIndex($resType, $resId);
+            $prevPath = $this->path;
+
+            $this->initPathStack();
+            $this->setPath('included')->setPath($idx);
+
+            $this->parseProperty([$idx => $linkedData], $pathValue, $relationship, '[' . $idx . ']');
+            $this->path = $prevPath;
+
+            return;
+        }
+
+        $this->parseProperty($data, $pathValue, $relationship);
+    }
+
+    /**
+     * Parse data for relationship that contains array of resources
+     *
+     * @param mixed $data
+     * @param mixed $pathValue
+     * @param PropertyMetadataInterface $relationship
+     */
+    private function parseArrayRelationship($data, $pathValue, PropertyMetadataInterface $relationship)
+    {
+
+        $data = $this->parseArray($data, $relationship->getDataPath(), function ($data, $path) use ($relationship) {
+            $resType = null;
+            if ($this->hasValue($data, $path . '.type')) {
+                $resType = $this->parseString($data, $path . '.type');
+            }
+
+            $resId = null;
+            if ($this->hasValue($data, $path .'.id')) {
+                $resId = $this->getValue($data, $path . '.id');
+            }
+
+            if ((null !== $resType) &&
+                (null !== $resId) &&
+                (null !== ($parsed = $this->context->getResource($resType, $resId)))
+            ) {
+                return $parsed;
+            }
+
+            $params = $relationship->getDataTypeParams();
+
+            if (null !== ($linkedData = $this->context->getLinkedData($resType, $resId))) {
+                $idx = $this->context->getLinkedDataIndex($resType, $resId);
+
+                $prevPath = $this->path;
+                $this->initPathStack();
+                $this->setPath('included')->setPath($idx);
+
+                $parsed = $this->parseResourceOrObject(
+                    [$idx => $linkedData],
+                    '[' . $idx .']',
+                    $params[1],
+                    $relationship
+                );
+
+                $this->path = $prevPath;
+
+                return $parsed;
+            }
+
+            return $this->parseResourceOrObject($data, $path, $params[1], $relationship);
+        });
+
+        $this->setProperty($pathValue, $data, $relationship);
+    }
+
+    /**
+     * Sets property value using metadata
+     *
+     * @param mixed $obj
+     * @param mixed $value
+     * @param PropertyMetadataInterface $metadata
+     */
+    private function setProperty($obj, $value, PropertyMetadataInterface $metadata)
+    {
+        $setter = $metadata->getSetter();
+        if (null !== $setter) {
+            $obj->{$setter}($value);
+        } else {
+            $setter = $metadata->getPropertyName();
+            $obj->{$setter} = $value;
+        }
     }
 }

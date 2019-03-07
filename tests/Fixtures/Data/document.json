@@ -10,6 +10,9 @@
       "relationships": {
         "store": {
           "data": {"id": "my-store", "type": "stores"}
+        },
+        "owners": {
+          "data": [{"id":  "mom", "type": "persons"}, {"id":  "dad", "type": "persons"}]
         }
       }
     },
@@ -19,6 +22,40 @@
       "attributes": {
         "name": "Jack",
         "family": "dogs"
+      },
+      "relationships": {
+        "store": {
+          "data": {"id": "my-store", "type": "stores"}
+        },
+        "owners": {
+          "data": [{"id":  "mom", "type": "persons"}, {"id":  "dad", "type": "persons"}]
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "id": "my-store",
+      "type": "stores",
+      "attributes": {
+        "name": "My Stores",
+        "address": "Example st, 11 b"
+      }
+    },
+    {
+      "id": "mom",
+      "type": "persons",
+      "attributes": {
+        "firstName": "Lada",
+        "lastName": "Muller"
+      }
+    },
+    {
+      "id": "dad",
+      "type": "persons",
+      "attributes": {
+        "firstName": "Max",
+        "lastName": "Muller"
       }
     }
   ],
