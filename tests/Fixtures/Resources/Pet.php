@@ -59,6 +59,12 @@ class Pet
     public $store;
 
     /**
+     * @var array|Person[]
+     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Person[]")
+     */
+    public $owners = [];
+
+    /**
      * Virtual attribute
      *
      * @var string

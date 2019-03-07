@@ -10,7 +10,6 @@
 
 namespace Reva2\JsonApi\Services;
 
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Document\Error;
@@ -237,7 +236,7 @@ class JsonApiService implements JsonApiServiceInterface
     {
         $parts = explode('/', $type);
         if (2 !== count($parts)) {
-            throw new InvalidArgumentException(sprintf("Invalid media type '%s' specified", $type));
+            throw new \InvalidArgumentException(sprintf("Invalid media type '%s' specified", $type));
         }
 
         return $this->factory->createMediaType($parts[0], $parts[1]);
