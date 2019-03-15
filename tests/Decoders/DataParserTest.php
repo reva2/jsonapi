@@ -364,6 +364,39 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, $doc->meta->someInt);
     }
 
+    /**
+     * @test
+     */
+    public function shouldParseDocumentWithErrors()
+    {
+        $data = $this->getDataFromFile('error-document.json');
+
+        try {
+            $this->parser->parseDocument($data, PetsListDocument::class);
+
+            $this->fail('It must throw exception on document with error');
+        } catch (JsonApiException $e) {
+            $errors = $e->getErrors();
+
+            $this->assertCount(2, $errors);
+
+            $this->assertEquals($data->errors[0]->id, $errors[0]->getId());
+            $this->assertEquals($data->errors[0]->status, $errors[0]->getStatus());
+            $this->assertEquals($data->errors[0]->code, $errors[0]->getCode());
+            $this->assertEquals($data->errors[0]->title, $errors[0]->getTitle());
+            $this->assertEquals($data->errors[0]->detail, $errors[0]->getDetail());
+            $this->assertEquals(['pointer' => $data->errors[0]->source->pointer], $errors[0]->getSource());
+            $this->assertSame($data->errors[0]->meta, $errors[0]->getMeta());
+
+            $this->assertEquals($data->errors[1]->id, $errors[1]->getId());
+            $this->assertEquals($data->errors[1]->status, $errors[1]->getStatus());
+            $this->assertEquals($data->errors[1]->code, $errors[1]->getCode());
+            $this->assertEquals($data->errors[1]->title, $errors[1]->getTitle());
+            $this->assertEquals($data->errors[1]->detail, $errors[1]->getDetail());
+            $this->assertEquals(['parameter' => $data->errors[1]->source->parameter], $errors[1]->getSource());
+        }
+    }
+
 
 
     /**

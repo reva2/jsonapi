@@ -424,6 +424,8 @@ class DataParser implements DataParserInterface
             $this->initPathStack();
             $this->initContext();
 
+            $this->parseErrors($data);
+
             $metadata = $this->factory->getMetadataFor($docType);
             if (!$metadata instanceof DocumentMetadataInterface) {
                 throw new \InvalidArgumentException(sprintf("Failed to parse %s as JSON API document", $docType));
@@ -992,5 +994,39 @@ class DataParser implements DataParserInterface
             $setter = $metadata->getPropertyName();
             $obj->{$setter} = $value;
         }
+    }
+
+    /**
+     * Parse errors from JSON API document
+     *
+     * @param object $data
+     */
+    private function parseErrors($data)
+    {
+        if (!$this->hasValue($data, 'errors')) {
+            return;
+        }
+
+        $errors = $this->parseArray($data, 'errors', function ($data, $path, DataParser $parser) {
+            $source = null;
+            if ($this->hasValue($data, $path . '.source.pointer')) {
+                $source = ['pointer' => $this->parseString($data, $path . '.source.pointer')];
+            } elseif ($this->hasValue($data, $path . '.source.parameter')) {
+                $source = ['parameter' => $this->parseString($data, $path . '.source.parameter')];
+            }
+
+            return new Error(
+                $this->parseString($data, $path . '.id'),
+                null,
+                $this->parseString($data, $path . '.status'),
+                $this->parseString($data, $path . '.code'),
+                $this->parseString($data, $path . '.title'),
+                $this->parseString($data, $path . '.detail'),
+                $source,
+                $this->parseRaw($data, $path . '.meta')
+            );
+        });
+
+        throw new JsonApiException($errors);
     }
 }
