@@ -12,7 +12,6 @@
 namespace Reva2\JsonApi\Decoders\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\ORM\Proxy\Proxy;
 use Reva2\JsonApi\Annotations\Attribute;
 use Reva2\JsonApi\Annotations\ApiDocument;
 use Reva2\JsonApi\Annotations\Id;
@@ -62,7 +61,7 @@ class AnnotationLoader implements LoaderInterface
      */
     public function loadClassMetadata(\ReflectionClass $class)
     {
-        if ($class->implementsInterface(Proxy::class)) {
+        if (class_exists('Doctrine\ORM\Proxy\Proxy') && $class->implementsInterface('Doctrine\ORM\Proxy\Proxy')) {
             return $this->loadClassMetadata($class->getParentClass());
         }
 

@@ -1,0 +1,27 @@
+{
+  "errors": [
+    {
+      "id": "error1",
+      "status": "400",
+      "code": "error-code-1",
+      "title": "First error",
+      "detail": "First error details",
+      "source": {
+        "pointer": "/data/attributes/title"
+      },
+      "meta": {
+        "some": "metadata"
+      }
+    },
+    {
+      "id": "error2",
+      "status": "400",
+      "code": "error-code-2",
+      "title": "Second error",
+      "detail": "Second error details",
+      "source": {
+        "parameter": "page"
+      }
+    }
+  ]
+}
