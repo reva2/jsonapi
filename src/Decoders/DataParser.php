@@ -367,9 +367,14 @@ class DataParser implements DataParserInterface
 
             $id = ($this->hasValue($value, 'id')) ? $this->getValue($value, 'id') : null;
 
-            $pathValue = null;
+            if (null !== $id) {
+                $pathValue = $this->context->getResource($name, $id);
+                if (null !== $pathValue) {
+                    $id = null;
+                }
+            }
 
-            if ($loader === null) {
+            if (null === $pathValue && $loader === null) {
                 $loader = $metadata->getLoader();
             }
 
