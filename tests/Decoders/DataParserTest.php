@@ -29,6 +29,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Person;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
+use Reva2\JsonApi\Tests\Fixtures\Resources\RussianDoll;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Something;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -304,6 +305,34 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Something::class, $result->getVirtualRel());
         $this->assertSame('test', $result->getVirtualRel()->id);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldParseHierarchicalListResource()
+    {
+        $data = $this->getDataFromFile('russian-doll-response.json');
+
+        $itemParser = function ($data, $path, DataParser $parser) {
+            $values = $parser->parseResource($data, $path, RussianDoll::class);
+
+            return $values;
+        };
+
+        $dolls = $this->parser->parseArray($data, 'data', $itemParser);
+
+        /** @var RussianDoll $doll */
+        foreach ($dolls as $doll) {
+            $this->assertInstanceOf(RussianDoll::class, $doll);
+            if ('large' === $doll->id) {
+                $this->assertNull($doll->containedBy);
+            } elseif ('medium' === $doll->id) {
+                $this->assertSame('large', $doll->containedBy->id);
+            } else {
+                $this->assertSame('medium', $doll->containedBy->id);
+            }
+        }
     }
 
     /**

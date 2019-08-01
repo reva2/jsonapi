@@ -1,0 +1,47 @@
+{
+  "data":[
+    {
+      "type":"dolls",
+      "id":"large",
+      "attributes": {
+        "color":"red"
+      },
+      "relationships":{
+        "parent": {
+          "data": null
+        }
+      },
+      "links":{
+        "self":"\/dolls\/large"
+      }
+    },
+    {
+      "type":"dolls",
+      "id":"medium",
+      "attributes":{
+        "color":"green"
+      },
+      "relationships":{
+        "containedBy":{
+          "data":{"type":"dolls","id":"large"}
+        }
+      },
+      "links":{
+        "self":"\/dolls\/medium"
+      }
+    },
+    {
+      "type":"dolls",
+      "id":"small",
+      "attributes":{
+        "color":"blue"
+      },
+      "relationships":{
+        "containedBy":{
+          "data":{"type":"dolls","id":"medium"}
+        }
+      },
+      "links":{"self":"\/dolls\/small"}
+    }
+  ]
+}
