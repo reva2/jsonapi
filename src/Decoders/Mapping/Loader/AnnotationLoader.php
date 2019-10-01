@@ -61,7 +61,7 @@ class AnnotationLoader implements LoaderInterface
      */
     public function loadClassMetadata(\ReflectionClass $class)
     {
-        if (class_exists('Doctrine\ORM\Proxy\Proxy') && $class->implementsInterface('Doctrine\ORM\Proxy\Proxy')) {
+        if (interface_exists('Doctrine\ORM\Proxy\Proxy') && $class->implementsInterface('Doctrine\ORM\Proxy\Proxy')) {
             return $this->loadClassMetadata($class->getParentClass());
         }
 
