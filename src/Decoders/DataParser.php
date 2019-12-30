@@ -83,7 +83,7 @@ class DataParser implements DataParserInterface
         $this->accessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
-        
+
         $this->initPathStack();
         $this->initContext();
     }
@@ -937,7 +937,6 @@ class DataParser implements DataParserInterface
      */
     private function parseArrayRelationship($data, $pathValue, PropertyMetadataInterface $relationship)
     {
-
         $data = $this->parseArray($data, $relationship->getDataPath(), function ($data, $path) use ($relationship) {
             $resType = null;
             if ($this->hasValue($data, $path . '.type')) {
@@ -980,7 +979,9 @@ class DataParser implements DataParserInterface
             return $this->parseResourceOrObject($data, $path, $params[1], $relationship);
         });
 
-        $this->setProperty($pathValue, $data, $relationship);
+        if (is_array($data)) {
+            $this->setProperty($pathValue, $data, $relationship);
+        }
     }
 
     /**
