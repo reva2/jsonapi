@@ -11,6 +11,8 @@
 
 namespace Reva2\JsonApi\Tests\Http\Query;
 
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Http\Query\ListQueryParameters;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -21,7 +23,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * @package Reva2\JsonApi\Tests\Http\Query
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class ListQueryParametersTest extends \PHPUnit_Framework_TestCase
+class ListQueryParametersTest extends TestCase
 {
 
     /**
@@ -36,11 +38,12 @@ class ListQueryParametersTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionCode 400
      */
     public function shouldThrowOnInvalidSortParameters()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(400);
+
         $query = new ListQueryParameters();
         $query->parseSortingParameters(null);
         $query->parseSortingParameters(['invalid']);

@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Tests\Decoders\Mapping;
 
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
 
 /**
@@ -20,11 +21,10 @@ use Reva2\JsonApi\Decoders\Mapping\ClassMetadata;
  * @package Reva2\JsonApi\Tests\Decoders\Mapping
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class ClassMetadataTest extends \PHPUnit_Framework_TestCase
+class ClassMetadataTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
      */
     public function shouldThrowIfValueNotConfiguredInDiscriminatorMap()
     {
@@ -34,6 +34,8 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertSame('ChildClass', $metadata->getDiscriminatorClass('child'));
+
+        $this->expectException(JsonApiException::class);
 
         $metadata->getDiscriminatorClass('unknown');
     }

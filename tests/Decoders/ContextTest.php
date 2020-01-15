@@ -13,6 +13,7 @@ namespace Reva2\JsonApi\Tests\Decoders;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\Context;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
+use RuntimeException;
 
 /**
  * ContextTest
@@ -30,7 +31,7 @@ class ContextTest extends TestCase
     /**
      * @inheritDoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -61,7 +62,6 @@ class ContextTest extends TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
      */
     public function shouldThrowIfResourceRegisteredAlready()
     {
@@ -69,6 +69,8 @@ class ContextTest extends TestCase
 
         $res = new Dog();
         $res->id = 'test';
+
+        $this->expectException(RuntimeException::class);
 
         $this->context->registerResource($type, $res->id, $res);
         $this->context->registerResource($type, $res->id, $res);

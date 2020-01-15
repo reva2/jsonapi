@@ -11,6 +11,8 @@
 
 namespace Reva2\JsonApi\Tests\Decoders;
 
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\CallbackResolver;
 
 /**
@@ -19,7 +21,7 @@ use Reva2\JsonApi\Decoders\CallbackResolver;
  * @package Reva2\JsonApi\Tests\Decoders
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class CallbackResolverTest extends \PHPUnit_Framework_TestCase
+class CallbackResolverTest extends TestCase
 {
     /**
      * @var CallbackResolver
@@ -37,7 +39,7 @@ class CallbackResolverTest extends \PHPUnit_Framework_TestCase
 
         $callback = $this->resolver->resolveCallback($name);
 
-        $this->assertInternalType('array', $callback);
+        $this->assertIsArray($callback);
         $this->assertCount(2, $callback);
         $this->assertSame($class, $callback[0]);
         $this->assertSame($method, $callback[1]);
@@ -57,11 +59,12 @@ class CallbackResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
      */
     public function shouldThrowIfNameIsNotCallable()
     {
         $name = 'Reva2\JsonApi\Tests\Fixtures\Converters\InvalidConverter::convert';
+
+        $this->expectException(InvalidArgumentException::class);
 
         $this->resolver->resolveCallback($name);
     }
@@ -69,7 +72,7 @@ class CallbackResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolver = new CallbackResolver();
     }

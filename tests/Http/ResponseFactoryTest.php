@@ -13,6 +13,7 @@ namespace Reva2\JsonApi\Tests\Http;
 
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Http\ResponseFactory;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @package Reva2\JsonApi\Tests\Http
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
+class ResponseFactoryTest extends TestCase
 {
     /**
      * @test

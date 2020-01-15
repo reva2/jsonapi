@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Tests\Decoders\Mapping\Factory;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Cache\CacheInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
@@ -25,7 +26,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
  * @package Reva2\JsonApi\Tests\Decoders\Mapping\Factory
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class LazyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class LazyMetadataFactoryTest extends TestCase
 {
     /**
      * @test
@@ -84,12 +85,12 @@ class LazyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('pets', $metadata->getName());
 
         $attributes = $metadata->getAttributes();
-        $this->assertInternalType('array', $attributes);
+        $this->assertIsArray($attributes);
         $this->assertArrayHasKey('name', $attributes);
         $this->assertArrayHasKey('family', $attributes);
 
         $relationships = $metadata->getRelationships();
-        $this->assertInternalType('array', $relationships);
+        $this->assertIsArray($relationships);
         $this->assertArrayHasKey('store', $relationships);
 
         $this->assertSame($metadata, $factory->getMetadataFor(Cat::class));
