@@ -12,8 +12,10 @@
 namespace Reva2\JsonApi\Tests\Services;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
@@ -37,6 +39,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
 use Reva2\JsonApi\Tests\Fixtures\Schemas\PetSchema;
 use Reva2\JsonApi\Tests\Fixtures\Schemas\StoreSchema;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validation;
@@ -47,7 +50,7 @@ use Symfony\Component\Validator\Validation;
  * @package Reva2\JsonApi\Tests\Services
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class JsonApiServiceTest extends \PHPUnit_Framework_TestCase
+class JsonApiServiceTest extends TestCase
 {
     /**
      * @var DataParserInterface
@@ -232,8 +235,6 @@ class JsonApiServiceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage JSON API environment is not provided
      */
     public function shouldThrowIfEnvironmentNotSpecified()
     {
@@ -243,13 +244,14 @@ class JsonApiServiceTest extends \PHPUnit_Framework_TestCase
             'Accept' => 'application/vnd.json+api'
         ]);
 
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('JSON API environment is not provided');
+
         $this->service->parseRequest($request);
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #JSON API environment should implement .+ interface#
      */
     public function shouldThrowOnInvalidEnvironment()
     {
@@ -261,13 +263,14 @@ class JsonApiServiceTest extends \PHPUnit_Framework_TestCase
 
         $request->attributes->set('_jsonapi', []);
 
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#JSON API environment should implement .+ interface#');
+
         $this->service->parseRequest($request);
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp  #Invalid media type .+ specified#
      */
     public function shouldThrowOnInvalidMediaTypes()
     {
@@ -291,13 +294,15 @@ class JsonApiServiceTest extends \PHPUnit_Framework_TestCase
 
         $request->attributes->set('_jsonapi', $environment);
 
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Invalid media type .+ specified#');
         $this->service->parseRequest($request);
     }
 
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $factory = $this->getApiFactory();
 

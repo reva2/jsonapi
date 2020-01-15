@@ -13,7 +13,9 @@ namespace Reva2\JsonApi\Tests\Services;
 
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Services\JsonApiRegistry;
+use RuntimeException;
 
 /**
  * Test for JSON API decoders/encoders registry
@@ -21,7 +23,7 @@ use Reva2\JsonApi\Services\JsonApiRegistry;
  * @package Reva2\JsonApi\Tests\Services
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class JsonApiRegistryTest extends \PHPUnit_Framework_TestCase
+class JsonApiRegistryTest extends TestCase
 {
     /**
      * @var JsonApiRegistry
@@ -45,10 +47,11 @@ class JsonApiRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
      */
     public function shouldThrowIfDecoderNotRegistered()
     {
+        $this->expectException(RuntimeException::class);
+
         $this->registry->getDecoder('unknown');
     }
 
@@ -69,17 +72,18 @@ class JsonApiRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
      */
     public function shouldThrowIfEncoderNotRegistered()
     {
+        $this->expectException(RuntimeException::class);
+
         $this->registry->getEncoder('unknown');
     }
 
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new JsonApiRegistry();
     }

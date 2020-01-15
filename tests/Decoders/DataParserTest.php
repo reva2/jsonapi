@@ -12,9 +12,11 @@
 namespace Reva2\JsonApi\Tests\Decoders;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\CallbackResolver;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
@@ -40,14 +42,14 @@ use Symfony\Component\Validator\Constraints\DateTime;
  * @package Reva2\JsonApi\Tests\Decoders
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class DataParserTest extends \PHPUnit_Framework_TestCase
+class DataParserTest extends TestCase
 {
     /**
      * @var DataParser
      */
     protected $parser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $loader = new AnnotationLoader($reader);
@@ -59,8 +61,6 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #Value expected to be a string, but .+ given#
      */
     public function shouldParseStrings()
     {
@@ -71,14 +71,14 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('value', $this->parser->parseString($data, 'key'));
         $this->assertNull($this->parser->parseString($data, 'unknown'));
 
-        // should throw exception on invalid value
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Value expected to be a string, but .+ given#');
+
         $this->parser->parseString($data, 'invalid');
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #Value expected to be int, but .+ given#
      */
     public function shouldParseIntegers()
     {
@@ -91,14 +91,14 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(10, $this->parser->parseInt($data, 'another'));
         $this->assertNull($this->parser->parseInt($data, 'unknown'));
 
-        // should throw exception on invalid value
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Value expected to be int, but .+ given#');
+
         $this->parser->parseInt($data, 'invalid');
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #alue expected to be float, but .+ given#
      */
     public function shouldParseFloats()
     {
@@ -111,14 +111,14 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(10.5, $this->parser->parseFloat($data, 'another'));
         $this->assertNull($this->parser->parseFloat($data, 'unknown'));
 
-        // should throw exception on invalid value
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#alue expected to be float, but .+ given#');
+
         $this->parser->parseFloat($data, 'invalid');
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #Value expected to be a boolean, but .+ given#
      */
     public function shouldParseBooleans()
     {
@@ -154,14 +154,14 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->parser->parseBool($data, 'zero'));
         $this->assertNull($this->parser->parseBool($data, 'unknown'));
 
-        // should throw exception on invalid value
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Value expected to be a boolean, but .+ given#');
+
         $this->parser->parseBool($data, 'invalid');
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value expected to be a date/time string in 'Y-m-d' format
      */
     public function shouldParseDateTimes()
     {
@@ -185,14 +185,14 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->parser->parseDateTime($data, 'unknown'));
 
-        // should throw exception on invalid value
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value expected to be a date/time string in \'Y-m-d\' format');
+
         $this->parser->parseDateTime($data, 'invalid');
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #Value expected to be an array, but .+ given#
      */
     public function shouldParseArrays()
     {
@@ -207,6 +207,9 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         };
 
         $this->assertSame(['f', 's', 't'], $this->parser->parseArray($data, 'arrayValue', $itemParser));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Value expected to be an array, but .+ given#');
 
         $this->parser->parseArray($data, 'invalid', $itemParser);
     }
@@ -245,14 +248,14 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['first', 'second', 'third'], $val->strArray);
         $this->assertSame([1, 2, 3], $val->intArray);
 
-        $this->assertInternalType('array', $val->dateArray);
+        $this->assertIsArray($val->dateArray);
         $this->assertCount(2, $val->dateArray);
         $this->assertInstanceOf(\DateTimeImmutable::class, $val->dateArray[0]);
         $this->assertSame('12:00:00', $val->dateArray[0]->format('H:i:s'));
         $this->assertInstanceOf(\DateTimeImmutable::class, $val->dateArray[1]);
         $this->assertSame('12:30:00', $val->dateArray[1]->format('H:i:s'));
 
-        $this->assertInternalType('array', $val->objArray);
+        $this->assertIsArray($val->objArray);
         $this->assertCount(2, $val->objArray);
         $this->assertInstanceOf(AnotherObject::class, $val->objArray[0]);
         $this->assertSame('another1', $val->objArray[0]->name);
@@ -271,14 +274,15 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Field value required and can not be empty
-     * @expectedExceptionCode 422
      */
     public function shouldThrowIfObjectDiscriminatorFieldEmpty()
     {
         $data = $this->getDataFromFile('resource.json');
         unset($data->pet->attributes->family);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field value required and can not be empty');
+        $this->expectExceptionCode(422);
 
         $this->parser->parseResource($data, 'pet', Pet::class);
     }
@@ -347,7 +351,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PetsListDocument::class, $doc);
         /* @var $doc PetsListDocument */
 
-        $this->assertInternalType('array', $doc->data);
+        $this->assertIsArray($doc->data);
         $this->assertCount(2, $doc->data);
 
         $cat = $doc->data[0];
@@ -362,7 +366,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data->included[0]->attributes->name, $store->getName());
         $this->assertEquals($data->included[0]->attributes->address, $store->getAddress());
 
-        $this->assertInternalType('array', $cat->owners);
+        $this->assertIsArray($cat->owners);
         $this->assertCount(2, $cat->owners);
 
         $mom = $cat->owners[0];
@@ -383,7 +387,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data->data[1]->attributes->name, $dog->name);
         $this->assertEquals($data->data[1]->attributes->family, $dog->family);
         $this->assertSame($store, $dog->store);
-        $this->assertInternalType('array', $dog->owners);
+        $this->assertIsArray($dog->owners);
         $this->assertCount(2, $dog->owners);
         $this->assertSame($mom, $dog->owners[0]);
         $this->assertSame($dad, $dog->owners[1]);
@@ -499,7 +503,7 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['number' => 2, 'size' => 15], $query->getPaginationParameters());
 
         $sort = $query->getSortParameters();
-        $this->assertInternalType('array', $sort);
+        $this->assertIsArray($sort);
         $this->assertCount(2, $sort);
 
         $this->assertInstanceOf(SortParameterInterface::class, $sort[0]);

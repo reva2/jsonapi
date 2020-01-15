@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Tests\Decoders\Mapping\Cache;
 
 use Doctrine\Common\Cache\Cache;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface;
 use Reva2\JsonApi\Decoders\Mapping\Cache\DoctrineCache;
 use Reva2\JsonApi\Decoders\Mapping\GenericMetadata;
@@ -22,7 +23,7 @@ use Reva2\JsonApi\Decoders\Mapping\GenericMetadata;
  * @package Reva2\JsonApi\Tests\Decoders\Mapping\Cache
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class DoctrineCacheTest extends \PHPUnit_Framework_TestCase
+class DoctrineCacheTest extends TestCase
 {
     /**
      * @test

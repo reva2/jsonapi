@@ -11,6 +11,7 @@
 namespace Reva2\JsonApi\Tests\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\EventListener\ApiListener;
 use Reva2\JsonApi\Factories\Factory;
@@ -19,7 +20,6 @@ use Reva2\JsonApi\Tests\Fixtures\Controllers\PetsController;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetDocument;
 use Reva2\JsonApi\Tests\Fixtures\Query\PetQuery;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @package Reva2\JsonApi\Tests\EventListener
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class ApiListenerTest extends \PHPUnit_Framework_TestCase
+class ApiListenerTest extends TestCase
 {
     /**
      * @var ApiListener
@@ -95,7 +95,7 @@ class ApiListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new ApiListener(
             new AnnotationReader(),
@@ -109,12 +109,16 @@ class ApiListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param callable $controller
-     * @return FilterControllerEvent
+     * @return \Symfony\Component\HttpKernel\Event\FilterControllerEvent | \Symfony\Component\HttpKernel\Event\ControllerEvent depends on symfony/http-kernel version
      */
     private function createEvent(callable $controller)
     {
         $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
 
-        return new FilterControllerEvent($kernel, $controller, new Request(), HttpKernelInterface::MASTER_REQUEST);
+        if (class_exists('Symfony\Component\HttpKernel\Event\FilterControllerEvent')) {
+            return new \Symfony\Component\HttpKernel\Event\FilterControllerEvent($kernel, $controller, new Request(), HttpKernelInterface::MASTER_REQUEST);
+        } else {
+            return new \Symfony\Component\HttpKernel\Event\ControllerEvent($kernel, $controller, new Request(), HttpKernelInterface::MASTER_REQUEST);
+        }
     }
 }

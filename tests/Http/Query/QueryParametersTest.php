@@ -11,6 +11,8 @@
 
 namespace Reva2\JsonApi\Tests\Http\Query;
 
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Http\Query\QueryParameters;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -21,7 +23,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * @package Reva2\JsonApi\Tests\Http\Query
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class QueryParametersTest extends \PHPUnit_Framework_TestCase
+class QueryParametersTest extends TestCase
 {
     /**
      * @test
@@ -35,11 +37,12 @@ class QueryParametersTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionCode 400
      */
     public function shouldThrowOnInvalidIncludePaths()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(400);
+
         $query = new QueryParameters();
         $query->parseIncludePaths(null);
         $query->parseIncludePaths(['invalid']);
@@ -47,11 +50,12 @@ class QueryParametersTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionCode 400
      */
     public function shouldThrowOnInvalidFieldsets()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(400);
+
         $query = new QueryParameters();
         $query->parseFieldSets(null);
         $query->parseFieldSets('invalid');

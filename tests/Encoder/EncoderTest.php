@@ -11,6 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Encoder\Encoder;
 
 /**
@@ -19,7 +20,7 @@ use Reva2\JsonApi\Encoder\Encoder;
  * @package Reva2\JsonApi\Tests\Encoder
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class EncoderTest extends \PHPUnit_Framework_TestCase
+class EncoderTest extends TestCase
 {
     /**
      * @test

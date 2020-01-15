@@ -13,6 +13,7 @@ namespace Reva2\JsonApi\Tests\Factories;
 
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Factories\Factory;
 use Reva2\JsonApi\Http\Headers\HeadersChecker;
@@ -23,7 +24,7 @@ use Reva2\JsonApi\Http\Headers\HeadersChecker;
  * @package Reva2\JsonApi\Tests\Factories
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends TestCase
 {
 
     /**

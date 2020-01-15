@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Tests\Decoders;
 
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\RequestDecoder;
 
@@ -21,7 +22,7 @@ use Reva2\JsonApi\Decoders\RequestDecoder;
  * @package Reva2\JsonApi\Tests\Decoders
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class RequestDecoderTest extends \PHPUnit_Framework_TestCase
+class RequestDecoderTest extends TestCase
 {
     /**
      * @test

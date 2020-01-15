@@ -15,7 +15,6 @@ use Doctrine\Common\Annotations\Reader;
 use Reva2\JsonApi\Annotations\ApiRequest;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -60,9 +59,9 @@ class ApiListener implements EventSubscriberInterface
     /**
      * Load JSON API configuration from controller annotations
      *
-     * @param FilterControllerEvent $event
+     * @param $event
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController($event)
     {
         $controller = $event->getController();
         if (!is_array($controller)) {

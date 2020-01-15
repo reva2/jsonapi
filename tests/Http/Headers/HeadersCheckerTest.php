@@ -18,6 +18,7 @@ use Neomerx\JsonApi\Contracts\Http\Headers\HeaderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\HeaderParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Http\Headers\HeadersChecker;
 
 /**
@@ -26,7 +27,7 @@ use Reva2\JsonApi\Http\Headers\HeadersChecker;
  * @package Reva2\JsonApi\Tests\Http\Headers
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class HeadersCheckerTest extends \PHPUnit_Framework_TestCase
+class HeadersCheckerTest extends TestCase
 {
     /**
      * @test

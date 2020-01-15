@@ -11,9 +11,11 @@
 
 namespace Reva2\JsonApi\Tests\Http\Query;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Http\Query\QueryParametersParser;
+use RuntimeException;
 
 /**
  * Test for query parameters parser
@@ -21,7 +23,7 @@ use Reva2\JsonApi\Http\Query\QueryParametersParser;
  * @package Reva2\JsonApi\Tests\Http\Query
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class QueryParametersParserTest extends \PHPUnit_Framework_TestCase
+class QueryParametersParserTest extends TestCase
 {
     /**
      * @test
@@ -61,12 +63,13 @@ class QueryParametersParserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Data parser not specified
      */
     public function shouldThrowIfDataParserNotSpecified()
     {
         $query = $this->getMockBuilder(ServerRequestInterface::class)->getMock();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Data parser not specified');
 
         $queryParser = new QueryParametersParser();
         $queryParser->parse($query);
@@ -74,13 +77,14 @@ class QueryParametersParserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Query type not specified
      */
     public function shouldThrowIfQueryTypeNotSpecified()
     {
         $query = $this->getMockBuilder(ServerRequestInterface::class)->getMock();
         $dataParser = $this->getMockBuilder(DataParserInterface::class)->getMock();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Query type not specified');
 
         $queryParser = new QueryParametersParser();
         $queryParser

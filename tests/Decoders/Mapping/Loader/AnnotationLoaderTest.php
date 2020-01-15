@@ -12,6 +12,8 @@
 namespace Reva2\JsonApi\Tests\Decoders\Mapping\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
@@ -30,6 +32,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Order;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Something;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
+use RuntimeException;
 
 /**
  * Test for metadata loader that use doctrine annotations
@@ -37,7 +40,7 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
  * @package Reva2\JsonApi\Tests\Decoders\Mapping\Loader
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
+class AnnotationLoaderTest extends TestCase
 {
     /**
      * @var AnnotationLoader
@@ -45,7 +48,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
     protected $loader;
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -197,7 +200,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ResourceMetadataInterface::class, $metadata);
 
         $attributes = $metadata->getAttributes();
-        $this->assertInternalType('array', $attributes);
+        $this->assertIsArray($attributes);
 
         $this->assertArrayHasKey('name', $attributes);
         $attr = $attributes['name'];
@@ -221,7 +224,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('setVirtualAttr', $attr->getSetter());
 
         $relationships = $metadata->getRelationships();
-        $this->assertInternalType('array', $relationships);
+        $this->assertIsArray($relationships);
 
         $this->assertArrayHasKey('store', $relationships);
         $rel = $relationships['store'];
@@ -287,7 +290,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ResourceMetadataInterface::class, $metadata);
 
         $relationships = $metadata->getRelationships();
-        $this->assertInternalType('array', $relationships);
+        $this->assertIsArray($relationships);
 
         $this->assertArrayHasKey('store', $relationships);
         $rel = $relationships['store'];
@@ -306,11 +309,12 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessageRegExp #Couldn't find setter for non public property: .*#
      */
     public function shouldThrowIfThereAreNotSetterForNonPublicProperty()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('#Couldn\'t find setter for non public property: .*#');
+
         $this->loader->loadClassMetadata(new \ReflectionClass(InvalidObject::class));
 
         $this->fail("Should throw exception if there are not settings for non public property");
@@ -318,11 +322,12 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp #Custom parser function .* for property '.*' does not exist#
      */
     public function shouldThrowIfCustomParserFunctionIsNotDefined()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Custom parser function .* for property \'.*\' does not exist#');
+
         $this->loader->loadClassMetadata(new \ReflectionClass(InvalidObject2::class));
 
         $this->fail("Should throw exception if specified custom parser function is not defined");

@@ -11,8 +11,10 @@
 
 namespace Reva2\JsonApi\Tests\Decoders\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\Mapping\ObjectMetadata;
 use Reva2\JsonApi\Decoders\Mapping\ResourceMetadata;
+use RuntimeException;
 
 /**
  * Tests for JSON API resource metadata
@@ -20,16 +22,17 @@ use Reva2\JsonApi\Decoders\Mapping\ResourceMetadata;
  * @package Reva2\JsonApi\Tests\Decoders\Mapping
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class ResourceMetadataTest extends \PHPUnit_Framework_TestCase
+class ResourceMetadataTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \RuntimeException
      */
     public function shouldThrowOnInvalidMetadataDuringMerge()
     {
         $resMetadata = new ResourceMetadata('MyResource');
         $objMetadata = new ObjectMetadata('MyObject');
+
+        $this->expectException(RuntimeException::class);
 
         $resMetadata->mergeMetadata($objMetadata);
     }
