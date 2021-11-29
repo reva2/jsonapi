@@ -402,16 +402,16 @@ class DataParser implements DataParserInterface
                 }
             }
 
+            if (null !== $id) {
+                $this->context->registerResource($name, $id, $pathValue);
+            }
+
             foreach ($metadata->getAttributes() as $attribute) {
                 $this->parseProperty($value, $pathValue, $attribute);
             }
 
             foreach ($metadata->getRelationships() as $relationship) {
                 $this->parseRelationship($value, $pathValue, $relationship);
-            }
-
-            if (null !== $id) {
-                $this->context->registerResource($name, $id, $pathValue);
             }
         }
 

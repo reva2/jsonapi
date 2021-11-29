@@ -22,18 +22,23 @@ use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
 use Reva2\JsonApi\Http\Query\ListQueryParameters;
+use Reva2\JsonApi\Tests\Fixtures\Documents\OfficesListDocument;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetsListDocument;
+use Reva2\JsonApi\Tests\Fixtures\Metadata\OfficesListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Office;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Person;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
 use Reva2\JsonApi\Tests\Fixtures\Resources\RussianDoll;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Something;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Store;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Table;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Window;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
@@ -395,6 +400,56 @@ class DataParserTest extends TestCase
         $this->assertInstanceOf(PetsListMetadata::class, $doc->meta);
         $this->assertSame('test', $doc->meta->someString);
         $this->assertSame(1, $doc->meta->someInt);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldParseRelationshipToParent()
+    {
+        $data = $this->getDataFromFile('document-relationship-to-parent.json');
+
+        try {
+            $doc = $this->parser->parseDocument($data, OfficesListDocument::class);
+            /** @var OfficesListDocument $doc */
+
+            $this->assertInstanceOf(OfficesListDocument::class, $doc);
+
+            $this->assertCount(1, $doc->data);
+
+            $office = $doc->data[0];
+            $this->assertInstanceOf(Office::class, $office);
+
+            $table = $office->table;
+            $this->assertInstanceOf(Table::class, $table);
+            $this->assertEquals($data->included[0]->id, $table->id);
+            $this->assertEquals($data->included[0]->attributes->name, $table->name);
+            $this->assertEquals($data->included[0]->attributes->height, $table->height);
+            $this->assertSame($office, $table->office);
+
+            $this->assertCount(2, $office->windows);
+
+            $windowOne = $office->windows[0];
+            $this->assertInstanceOf(Window::class, $windowOne);
+            $this->assertEquals($data->included[1]->id, $windowOne->id);
+            $this->assertEquals($data->included[1]->attributes->name, $windowOne->name);
+            $this->assertEquals($data->included[1]->attributes->layers, $windowOne->layers);
+            $this->assertSame($office, $windowOne->office);
+
+            $windowTwo = $office->windows[1];
+            $this->assertInstanceOf(Window::class, $windowTwo);
+            $this->assertEquals($data->included[2]->id, $windowTwo->id);
+            $this->assertEquals($data->included[2]->attributes->name, $windowTwo->name);
+            $this->assertEquals($data->included[2]->attributes->layers, $windowTwo->layers);
+            $this->assertSame($office, $windowTwo->office);
+
+            $this->assertInstanceOf(OfficesListMetadata::class, $doc->meta);
+            $this->assertSame(12, $doc->meta->someInt);
+            $this->assertSame(1, $doc->meta->someInnerIntOne);
+            $this->assertSame(2, $doc->meta->someInnerIntTwo);
+        } catch (JsonApiException $e) {
+            $this->fail('It must parse this document without exceptions');
+        }
     }
 
     /**
