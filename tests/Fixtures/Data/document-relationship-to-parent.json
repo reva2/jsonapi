@@ -1,0 +1,70 @@
+{
+  "data": [
+    {
+      "id": "my-office",
+      "type": "offices",
+      "attributes": {
+        "name": "Workplace"
+      },
+      "relationships": {
+        "table": {
+          "data": {"id": "my-cabinet-table", "type": "tables"}
+        },
+        "windows": {
+          "data": [
+            {"id":  "my-cabinet-window-one", "type": "windows"},
+            {"id":  "my-cabinet-window-two", "type": "windows"}
+          ]
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "id": "my-cabinet-table",
+      "type": "tables",
+      "attributes": {
+        "name": "Old durable table",
+        "height": 500
+      },
+      "relationships": {
+        "office": {
+          "data": {"id": "my-office", "type": "offices"}
+        }
+      }
+    },
+    {
+      "id": "my-cabinet-window-one",
+      "type": "windows",
+      "attributes": {
+        "name": "Wide window",
+        "layers": 3
+      },
+      "relationships": {
+        "office": {
+          "data": {"id": "my-office", "type": "offices"}
+        }
+      }
+    },
+    {
+      "id": "my-cabinet-window-two",
+      "type": "windows",
+      "attributes": {
+        "name": "Small window",
+        "layers": 3
+      },
+      "relationships": {
+        "office": {
+          "data": {"id": "my-office", "type": "offices"}
+        }
+      }
+    }
+  ],
+  "meta": {
+    "someInt": 12,
+    "inner_int": {
+      "one": 1,
+      "two": 2
+    }
+  }
+}
