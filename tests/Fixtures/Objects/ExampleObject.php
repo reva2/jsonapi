@@ -11,7 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Objects;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Example object
@@ -23,129 +23,131 @@ class ExampleObject extends BaseObject
 {
     /**
      * @var string
-     * @API\Property(type="string")
      */
-    public $strProp;
+    #[API\Property(type: "string")]
+    public string $strProp;
 
     /**
      * @var int
-     * @API\Property(type="int")
      */
-    public $intProp;
+    #[API\Property(type: "int")]
+    public int $intProp;
 
     /**
      * @var int
-     * @API\Property(type="integer")
      */
+    #[API\Property(type: "integer")]
     public $integerProp;
 
     /**
      * @var bool
-     * @API\Property(type="bool")
      */
-    public $boolProp;
+    #[API\Property(type: "bool")]
+    public bool $boolProp;
 
     /**
      * @var bool
-     * @API\Property(type="boolean")
      */
-    public $booleanProp;
+    #[API\Property(type: "boolean")]
+    public bool $booleanProp;
 
     /**
      * @var float
-     * @API\Property(type="float")
      */
-    public $floatProp;
+    #[API\Property(type: "float")]
+    public float $floatProp;
 
     /**
      * @var double
-     * @API\Property(type="double")
      */
-    public $doubleProp;
+    #[API\Property(type: "double")]
+    public float $doubleProp;
 
     /**
      * @var \DateTimeImmutable
-     * @API\Property(type="DateTime")
      */
-    public $dateProp;
+    #[API\Property(type: "DateTime")]
+    public \DateTimeImmutable $dateProp;
 
     /**
      * @var \DateTimeImmutable
-     * @API\Property(type="DateTime<H:i:s>")
      */
-    public $timeProp;
+    #[API\Property(type: "DateTime<H:i:s>")]
+    public \DateTimeImmutable $timeProp;
 
     /**
      * @var \DateTimeImmutable
-     * @API\Property(type="DateTime<Y-m-d H:i:s>")
      */
-    public $datetimeProp;
+    #[API\Property(type: "DateTime<Y-m-d H:i:s>")]
+    public \DateTimeImmutable $datetimeProp;
 
     /**
      * @var array
-     * @API\Property(type="array")
      */
-    public $rawArray;
+    #[API\Property(type: "array")]
+    public array $rawArray;
 
     /**
      * @var string[]
-     * @API\Property(type="Array<string>")
      */
-    public $strArray;
+    #[API\Property(type: "Array<string>")]
+    public array $strArray;
 
     /**
      * @var int[]
      * @API\Property()
      */
-    public $intArray;
+    #[API\Property()]
+    public array $intArray;
 
     /**
      * @var \DateTimeImmutable[]
-     * @API\Property(type="Array<DateTime<H:i:s>>")
      */
-    public $dateArray;
+    #[API\Property(type: "Array<DateTime<H:i:s>>")]
+    public array $dateArray;
 
     /**
      * @var AnotherObject[]
-     * @API\Property(type="Array<Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject>")
      */
-    public $objArray;
+    #[API\Property(type: "Array<Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject>")]
+    public array $objArray;
 
     /**
      * @var array
-     * @API\Property(type="Array<Array<int>>")
      */
-    public $arrArray;
+    #[API\Property(type: "Array<Array<int>>")]
+    public array $arrArray;
 
     /**
      * @var string[]
-     * @API\Property(parser="parseCustomProp")
      */
-    public $customProp;
+    #[API\Property(parser: "parseCustomProp")]
+    public array $customProp;
 
     /**
      * @API\Property()
      */
+    #[API\Property]
     public $rawProp;
 
     /**
      * @var AnotherObject
-     * @API\Property(type="Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject")
      */
-    public $objProp;
+    #[API\Property(type: AnotherObject::class)]
+    public AnotherObject $objProp;
 
     /**
      * @var int
-     * @API\Property(type="raw")
      */
-    public $rawPropWithDockblock;
+    #[API\Property(type: "raw")]
+    public int $rawPropWithDockblock;
 
     /**
      * Sets virtual property value
      *
      * @param mixed $value
-     * @API\VirtualProperty(name="virtual", type="string")
      */
+    #[API\VirtualProperty(name: "virtual", type: "string")]
     public function setVirtualProperty($value)
     {
         // Nothing to do here

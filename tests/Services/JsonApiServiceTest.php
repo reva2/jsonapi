@@ -11,7 +11,6 @@
 
 namespace Reva2\JsonApi\Tests\Services;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
@@ -22,7 +21,7 @@ use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Reva2\JsonApi\Decoders\CallbackResolver;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
-use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
+use Reva2\JsonApi\Decoders\Mapping\Loader\AttributeLoader;
 use Reva2\JsonApi\Decoders\RequestDecoder;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Factories\Factory;
@@ -380,7 +379,7 @@ class JsonApiServiceTest extends TestCase
      */
     private function getMetadataFactory()
     {
-        return new LazyMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        return new LazyMetadataFactory(new AttributeLoader());
     }
 
     /**

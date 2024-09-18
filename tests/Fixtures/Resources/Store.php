@@ -8,38 +8,36 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Example JSON API resource that represent store
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
  * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @API\ApiResource("stores")
  */
+#[API\Resource('stores')]
 class Store
 {
     /**
      * @var string
-     * @API\Id()
      */
-    protected $id;
+    #[API\Id]
+    protected string $id;
 
     /**
      * @var string
-     * @API\Attribute()
      */
-    protected $name;
+    #[API\Attribute]
+    protected string $name;
 
     /**
      * @var string
-     * @API\Attribute()
      */
-    protected $address;
+    #[API\Attribute]
+    protected string $address;
 
     /**
      * @var bool

@@ -8,18 +8,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Reva2\JsonApi\Attributes;
 
-namespace Reva2\JsonApi\Annotations;
+use Attribute;
 
-/**
- * JSON API document metadata annotation
- *
- * @author Sergey Revenko <sergey.revenko@orbitsoft.com>
- * @package Reva2\JsonApi\Annotations
- *
- * @Annotation
- * @Target({"PROPERTY"})
- */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Metadata extends Property
 {
 

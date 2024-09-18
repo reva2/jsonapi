@@ -8,5 +8,12 @@
  * file that was distributed with this source code.
  */
 
+namespace Reva2\JsonApi\Attributes;
 
-$loader = require __DIR__ . '/../vendor/autoload.php';
+use Attribute;
+
+#[Attribute(Attribute::TARGET_METHOD)]
+class VirtualAttribute extends VirtualProperty
+{
+
+}

@@ -11,14 +11,13 @@
 
 namespace Reva2\JsonApi\Tests\Decoders\Mapping\Loader;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
-use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
+use Reva2\JsonApi\Decoders\Mapping\Loader\AttributeLoader;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetsListDocument;
 use Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
@@ -40,19 +39,19 @@ use RuntimeException;
  * @package Reva2\JsonApi\Tests\Decoders\Mapping\Loader
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class AnnotationLoaderTest extends TestCase
+class AttributesLoaderTest extends TestCase
 {
     /**
-     * @var AnnotationLoader
+     * @var AttributeLoader
      */
-    protected $loader;
+    protected AttributeLoader $loader;
 
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->loader = new AnnotationLoader(new AnnotationReader());
+        $this->loader = new AttributeLoader();
     }
 
     /**

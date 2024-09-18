@@ -10,35 +10,32 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations\ApiResource;
-use Reva2\JsonApi\Annotations\Attribute;
-use Reva2\JsonApi\Annotations\Id;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Person
  *
  * @author Sergey Revenko <sergey.revenko@orbitsoft.com>
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
- *
- * @ApiResource(name="persons")
  */
+#[API\Resource(type: 'persons')]
 class Person
 {
     /**
      * @var string
-     * @Id()
      */
-    public $id;
+    #[API\Id]
+    public string $id;
 
     /**
      * @var string
-     * @Attribute()
      */
-    public $firstName;
+    #[API\Attribute]
+    public string $firstName;
 
     /**
      * @var string
-     * @Attribute()
      */
-    public $lastName;
+    #[API\Attribute]
+    public string $lastName;
 }

@@ -11,22 +11,21 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Cat
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
  * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @API\ApiResource()
  */
+#[API\Resource]
 class Cat extends Pet
 {
     /**
      * @inheritdoc
      */
-    public function whoIAm()
+    public function whoIAm(): string
     {
         return 'cat';
     }

@@ -11,7 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Objects;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Invalid JSON API object
@@ -23,7 +23,7 @@ class InvalidObject
 {
     /**
      * @var string
-     * @API\Property()
      */
-    protected $name;
+    #[API\Property]
+    protected string $name;
 }

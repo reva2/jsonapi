@@ -10,43 +10,37 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Controllers;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
+use Reva2\JsonApi\Tests\Fixtures\Documents\PetDocument;
+use Reva2\JsonApi\Tests\Fixtures\Query\PetQuery;
+use Reva2\JsonApi\Tests\Fixtures\Query\PetsListQuery;
 
 /**
  * PetsController
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Controllers
  * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @API\ApiRequest(
- *     urlPrefix="/myapp",
- *     matcher=@API\Matcher(
- *      decoders={
- *          @API\Decoder(type="application", subtype="vnd.json+api", decoder="jsonapi.decoders.jsonapi")
- *      },
- *      encoders={
- *          @API\Encoder(type="application", subtype="vnd.json+api", encoder="jsonapi.encoders.jsonapi")
- *      }
- *     )
- * )
  */
+#[API\Request(
+    urlPrefix: '/myapp',
+    matcher: new API\Matcher(
+        decoders: [
+            new API\Decoder('jsonapi.decoders.jsonapi', 'application', 'vnd.json+api')
+        ],
+        encoders: [
+            new API\Encoder('jsonapi.encoders.jsonapi', 'application', 'vnd.json+api'),
+        ]
+    ),
+)]
 class PetsController
 {
-    /**
-     * @API\ApiRequest(query="Reva2\JsonApi\Tests\Fixtures\Query\PetsListQuery")
-     */
+    #[API\Request(query: PetsListQuery::class)]
     public function getListAction()
     {
 
     }
 
-    /**
-     * @API\ApiRequest(
-     *     query="Reva2\JsonApi\Tests\Fixtures\Query\PetQuery",
-     *     body="Reva2\JsonApi\Tests\Fixtures\Documents\PetDocument",
-     *     validation={"Default", "Create"}
-     * )
-     */
+    #[API\Request(query: PetQuery::class, body: PetDocument::class, validation: ['Default', 'Create'])]
     public function createAction()
     {
 

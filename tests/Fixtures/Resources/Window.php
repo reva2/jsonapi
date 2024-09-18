@@ -2,34 +2,32 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
-/**
- * @API\ApiResource(name="windows")
- */
+#[API\Resource('windows')]
 class Window
 {
     /**
      * @var string
-     * @API\Id()
      */
-    public $id;
+    #[API\Id()]
+    public string $id;
 
     /**
      * @var string
-     * @API\Attribute()
      */
-    public $name;
+    #[API\Attribute]
+    public string $name;
 
     /**
      * @var int
-     * @API\Attribute()
      */
-    public $layers;
+    #[API\Attribute]
+    public int $layers;
 
     /**
      * @var Office
-     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Office")
      */
-    public $office;
+    #[API\Relationship(Office::class)]
+    public Office $office;
 }

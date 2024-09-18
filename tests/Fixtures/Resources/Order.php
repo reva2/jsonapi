@@ -10,55 +10,50 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations\ApiResource;
-use Reva2\JsonApi\Annotations\Attribute;
-use Reva2\JsonApi\Annotations\Id;
-use Reva2\JsonApi\Annotations\Loader;
-use Reva2\JsonApi\Annotations\Relationship;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Example JSON API resource that represent order
  *
  * @author Sergey Revenko <sergey.revenko@orbitsoft.com>
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
- *
- * @ApiResource(name="orders")
  */
+#[API\Resource("orders")]
 class Order
 {
     /**
      * @var string
-     * @Id()
      */
-    public $id;
+    #[API\Id]
+    public string $id;
 
     /**
      * @var float
-     * @Attribute()
      */
-    public $amount;
+    #[API\Attribute]
+    public float $amount;
 
     /**
      * @var Store
-     * @Relationship(
-     *     type="Reva2\JsonApi\Tests\Fixtures\Resources\Store",
-     *     loaders={
-     *      @Loader(loader="store.custom_loader:create", group="CreateOrder"),
-     *      @Loader(loader="store.custom_loader:load", group="UpdateOrder")
-     *     }
-     * )
      */
-    public $store;
+    #[API\Relationship(
+        type: Store::class,
+        loaders: [
+            new API\Loader('store.custom_loader:create', 'CreateOrder'),
+            new API\Loader('store.custom_loader:load', 'UpdateOrder')
+        ]
+    )]
+    public Store $store;
 
     /**
      * @var Pet[]
-     * @Relationship(
-     *     type="Reva2\JsonApi\Tests\Fixtures\Resources\Pet[]",
-     *     loaders={
-     *      @Loader(loader="pet.custom_loader:create", group="CreateOrder"),
-     *      @Loader(loader="pet.custom_loader:load", group="UpdateOrder")
-     *     }
-     * )
      */
-    public $pets;
+    #[API\Relationship(
+        type: Pet::class . '[]',
+        loaders: [
+            new API\Loader('pet.custom_loader:create', 'CreateOrder'),
+            new API\Loader('pet.custom_loader:load', 'UpdateOrder'),
+        ]
+    )]
+    public array $pets;
 }

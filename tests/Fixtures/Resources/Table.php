@@ -2,34 +2,32 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
-/**
- * @API\ApiResource(name="tables")
- */
+#[API\Resource('tables')]
 class Table
 {
     /**
      * @var string
-     * @API\Id()
      */
-    public $id;
+    #[API\Id]
+    public string $id;
 
     /**
      * @var string
-     * @API\Attribute()
      */
-    public $name;
+    #[API\Attribute]
+    public string $name;
 
     /**
      * @var float
-     * @API\Attribute()
      */
-    public $height;
+    #[API\Attribute]
+    public float $height;
 
     /**
      * @var Office
-     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Office")
      */
-    public $office;
+    #[API\Relationship(type: Office::class)]
+    public Office $office;
 }

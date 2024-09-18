@@ -12,9 +12,9 @@
 namespace Reva2\JsonApi\Http\Query;
 
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * JSON API single resource query parameters
@@ -29,28 +29,28 @@ class QueryParameters implements EncodingParametersInterface
 
     /**
      * @var string[]|null
-     * @API\Property(path="[include]", parser="parseIncludePaths")
-     * @Assert\Type(type="array")
-     * @Assert\All({
-     *     @Assert\Type(type="string")
-     * })
      */
-    protected $includePaths;
+    #[API\Property(path: "[include]", parser: "parseIncludePaths")]
+    #[Assert\Type('array')]
+    #[Assert\All([
+        new Assert\Type('string'),
+    ])]
+    protected ?array $includePaths = null;
 
     /**
      * @var array[]|null
-     * @API\Property(path="[fields]", parser="parseFieldSets")
-     * @Assert\Type(type="array")
-     * @Assert\All({
-     *     @Assert\Type(type="array")
-     * })
      */
-    protected $fieldSets;
+    #[API\Property(path: '[fields]', parser: 'parseFieldSets')]
+    #[Assert\Type('array')]
+    #[Assert\All([
+        new Assert\Type('array'),
+    ])]
+    protected ?array $fieldSets = null;
 
     /**
      * @inheritdoc
      */
-    public function getIncludePaths()
+    public function getIncludePaths(): ?array
     {
         return $this->includePaths;
     }
@@ -61,7 +61,7 @@ class QueryParameters implements EncodingParametersInterface
      * @param string[]|null $paths
      * @return $this
      */
-    public function setIncludePaths(array $paths = null)
+    public function setIncludePaths(array $paths = null): self
     {
         $this->includePaths = $paths;
 
@@ -71,7 +71,7 @@ class QueryParameters implements EncodingParametersInterface
     /**
      * @inheritdoc
      */
-    public function getFieldSets()
+    public function getFieldSets(): ?array
     {
         return $this->fieldSets;
     }
@@ -88,7 +88,7 @@ class QueryParameters implements EncodingParametersInterface
      * @param array[]|null $fieldSets
      * @return $this
      */
-    public function setFieldSets(array $fieldSets = null)
+    public function setFieldSets(array $fieldSets = null): self
     {
         $this->fieldSets = $fieldSets;
 
@@ -98,7 +98,7 @@ class QueryParameters implements EncodingParametersInterface
     /**
      * @inheritdoc
      */
-    public function getSortParameters()
+    public function getSortParameters(): ?array
     {
         return null;
     }
@@ -106,7 +106,7 @@ class QueryParameters implements EncodingParametersInterface
     /**
      * @inheritdoc
      */
-    public function getPaginationParameters()
+    public function getPaginationParameters(): ?array
     {
         return null;
     }

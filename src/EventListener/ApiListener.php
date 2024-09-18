@@ -11,10 +11,11 @@
 
 namespace Reva2\JsonApi\EventListener;
 
-use Doctrine\Common\Annotations\Reader;
-use Reva2\JsonApi\Annotations\ApiRequest;
+use ReflectionClass;
+use Reva2\JsonApi\Attributes\Request;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -25,11 +26,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ApiListener implements EventSubscriberInterface
 {
-    /**
-     * @var Reader
-     */
-    protected $reader;
-
     /**
      * @var FactoryInterface
      */
@@ -45,13 +41,11 @@ class ApiListener implements EventSubscriberInterface
     /**
      * Constructor
      *
-     * @param Reader $reader
      * @param FactoryInterface $factory
      * @param array $defMatcher
      */
-    public function __construct(Reader $reader, FactoryInterface $factory, array $defMatcher)
+    public function __construct(FactoryInterface $factory, array $defMatcher)
     {
-        $this->reader = $reader;
         $this->factory = $factory;
         $this->defMatcher = $defMatcher;
     }
@@ -59,9 +53,10 @@ class ApiListener implements EventSubscriberInterface
     /**
      * Load JSON API configuration from controller annotations
      *
-     * @param $event
+     * @param ControllerEvent $event
+     * @throws \ReflectionException
      */
-    public function onKernelController($event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
         if (!is_array($controller)) {
@@ -70,20 +65,20 @@ class ApiListener implements EventSubscriberInterface
 
         $config = null;
 
-        $refClass = new \ReflectionClass($controller[0]);
-        if (null !== ($annotation = $this->reader->getClassAnnotation($refClass, ApiRequest::class))) {
-            /* @var $annotation ApiRequest */
-            $config = $annotation->toArray();
+        $refClass = new ReflectionClass($controller[0]);
+        if (null !== ($attr = $this->getAttribute($refClass->getAttributes(Request::class)))) {
+            $config = $attr->toArray();
         }
 
         $refMethod = $refClass->getMethod($controller[1]);
-        if (null !== ($annotation = $this->reader->getMethodAnnotation($refMethod, ApiRequest::class))) {
+        if (null !== ($attr = $this->getAttribute($refMethod->getAttributes(Request::class)))) {
             if (null !== $config) {
-                $config = array_replace($config, $annotation->toArray());
+                $config = array_replace($config, $attr->toArray());
             } else {
-                $config = $annotation->toArray();
+                $config = $attr->toArray();
             }
         }
+
 
         if (null !== $config) {
             if (!array_key_exists('matcher', $config)) {
@@ -102,5 +97,14 @@ class ApiListener implements EventSubscriberInterface
         return [
             KernelEvents::CONTROLLER => 'onKernelController'
         ];
+    }
+
+    private function getAttribute(array $attrs): ?Request
+    {
+        if (count($attrs) > 0) {
+            return $attrs[0]->newInstance();
+        }
+
+        return null;
     }
 }

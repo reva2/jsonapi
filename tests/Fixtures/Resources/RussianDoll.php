@@ -10,7 +10,7 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 use Reva2\JsonApi\Tests\Fixtures as Fixtures;
 
 /**
@@ -18,28 +18,25 @@ use Reva2\JsonApi\Tests\Fixtures as Fixtures;
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
  * @author Mikhail Shaulsky <mikhail.shaulsky@orbitsoft.com>
- *
- * @API\ApiResource(name="dolls")
  */
+#[API\Resource(type: 'dolls')]
 class RussianDoll
 {
     /**
      * @var string
-     * @API\Id()
      */
-    public $id;
+    #[API\Id]
+    public string $id;
 
     /**
      * @var string
-     * @API\Attribute()
      */
-    public $color;
+    #[API\Attribute]
+    public string $color;
 
     /**
-     * @var RussianDoll
-     * @API\Relationship(
-     *     type="Reva2\JsonApi\Tests\Fixtures\Resources\RussianDoll",
-     * )
+     * @var ?RussianDoll
      */
-    public $containedBy;
+    #[API\Relationship(type: RussianDoll::class)]
+    public ?RussianDoll $containedBy = null;
 }

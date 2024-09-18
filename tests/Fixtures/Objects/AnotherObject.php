@@ -11,7 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Objects;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Another example object
@@ -23,7 +23,7 @@ class AnotherObject
 {
     /**
      * @var string
-     * @API\Property()
      */
-    public $name;
+    #[API\Property]
+    public string $name;
 }

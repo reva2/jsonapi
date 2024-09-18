@@ -11,77 +11,77 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Resources;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 use Reva2\JsonApi\Tests\Fixtures as Fixtures;
+use Reva2\JsonApi\Tests\Fixtures\Converters\StoreConverter;
 
 /**
  * Example JSON API resource that represent pet
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Resources
  * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @API\ApiResource(
- *     name="pets",
- *     discField="family",
- *     discMap={
- *      "cats": Fixtures\Resources\Cat::class,
- *      "dogs": Fixtures\Resources\Dog::class
- *     }
- * )
  */
+#[API\Resource(
+    type: "pets",
+    discField: "family",
+    discMap: [
+        "cats" => Cat::class,
+        "dogs" => Dog::class
+    ]
+)]
 class Pet
 {
     /**
-     * @var string
-     * @API\Id()
+     * @var ?string
      */
-    public $id;
+    #[API\Id]
+    public ?string $id;
 
     /**
-     * @var string
-     * @API\Attribute()
+     * @var ?string
      */
-    public $name;
+    #[API\Attribute]
+    public ?string $name;
 
     /**
-     * @var string
-     * @API\Attribute()
+     * @var ?string
      */
-    public $family;
+    #[API\Attribute]
+    public ?string $family;
 
     /**
-     * @var Store
-     * @API\Relationship(
-     *     type="Reva2\JsonApi\Tests\Fixtures\Resources\Store",
-     *     converter="Reva2\JsonApi\Tests\Fixtures\Converters\StoreConverter::convert"
-     * )
+     * @var ?Store
      */
-    public $store;
+    #[API\Relationship(
+        type: Store::class,
+        converter: StoreConverter::class. '::convert'
+    )]
+    public ?Store $store;
 
     /**
      * @var array|Person[]
-     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Person[]")
      */
-    public $owners = [];
+    #[API\Relationship(type: Person::class . '[]')]
+    public array $owners = [];
 
     /**
      * Virtual attribute
      *
-     * @var string
+     * @var ?string
      */
-    protected $virtualAttr;
+    protected ?string $virtualAttr;
 
     /**
      * Virtual relationship
      *
-     * @var Something
+     * @var ?Something
      */
-    protected $virtualRel;
+    protected ?Something $virtualRel;
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getVirtualAttr()
+    public function getVirtualAttr(): ?string
     {
         return $this->virtualAttr;
     }
@@ -91,7 +91,8 @@ class Pet
      * @return Pet
      * @API\VirtualAttribute(name="virtualAttr", type="string")
      */
-    public function setVirtualAttr($virtualAttr)
+    #[API\VirtualAttribute(name: "virtualAttr", type: "string")]
+    public function setVirtualAttr(?string $virtualAttr): self
     {
         $this->virtualAttr = $virtualAttr;
 
@@ -101,27 +102,28 @@ class Pet
     /**
      * @return string
      */
-    public function whoIAm()
+    public function whoIAm(): string
     {
         return 'pet';
     }
 
     /**
-     * @return Something
+     * @return ?Something
      */
-    public function getVirtualRel()
+    public function getVirtualRel(): ?Something
     {
         return $this->virtualRel;
     }
 
     /**
-     * @param Something $virtualRel
-     * @return Pet
-     * @API\VirtualRelationship(name="virtualRel", type="Reva2\JsonApi\Tests\Fixtures\Resources\Something")
+     * @param ?Something $virtualRel
+     * @return $this
      */
-    public function setVirtualRel(Something $virtualRel)
+    #[API\VirtualRelationship(name: "virtualRel", type: Something::class)]
+    public function setVirtualRel(?Something $virtualRel): self
     {
         $this->virtualRel = $virtualRel;
+
         return $this;
     }
 }
