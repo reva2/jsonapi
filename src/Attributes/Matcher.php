@@ -1,47 +1,42 @@
 <?php
-/*
- * This file is part of the reva2/jsonapi.
- *
- * (c) Sergey Revenko <dedsemen@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
+namespace Reva2\JsonApi\Attributes;
 
-namespace Reva2\JsonApi\Annotations;
-
-/**
- * JSON API code matcher annotation
- *
- * @package Reva2\JsonApi\Annotations
- * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @Annotation
- * @Target({"ANNOTATION"})
- */
 class Matcher
 {
     /**
      * Request decoders
      *
-     * @var array<Reva2\JsonApi\Annotations\Decoder>
+     * @var Decoder[]
      */
-    public $decoders;
+    public ?array $decoders;
 
     /**
      * Response encoders
      *
-     * @var array<Reva2\JsonApi\Annotations\Encoder>
+     * @var Encoder[]
      */
-    public $encoders;
+    public ?array $encoders;
+
+    /**
+     * @param Decoder[]|null $decoders
+     * @param Encoder[]|null $encoders
+     */
+    public function __construct(?array $decoders = null, ?array $encoders = null)
+    {
+        $this->decoders = $decoders;
+        $this->encoders = $encoders;
+    }
 
     /**
      * @return array
      */
     public function toArray()
     {
-        $data = ['encoders' => [], 'decoders' => []];
+        $data = [
+            'encoders' => [],
+            'decoders' => [],
+        ];
 
         if (null !== $this->decoders) {
             foreach ($this->decoders as $decoder) {
@@ -62,7 +57,7 @@ class Matcher
      * @param MediaType $mediaType
      * @return string
      */
-    private function getMediaType(MediaType $mediaType)
+    private function getMediaType(MediaType $mediaType): string
     {
         return $mediaType->type . '/' . $mediaType->subtype;
     }

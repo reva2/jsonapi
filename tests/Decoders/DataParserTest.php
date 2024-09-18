@@ -11,7 +11,6 @@
 
 namespace Reva2\JsonApi\Tests\Decoders;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
 use Neomerx\JsonApi\Document\Error;
@@ -20,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\CallbackResolver;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
-use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
+use Reva2\JsonApi\Decoders\Mapping\Loader\AttributeLoader;
 use Reva2\JsonApi\Http\Query\ListQueryParameters;
 use Reva2\JsonApi\Tests\Fixtures\Documents\OfficesListDocument;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetsListDocument;
@@ -56,8 +55,7 @@ class DataParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $loader = new AnnotationLoader($reader);
+        $loader = new AttributeLoader();
         $factory = new LazyMetadataFactory($loader);
         $resolver = new CallbackResolver();
 

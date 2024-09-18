@@ -12,7 +12,7 @@
 namespace Reva2\JsonApi\Tests\Fixtures\Query;
 
 use Reva2\JsonApi\Http\Query\ListQueryParameters;
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Query parameters for pets list API request
@@ -26,14 +26,14 @@ class PetsListQuery extends ListQueryParameters
      * Filter by pet family
      *
      * @var string
-     * @API\Property()
      */
+    #[API\Property]
     protected $family;
 
     /**
      * @var int
-     * @API\Property()
      */
+    #[API\Property]
     protected $store;
 
     /**
@@ -77,7 +77,7 @@ class PetsListQuery extends ListQueryParameters
     /**
      * @inheritdoc
      */
-    public function getFilteringParameters()
+    public function getFilteringParameters(): ?array
     {
         $params = [];
 
@@ -96,7 +96,7 @@ class PetsListQuery extends ListQueryParameters
     /**
      * @inheritdoc
      */
-    protected function getAllowedIncludePaths()
+    protected function getAllowedIncludePaths(): array
     {
         return ['store'];
     }
@@ -121,7 +121,7 @@ class PetsListQuery extends ListQueryParameters
     /**
      * @inheritdoc
      */
-    protected function getSortableFields()
+    protected function getSortableFields(): array
     {
         return [
             'id',

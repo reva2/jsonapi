@@ -11,6 +11,9 @@
 
 namespace Reva2\JsonApi\Contracts\Decoders\Mapping\Loader;
 
+use ReflectionClass;
+use Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface;
+
 /**
  * Loads JSON API metadata into ClassMetadata instance
  *
@@ -21,8 +24,8 @@ interface LoaderInterface
     /**
      * Load JSON API metadata into a ClassMetadata instance
      *
-     * @param \ReflectionClass $class
-     * @return mixed Whether the loader succeeded
+     * @param ReflectionClass $class
+     * @return GenericMetadataInterface Whether the loader succeeded
      */
-    public function loadClassMetadata(\ReflectionClass $class);
+    public function loadClassMetadata(ReflectionClass $class): GenericMetadataInterface;
 }

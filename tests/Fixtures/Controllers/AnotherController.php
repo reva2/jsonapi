@@ -11,7 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Controllers;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * AnotherController
@@ -26,9 +26,7 @@ class AnotherController
 
     }
 
-    /**
-     * @API\ApiRequest()
-     */
+    #[API\Request]
     public function anotherAction()
     {
 

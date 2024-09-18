@@ -8,18 +8,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Reva2\JsonApi\Attributes;
 
-namespace Reva2\JsonApi\Annotations;
+use Attribute;
 
-/**
- * JSON API document content annotation
- *
- * @package Reva2\JsonApi\Annotations
- * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @Annotation
- * @Target({"PROPERTY"})
- */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Content extends Property
 {
 

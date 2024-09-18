@@ -10,7 +10,6 @@
 
 namespace Reva2\JsonApi\Tests\EventListener;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\EventListener\ApiListener;
@@ -20,6 +19,7 @@ use Reva2\JsonApi\Tests\Fixtures\Controllers\PetsController;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetDocument;
 use Reva2\JsonApi\Tests\Fixtures\Query\PetQuery;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -98,7 +98,6 @@ class ApiListenerTest extends TestCase
     protected function setUp(): void
     {
         $this->listener = new ApiListener(
-            new AnnotationReader(),
             new Factory(),
             [
                 'decoders' => ['application/vnd.json+api' => 'jsonapi'],
@@ -109,16 +108,17 @@ class ApiListenerTest extends TestCase
 
     /**
      * @param callable $controller
-     * @return \Symfony\Component\HttpKernel\Event\FilterControllerEvent | \Symfony\Component\HttpKernel\Event\ControllerEvent depends on symfony/http-kernel version
+     * @return ControllerEvent
      */
-    private function createEvent(callable $controller)
+    private function createEvent(callable $controller): ControllerEvent
     {
         $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
 
-        if (class_exists('Symfony\Component\HttpKernel\Event\FilterControllerEvent')) {
-            return new \Symfony\Component\HttpKernel\Event\FilterControllerEvent($kernel, $controller, new Request(), HttpKernelInterface::MASTER_REQUEST);
-        } else {
-            return new \Symfony\Component\HttpKernel\Event\ControllerEvent($kernel, $controller, new Request(), HttpKernelInterface::MASTER_REQUEST);
-        }
+        return new ControllerEvent(
+            $kernel,
+            $controller,
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+        );
     }
 }

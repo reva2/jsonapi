@@ -11,28 +11,26 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Metadata;
 
-use Reva2\JsonApi\Annotations\ApiObject;
-use Reva2\JsonApi\Annotations\Property;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Pets list metadata
  *
  * @author Sergey Revenko <sergey.revenko@orbitsoft.com>
  * @package Reva2\JsonApi\Tests\Fixtures\Metadata
- *
- * @ApiObject()
  */
+#[API\ApiObject]
 class PetsListMetadata
 {
     /**
      * @var string
-     * @Property(type="string")
      */
-    public $someString;
+    #[API\Property]
+    public string $someString;
 
     /**
      * @var int
-     * @Property(type="integer")
      */
-    public $someInt;
+    #[API\Property]
+    public int $someInt;
 }

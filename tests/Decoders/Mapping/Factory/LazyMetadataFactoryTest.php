@@ -8,16 +8,14 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Reva2\JsonApi\Tests\Decoders\Mapping\Factory;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Cache\CacheInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
-use Reva2\JsonApi\Decoders\Mapping\Loader\AnnotationLoader;
+use Reva2\JsonApi\Decoders\Mapping\Loader\AttributeLoader;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 
 /**
@@ -73,7 +71,7 @@ class LazyMetadataFactoryTest extends TestCase
             ->method('write')
             ->withAnyParameters();
 
-        $loader = new AnnotationLoader(new AnnotationReader());
+        $loader = new AttributeLoader();
 
         $factory = new LazyMetadataFactory($loader, $cache);
 

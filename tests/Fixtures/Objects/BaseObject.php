@@ -11,35 +11,34 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Objects;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * Base example object
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Objects
  * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @API\ApiObject(
- *     discField="parentProp",
- *     discMap={
- *      "example": "Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject"
- *     }
- * )
  */
+#[API\ApiObject(
+    discField: "parentProp",
+    discMap: [
+        "example" => ExampleObject::class
+    ]
+)]
 class BaseObject
 {
     /**
-     * @var string
-     * @API\Property()
+     * @var ?string
      */
-    protected $parentProp;
+    #[API\Property]
+    protected ?string $parentProp;
 
     /**
      * Sets value of parent property
      *
-     * @param $value
+     * @param ?string $value
      */
-    public function setParentProp($value)
+    public function setParentProp(?string $value)
     {
         $this->parentProp = $value;
     }
@@ -47,9 +46,9 @@ class BaseObject
     /**
      * Returns value of parent property
      *
-     * @return string
+     * @return ?string
      */
-    public function getParentProp()
+    public function getParentProp(): ?string
     {
         return $this->parentProp;
     }

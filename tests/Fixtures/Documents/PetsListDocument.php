@@ -11,7 +11,7 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Documents;
 
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 use Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
 
@@ -20,20 +20,19 @@ use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Documents
  * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @API\ApiDocument(allowEmpty=true)
  */
+#[API\Document(allowEmpty: true)]
 class PetsListDocument
 {
     /**
      * @var Pet[]
-     * @API\Content(type="Array<Reva2\JsonApi\Tests\Fixtures\Resources\Pet>")
      */
-    public $data;
+    #[API\Content(type: Pet::class, multiple: true)]
+    public array $data;
 
     /**
      * @var PetsListMetadata
-     * @API\Metadata(type="Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata")
      */
-    public $meta;
+    #[API\Metadata(PetsListMetadata::class)]
+    public PetsListMetadata $meta;
 }

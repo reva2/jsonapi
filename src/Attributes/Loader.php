@@ -8,28 +8,29 @@
  * file that was distributed with this source code.
  */
 
-namespace Reva2\JsonApi\Annotations;
+namespace Reva2\JsonApi\Attributes;
 
-/**
- * JSON API relationship loader annotation
- *
- * @author Sergey Revenko <dedsemen@gmail.com>
- * @package Reva2\JsonApi\Annotations
- *
- * @Annotation
- * @Target({"ANNOTATION"})
- */
 class Loader
 {
     /**
      * @var string
      */
-    public $loader;
+    public string $loader;
 
     /**
      * Serialization group
      *
      * @var string
      */
-    public $group = 'Default';
+    public string $group = 'Default';
+
+    /**
+     * @param string $loader
+     * @param string $group
+     */
+    public function __construct(string $loader, string $group = 'Default')
+    {
+        $this->loader = $loader;
+        $this->group = $group;
+    }
 }

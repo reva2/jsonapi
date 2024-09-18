@@ -15,7 +15,7 @@ use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
 use Neomerx\JsonApi\Encoder\Parameters\SortParameter;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -31,32 +31,33 @@ class ListQueryParameters extends QueryParameters
 
     /**
      * @var integer|null
-     * @API\Property(type="integer", path="[page][number]")
-     * @Assert\Type(type="integer")
-     * @Assert\GreaterThan(value=0)
      */
-    protected $pageNumber;
+    #[API\Property(path: '[page][number]')]
+    #[Assert\Type('integer')]
+    #[Assert\GreaterThan(value: 0)]
+    protected ?int $pageNumber = null;
 
     /**
      * @var integer|null
-     * @API\Property(type="integer", path="[page][size]")
-     * @Assert\Type(type="integer")
-     * @Assert\GreaterThan(value=0)
      */
-    protected $pageSize;
+    #[API\Property(path: '[page][size]')]
+    #[Assert\Type('integer')]
+    #[Assert\GreaterThan(value: 0)]
+    protected ?int $pageSize = null;
 
     /**
      * @var SortParameterInterface[]|null
-     * @API\Property(path="[sort]", parser="parseSortingParameters")
      * @Assert\Type(type="array")
      */
-    protected $sortParameters;
+    #[API\Property(path: '[sort]', parser: 'parseSortingParameters')]
+    #[Assert\Type('array')]
+    protected ?array $sortParameters;
 
     /**
      * @param int|null $pageNumber
      * @return $this
      */
-    public function setPageNumber($pageNumber = null)
+    public function setPageNumber(?int $pageNumber = null): self
     {
         $this->pageNumber = $pageNumber;
 
@@ -67,7 +68,7 @@ class ListQueryParameters extends QueryParameters
      * @param int|null $pageSize
      * @return $this
      */
-    public function setPageSize($pageSize = null)
+    public function setPageSize(?int $pageSize = null): self
     {
         $this->pageSize = $pageSize;
 
@@ -77,11 +78,11 @@ class ListQueryParameters extends QueryParameters
     /**
      * @inheritdoc
      */
-    public function getPaginationParameters()
+    public function getPaginationParameters(): ?array
     {
         return [
-            'number' => ($this->pageNumber) ? $this->pageNumber : 1,
-            'size' => ($this->pageSize) ? $this->pageSize : $this->getDefaultPageSize()
+            'number' => ($this->pageNumber) ?: 1,
+            'size' => ($this->pageSize) ?: $this->getDefaultPageSize()
         ];
     }
 
@@ -91,7 +92,7 @@ class ListQueryParameters extends QueryParameters
      * @param SortParameterInterface[]|null $sorting
      * @return $this
      */
-    public function setSortParameters(array $sorting = null)
+    public function setSortParameters(array $sorting = null): self
     {
         $this->sortParameters = $sorting;
 
@@ -101,7 +102,7 @@ class ListQueryParameters extends QueryParameters
     /**
      * @inheritdoc
      */
-    public function getSortParameters()
+    public function getSortParameters(): ?array
     {
         return $this->sortParameters;
     }
@@ -109,10 +110,10 @@ class ListQueryParameters extends QueryParameters
     /**
      * Parse sorting parameters string
      *
-     * @param string $value
-     * @return array
+     * @param ?string $value
+     * @return ?array
      */
-    public function parseSortingParameters($value)
+    public function parseSortingParameters($value): ?array
     {
         if (empty($value)) {
             return null;
@@ -141,9 +142,9 @@ class ListQueryParameters extends QueryParameters
      * Validate sort parameters
      *
      * @param ExecutionContextInterface $context
-     * @Assert\Callback()
      */
-    public function validateSortParameters(ExecutionContextInterface $context)
+    #[Assert\Callback()]
+    public function validateSortParameters(ExecutionContextInterface $context): void
     {
         if (empty($this->sortParameters)) {
             return;
@@ -172,9 +173,9 @@ class ListQueryParameters extends QueryParameters
      * Validate page size
      *
      * @param ExecutionContextInterface $context
-     * @Assert\Callback()
      */
-    public function validatePageSize(ExecutionContextInterface $context)
+    #[Assert\Callback()]
+    public function validatePageSize(ExecutionContextInterface $context): void
     {
         if (!empty($this->pageSize) &&
             (null !== ($maxSize = $this->getMaxPageSize())) &&
@@ -196,7 +197,7 @@ class ListQueryParameters extends QueryParameters
      *
      * @return int|null
      */
-    protected function getDefaultPageSize()
+    protected function getDefaultPageSize(): ?int
     {
         return 10;
     }
@@ -206,7 +207,7 @@ class ListQueryParameters extends QueryParameters
      *
      * @return int|null
      */
-    protected function getMaxPageSize()
+    protected function getMaxPageSize(): ?int
     {
         return 100;
     }
@@ -216,7 +217,7 @@ class ListQueryParameters extends QueryParameters
      *
      * @return string[]
      */
-    protected function getSortableFields()
+    protected function getSortableFields(): array
     {
         return [];
     }

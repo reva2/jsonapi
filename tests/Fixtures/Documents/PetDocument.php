@@ -12,21 +12,21 @@
 namespace Reva2\JsonApi\Tests\Fixtures\Documents;
 
 use Reva2\JsonApi\Tests\Fixtures\Resources\Pet;
-use Reva2\JsonApi\Annotations as API;
+use Reva2\JsonApi\Attributes as API;
 
 /**
  * PetDocument
  *
  * @package Reva2\JsonApi\Tests\Fixtures\Documents
  * @author Sergey Revenko <dedsemen@gmail.com>
- *
- * @API\ApiDocument()
  */
+#[API\Document]
 class PetDocument
 {
     /**
      * @var Pet
      * @API\Content(type="Reva2\JsonApi\Tests\Fixtures\Resources\Pet")
      */
-    public $data;
+    #[API\Content(Pet::class)]
+    public Pet $data;
 }
