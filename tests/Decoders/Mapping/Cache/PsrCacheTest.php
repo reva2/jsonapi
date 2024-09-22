@@ -17,8 +17,8 @@ class PsrCacheTest extends TestCase
         $pool = new ArrayAdapter();
         $cache = new PsrCache($pool);
 
-        $class = 'MyClass';
-        $anotherClass = 'AnotherClass';
+        $class = 'MyNamespace\MyClass';
+        $anotherClass = 'MyNamespace\AnotherClass';
         $metadata = new GenericMetadata($class);
 
         $cache->write($metadata);

@@ -20,12 +20,12 @@ class PsrCache implements CacheInterface
 
     public function has($class)
     {
-        return $this->pool->getItem($class)->isHit();
+        return $this->pool->getItem($this->getCacheKey($class))->isHit();
     }
 
     public function read($class)
     {
-        $item = $this->pool->getItem($class);
+        $item = $this->pool->getItem($this->getCacheKey($class));
         if ($item->isHit()) {
             return $item->get();
         }
@@ -35,9 +35,14 @@ class PsrCache implements CacheInterface
 
     public function write(GenericMetadataInterface $metadata)
     {
-        $item = $this->pool->getItem($metadata->getClassName());
+        $item = $this->pool->getItem($this->getCacheKey($metadata->getClassName()));
         $item->set($metadata);
 
         $this->pool->save($item);
+    }
+
+    private function getCacheKey(string $class): string
+    {
+        return str_replace('\\', '_', $class);
     }
 }
