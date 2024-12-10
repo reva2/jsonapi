@@ -11,20 +11,26 @@
 
 namespace Reva2\JsonApi\Contracts\Decoders;
 
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface as BaseDecoderInterface;
-
 /**
  * Response decoder interface
  *
  * @package Reva2\JsonApi\Contracts\Decoders
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-interface DecoderInterface extends BaseDecoderInterface
+interface DecoderInterface
 {
     /**
      * Sets content type
      *
      * @param string $type
      */
-    public function setContentType($type);
+    public function setContentType(string $type);
+
+    /**
+     * Decode input JSON API data
+     *
+     * @param string $data
+     * @return mixed
+     */
+    public function decode(string $data): mixed;
 }

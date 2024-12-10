@@ -26,7 +26,7 @@ interface CacheInterface
      * @param string $class Class name
      * @return bool
      */
-    public function has($class);
+    public function has(string $class): bool;
 
     /**
      * Returns metadata for the given class from cache
@@ -34,7 +34,7 @@ interface CacheInterface
      * @param string $class Class name
      * @return GenericMetadataInterface|false A ClassMetadata instance or false on miss
      */
-    public function read($class);
+    public function read(string $class): mixed;
 
     /**
      * Stores a class metadata in the cache

@@ -6,13 +6,19 @@
       "attributes": {
         "family":"cats"
       },
-      "relationships":{
-        "store":{
-          "data":{"type":"stores","id":"my-store"},
-          "links":{"related":"\/pets\/my-cat\/store"}}
+      "relationships": {
+        "store": {
+          "links": {
+            "related": "http:\/\/my-api.org\/pets\/my-cat\/store"
+          },
+          "data": {
+            "type": "stores",
+            "id": "my-store"
+          }
+        }
       },
       "links":{
-        "self":"\/pets\/my-cat"
+        "self":"http:\/\/my-api.org\/pets\/my-cat"
       }
     },
     {
@@ -23,11 +29,11 @@
       },
       "relationships":{
         "store":{
-          "data":{"type":"stores","id":"my-store"},
-          "links":{"related":"\/pets\/my-dog\/store"}
+          "links":{"related":"http:\/\/my-api.org\/pets\/my-dog\/store"},
+          "data":{"type":"stores","id":"my-store"}
         }
       },
-      "links":{"self":"\/pets\/my-dog"}
+      "links":{"self":"http:\/\/my-api.org\/pets\/my-dog"}
     }
   ],
   "included":[
@@ -36,7 +42,8 @@
       "id":"my-store",
       "attributes":{
         "name":"My store"
-      }
+      },
+      "links":{"self":"http:\/\/my-api.org\/stores\/my-store"}
     }
   ]
 }

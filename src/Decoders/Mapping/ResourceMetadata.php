@@ -11,8 +11,10 @@
 
 namespace Reva2\JsonApi\Decoders\Mapping;
 
+use Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
+use RuntimeException;
 
 /**
  * JSON API resource metadata
@@ -23,47 +25,47 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
 class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterface
 {
     /**
-     * @var string
+     * @var string|null
      * @internal
      */
-    public $name;
+    public ?string $name = null;
 
     /**
-     * @var string
+     * @var string|null
      * @internal
      */
-    public $loader;
+    public ?string $loader = null;
 
     /**
-     * @var PropertyMetadataInterface
+     * @var PropertyMetadataInterface|null
      */
-    public $idMetadata;
-
-    /**
-     * @var PropertyMetadataInterface[]
-     * @internal
-     */
-    public $attributes = [];
+    public ?PropertyMetadataInterface $idMetadata = null;
 
     /**
      * @var PropertyMetadataInterface[]
      * @internal
      */
-    public $relationships = [];
+    public array $attributes = [];
+
+    /**
+     * @var PropertyMetadataInterface[]
+     * @internal
+     */
+    public array $relationships = [];
 
     /**
      * @inheritdoc
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      * @return $this
      */
-    public function setName($name = null)
+    public function setName(?string $name = null): self
     {
         $this->name = $name;
 
@@ -71,18 +73,18 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     }
 
     /**
-     * @return PropertyMetadataInterface
+     * @return PropertyMetadataInterface|null
      */
-    public function getIdMetadata()
+    public function getIdMetadata(): ?PropertyMetadataInterface
     {
         return $this->idMetadata;
     }
 
     /**
-     * @param PropertyMetadataInterface $idMetadata
+     * @param PropertyMetadataInterface|null $idMetadata
      * @return $this
      */
-    public function setIdMetadata($idMetadata)
+    public function setIdMetadata(PropertyMetadataInterface $idMetadata = null): self
     {
         $this->idMetadata = $idMetadata;
 
@@ -92,7 +94,7 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     /**
      * @inheritdoc
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -103,7 +105,7 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
      * @param PropertyMetadataInterface $attribute
      * @return $this
      */
-    public function addAttribute(PropertyMetadataInterface $attribute)
+    public function addAttribute(PropertyMetadataInterface $attribute): self
     {
         $this->attributes[$attribute->getPropertyName()] = $attribute;
 
@@ -113,7 +115,7 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     /**
      * @inheritdoc
      */
-    public function getRelationships()
+    public function getRelationships(): array
     {
         return $this->relationships;
     }
@@ -124,7 +126,7 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
      * @param PropertyMetadataInterface $relationship
      * @return $this
      */
-    public function addRelationship(PropertyMetadataInterface $relationship)
+    public function addRelationship(PropertyMetadataInterface $relationship): self
     {
         $this->relationships[$relationship->getPropertyName()] = $relationship;
 
@@ -132,18 +134,18 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLoader()
+    public function getLoader(): ?string
     {
         return $this->loader;
     }
 
     /**
-     * @param string $loader
+     * @param string|null $loader
      * @return $this
      */
-    public function setLoader($loader = null)
+    public function setLoader(string $loader = null): self
     {
         $this->loader = $loader;
 
@@ -153,13 +155,13 @@ class ResourceMetadata extends ClassMetadata implements ResourceMetadataInterfac
     /**
      * @inheritdoc
      */
-    public function mergeMetadata($metadata = null)
+    public function mergeMetadata(mixed $metadata = null): self
     {
         if (null !== $metadata) {
             if (!$metadata instanceof ResourceMetadataInterface) {
-                /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface */
+                /* @var $metadata GenericMetadataInterface */
 
-                throw new \RuntimeException(sprintf(
+                throw new RuntimeException(sprintf(
                     "Failed to merge metadata from parent class %s",
                     $metadata->getClassName()
                 ));

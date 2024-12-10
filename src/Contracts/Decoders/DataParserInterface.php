@@ -10,7 +10,8 @@
 
 namespace Reva2\JsonApi\Contracts\Decoders;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
 
 /**
  * Interface for JSON API requests parser
@@ -27,7 +28,7 @@ interface DataParserInterface
      * @param string $docType
      * @return mixed
      */
-    public function parseDocument($data, $docType);
+    public function parseDocument(mixed $data, string $docType): mixed;
 
     /**
      * Parse JSON API request query parameters
@@ -36,7 +37,7 @@ interface DataParserInterface
      * @param string $paramsType
      * @return EncodingParametersInterface
      */
-    public function parseQueryParams($data, $paramsType);
+    public function parseQueryParams(mixed $data, string $paramsType): EncodingParametersInterface;
 
     /**
      * Sets serialization groups
@@ -44,12 +45,12 @@ interface DataParserInterface
      * @param string[] $groups
      * @return DataParserInterface
      */
-    public function setSerializationGroups(array $groups);
+    public function setSerializationGroups(array $groups): self;
 
     /**
      * Returns serialization groups
      *
      * @return string[]
      */
-    public function getSerializationGroups();
+    public function getSerializationGroups(): array;
 }

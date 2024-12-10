@@ -67,7 +67,7 @@ class RequestDecoderTest extends TestCase
             $content = "invalid json";
             $parser = $this->getMockBuilder(DataParser::class)->disableOriginalConstructor()->getMock();
 
-            $decoder = new RequestDecoder($parser, 'resource1');
+            $decoder = new RequestDecoder($parser);
             $decoder->decode($content);
 
             $this->fail("Request decoder should throw exception on bad content");

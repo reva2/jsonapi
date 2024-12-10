@@ -11,7 +11,6 @@
 
 namespace Reva2\JsonApi\Contracts\Http\Query;
 
-use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface as BaseQueryParametersParser;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 
 /**
@@ -20,7 +19,7 @@ use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
  * @package Reva2\JsonApi\Contracts\Http\Query
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-interface QueryParametersParserInterface extends BaseQueryParametersParser
+interface QueryParametersParserInterface
 {
     /**
      * Sets data parser

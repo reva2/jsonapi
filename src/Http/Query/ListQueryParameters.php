@@ -12,8 +12,8 @@
 namespace Reva2\JsonApi\Http\Query;
 
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
-use Neomerx\JsonApi\Encoder\Parameters\SortParameter;
+use Reva2\JsonApi\Contracts\Encoder\SortParameterInterface;
+use Reva2\JsonApi\Encoder\Parameters\SortParameter;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Reva2\JsonApi\Attributes as API;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -46,8 +46,7 @@ class ListQueryParameters extends QueryParameters
     protected ?int $pageSize = null;
 
     /**
-     * @var SortParameterInterface[]|null
-     * @Assert\Type(type="array")
+     * @var SortParameter[]|null
      */
     #[API\Property(path: '[sort]', parser: 'parseSortingParameters')]
     #[Assert\Type('array')]

@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Http\Query\QueryParametersParser;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Test for query parameters parser
@@ -66,13 +67,13 @@ class QueryParametersParserTest extends TestCase
      */
     public function shouldThrowIfDataParserNotSpecified()
     {
-        $query = $this->getMockBuilder(ServerRequestInterface::class)->getMock();
+        $request = new Request();
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Data parser not specified');
 
         $queryParser = new QueryParametersParser();
-        $queryParser->parse($query);
+        $queryParser->parse($request);
     }
 
     /**
@@ -80,7 +81,7 @@ class QueryParametersParserTest extends TestCase
      */
     public function shouldThrowIfQueryTypeNotSpecified()
     {
-        $query = $this->getMockBuilder(ServerRequestInterface::class)->getMock();
+        $request = new Request();
         $dataParser = $this->getMockBuilder(DataParserInterface::class)->getMock();
 
         $this->expectException(RuntimeException::class);
@@ -89,6 +90,6 @@ class QueryParametersParserTest extends TestCase
         $queryParser = new QueryParametersParser();
         $queryParser
             ->setDataParser($dataParser)
-            ->parse($query);
+            ->parse($request);
     }
 }

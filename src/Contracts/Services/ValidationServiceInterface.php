@@ -11,7 +11,7 @@
 
 namespace Reva2\JsonApi\Contracts\Services;
 
-use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Schema\Error;
 
 /**
  * Interface for validation service

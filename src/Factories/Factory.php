@@ -10,11 +10,15 @@
 
 namespace Reva2\JsonApi\Factories;
 
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\HeaderParametersParserInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
+use Neomerx\JsonApi\Http\Headers\HeaderParametersParser;
+use Reva2\JsonApi\Codec\CodecMatcher;
+use Reva2\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
+use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Http\Headers\HeadersChecker;
@@ -34,18 +38,16 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createEncoder(ContainerInterface $container, EncoderOptions $encoderOptions = null)
+    public function createEncoder(SchemaContainerInterface $container): EncoderInterface
     {
-        $encoder = new Encoder($this, $container, $encoderOptions);
-        $encoder->setLogger($this->logger);
-
-        return $encoder;
+        return new Encoder($this, $container);
     }
 
     /**
-     * @inheritdoc
+     * @param CodecMatcherInterface $codecMatcher
+     * @return HeadersChecker
      */
-    public function createHeadersChecker(CodecMatcherInterface $codecMatcher)
+    public function createHeadersChecker(CodecMatcherInterface $codecMatcher): HeadersChecker
     {
         return new HeadersChecker($codecMatcher);
     }
@@ -53,7 +55,7 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createEnvironment(array $config = null)
+    public function createEnvironment(array $config = null): EnvironmentInterface
     {
         return new Environment($config);
     }
@@ -61,7 +63,7 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createRequest(EnvironmentInterface $environment)
+    public function createRequest(EnvironmentInterface $environment): RequestInterface
     {
         return new Request($environment);
     }
@@ -79,9 +81,16 @@ class Factory extends BaseFactory implements FactoryInterface
      */
     public function createContainer(array $providers = [])
     {
-        $container = new Container($this, $providers);
-        $container->setLogger($this->logger);
+        return new Container($this, $providers);
+    }
 
-        return $container;
+    public function createCodecMatcher(): CodecMatcherInterface
+    {
+        return new CodecMatcher();
+    }
+
+    public function createHeaderParametersParser(): HeaderParametersParserInterface
+    {
+        return new HeaderParametersParser($this);
     }
 }

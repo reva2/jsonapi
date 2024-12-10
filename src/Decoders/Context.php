@@ -21,12 +21,12 @@ class Context
     /**
      * @var array
      */
-    protected $resources = [];
+    protected array $resources = [];
 
     /**
      * @var array
      */
-    protected $linked = [];
+    protected array $linked = [];
 
     /**
      * Register resource with specified type and id
@@ -36,7 +36,7 @@ class Context
      * @param mixed $resource
      * @return self
      */
-    public function registerResource($type, $id, $resource)
+    public function registerResource(string $type, string $id, mixed $resource): self
     {
         if (!isset($this->resources[$type])) {
             $this->resources[$type] = [];
@@ -62,7 +62,7 @@ class Context
      * @param string $id
      * @return mixed|null
      */
-    public function getResource($type, $id)
+    public function getResource(string $type, string $id): mixed
     {
         if (!isset($this->resources[$type][$id])) {
             return null;
@@ -80,7 +80,7 @@ class Context
      * @param mixed $data
      * @return $this
      */
-    public function addLinkedData($type, $id, $idx, $data)
+    public function addLinkedData(string $type, string $id, int $idx, mixed $data): self
     {
         if (!isset($this->linked[$type])) {
             $this->linked[$type] = [];
@@ -94,11 +94,11 @@ class Context
     /**
      * Returns linked data for resource with specified type and id
      *
-     * @param $type
-     * @param $id
-     * @return array|null
+     * @param string|null $type
+     * @param string|null $id
+     * @return mixed|null
      */
-    public function getLinkedData($type, $id)
+    public function getLinkedData(?string $type, ?string $id): mixed
     {
         if (!isset($this->linked[$type][$id])) {
             return null;
@@ -107,7 +107,12 @@ class Context
         return $this->linked[$type][$id]['data'];
     }
 
-    public function getLinkedDataIndex($type, $id)
+    /**
+     * @param string $type
+     * @param string $id
+     * @return array|null
+     */
+    public function getLinkedDataIndex(string $type, string $id): ?int
     {
         if (!isset($this->linked[$type][$id])) {
             return null;

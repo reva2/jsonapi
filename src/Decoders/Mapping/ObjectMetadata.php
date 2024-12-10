@@ -11,8 +11,10 @@
 
 namespace Reva2\JsonApi\Decoders\Mapping;
 
+use Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
+use RuntimeException;
 
 /**
  * ObjectMetadata
@@ -25,14 +27,14 @@ class ObjectMetadata extends ClassMetadata implements ObjectMetadataInterface
     /**
      * @var PropertyMetadataInterface[]
      */
-    public $properties = [];
+    public array $properties = [];
 
     /**
      * Returns object properties metadata
      *
      * @return PropertyMetadataInterface[]
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -43,7 +45,7 @@ class ObjectMetadata extends ClassMetadata implements ObjectMetadataInterface
      * @param PropertyMetadataInterface $metadata
      * @return $this
      */
-    public function addProperty(PropertyMetadataInterface $metadata)
+    public function addProperty(PropertyMetadataInterface $metadata): self
     {
         $this->properties[$metadata->getPropertyName()] = $metadata;
 
@@ -53,13 +55,13 @@ class ObjectMetadata extends ClassMetadata implements ObjectMetadataInterface
     /**
      * @inheritdoc
      */
-    public function mergeMetadata($metadata = null)
+    public function mergeMetadata($metadata = null): self
     {
         if (null !== $metadata) {
             if (!$metadata instanceof ObjectMetadataInterface) {
-                /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface */
+                /* @var $metadata GenericMetadataInterface */
 
-                throw new \RuntimeException(sprintf(
+                throw new RuntimeException(sprintf(
                     "Failed to merge metadata from parent class %s",
                     $metadata->getClassName()
                 ));

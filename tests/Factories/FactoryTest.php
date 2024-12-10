@@ -11,9 +11,9 @@
 
 namespace Reva2\JsonApi\Tests\Factories;
 
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use PHPUnit\Framework\TestCase;
+use Reva2\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Factories\Factory;
 use Reva2\JsonApi\Http\Headers\HeadersChecker;
@@ -33,7 +33,7 @@ class FactoryTest extends TestCase
     public function shouldCreateCustomEncoder()
     {
         $factory = new Factory();
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(SchemaContainerInterface::class)->getMock();
 
         $encoder = $factory->createEncoder($container);
 

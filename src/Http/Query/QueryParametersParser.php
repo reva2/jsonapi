@@ -11,9 +11,11 @@
 
 namespace Reva2\JsonApi\Http\Query;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
 use Reva2\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Query parameters parser
@@ -24,35 +26,36 @@ use Reva2\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 class QueryParametersParser implements QueryParametersParserInterface
 {
     /**
-     * @var DataParserInterface
+     * @var DataParserInterface|null
      */
-    protected $parser;
+    protected ?DataParserInterface $parser = null;
 
     /**
      * @var string|null
      */
-    protected $queryType;
+    protected ?string $queryType = null;
 
     /**
-     * @inheritdoc
+     * @param Request $request
+     * @return EncodingParametersInterface
      */
-    public function parse(ServerRequestInterface $request)
+    public function parse(Request $request): EncodingParametersInterface
     {
         if (null === $this->parser) {
-            throw new \RuntimeException('Data parser not specified');
+            throw new RuntimeException('Data parser not specified');
         }
 
         if (null === $this->queryType) {
-            throw new \RuntimeException('Query type not specified');
+            throw new RuntimeException('Query type not specified');
         }
 
-        return $this->parser->parseQueryParams($request->getQueryParams(), $this->queryType);
+        return $this->parser->parseQueryParams($request->query->all(), $this->queryType);
     }
 
     /**
      * @inheritdoc
      */
-    public function setDataParser(DataParserInterface $parser)
+    public function setDataParser(DataParserInterface $parser): self
     {
         $this->parser = $parser;
 
@@ -62,7 +65,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     /**
      * @inheritdoc
      */
-    public function setQueryType($type)
+    public function setQueryType($type): self
     {
         $this->queryType = $type;
 

@@ -10,8 +10,12 @@
 
 namespace Reva2\JsonApi\Decoders;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Document\Error;
+use Closure;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
+use InvalidArgumentException;
+use Neomerx\JsonApi\Schema\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\CallbackResolverInterface;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
@@ -21,6 +25,8 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\Factory\MetadataFactoryInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ObjectMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ResourceMetadataInterface;
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
+use SplStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -37,38 +43,38 @@ class DataParser implements DataParserInterface
     /**
      * Current path
      *
-     * @var \SplStack
+     * @var SplStack
      */
-    protected $path;
+    protected SplStack $path;
 
     /**
      * @var Context
      */
-    protected $context;
+    protected Context $context;
 
     /**
      * Resource decoders factory
      *
      * @var MetadataFactoryInterface
      */
-    protected $factory;
+    protected MetadataFactoryInterface $factory;
 
     /**
      * @var PropertyAccessor
      */
-    protected $accessor;
+    protected PropertyAccessor $accessor;
 
     /**
      * @var CallbackResolverInterface
      */
-    protected $callbackResolver;
+    protected CallbackResolverInterface $callbackResolver;
 
     /**
      * Serialization groups
      *
      * @var string[]
      */
-    protected $serializationGroups = ['Default'];
+    protected array $serializationGroups = ['Default'];
 
     /**
      * Constructor
@@ -89,9 +95,10 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @param string $path
+     * @return $this
      */
-    public function setPath($path)
+    public function setPath(string $path): self
     {
         $this->path->push($this->preparePathSegment($path));
 
@@ -99,9 +106,9 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @return $this
      */
-    public function restorePath()
+    public function restorePath(): self
     {
         $this->path->pop();
 
@@ -111,26 +118,23 @@ class DataParser implements DataParserInterface
     /**
      * @return string[]
      */
-    public function getSerializationGroups()
+    public function getSerializationGroups(): array
     {
         return $this->serializationGroups;
     }
 
     /**
-     * @param string[] $serializationGroups
+     * @param string[] $groups
      * @return $this
      */
-    public function setSerializationGroups(array $serializationGroups)
+    public function setSerializationGroups(array $groups): self
     {
-        $this->serializationGroups = $serializationGroups;
+        $this->serializationGroups = $groups;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getPath()
+    public function getPath(): string
     {
         $segments = [];
         foreach ($this->path as $segment) {
@@ -141,25 +145,31 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @return bool
      */
-    public function hasValue($data, $path)
+    public function hasValue(mixed $data, string $path): bool
     {
         return $this->accessor->isReadable($data, $path);
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @return mixed
      */
-    public function getValue($data, $path)
+    public function getValue(mixed $data, string $path): mixed
     {
         return $this->accessor->getValue($data, $path);
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @return string|null
      */
-    public function parseString($data, $path)
+    public function parseString(mixed $data, string $path): ?string
     {
         $this->setPath($path);
 
@@ -169,7 +179,7 @@ class DataParser implements DataParserInterface
             if ((null === $value) || (is_string($value))) {
                 $pathValue = $value;
             } else {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     sprintf("Value expected to be a string, but %s given", gettype($value)),
                     400
                 );
@@ -181,25 +191,31 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @return int|null
      */
-    public function parseInt($data, $path)
+    public function parseInt(mixed $data, string $path): ?int
     {
         return $this->parseNumeric($data, $path, 'int');
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @return float|null
      */
-    public function parseFloat($data, $path)
+    public function parseFloat(mixed $data, string $path): ?float
     {
         return $this->parseNumeric($data, $path, 'float');
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @return mixed
      */
-    public function parseRaw($data, $path)
+    public function parseRaw(mixed $data, string $path): mixed
     {
         $this->setPath($path);
 
@@ -214,9 +230,12 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @param callable $callback
+     * @return mixed
      */
-    public function parseCallback($data, $path, $callback)
+    public function parseCallback(mixed $data, string $path, callable $callback): mixed
     {
         $this->setPath($path);
 
@@ -231,9 +250,11 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @return bool|null
      */
-    public function parseBool($data, $path)
+    public function parseBool(mixed $data, string $path): ?bool
     {
         $this->setPath($path);
 
@@ -243,11 +264,11 @@ class DataParser implements DataParserInterface
             if ((null === $value) || (is_bool($value))) {
                 $pathValue = $value;
             } elseif (is_string($value)) {
-                $pathValue = (in_array($value, ['true', 'yes', 'y', 'on', 'enabled'])) ? true : false;
+                $pathValue = in_array($value, ['true', 'yes', 'y', 'on', 'enabled']);
             } elseif (is_numeric($value)) {
                 $pathValue = (bool) $value;
             } else {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     sprintf("Value expected to be a boolean, but %s given", gettype($value)),
                     400
                 );
@@ -260,9 +281,12 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @param string $format
+     * @return DateTimeInterface|null
      */
-    public function parseDateTime($data, $path, $format = 'Y-m-d')
+    public function parseDateTime(mixed $data, string $path, string $format = 'Y-m-d'): ?DateTimeInterface
     {
         $this->setPath($path);
 
@@ -271,11 +295,11 @@ class DataParser implements DataParserInterface
             $value = $this->getValue($data, $path);
             if (null !== $value) {
                 if (is_string($value)) {
-                    $pathValue = \DateTimeImmutable::createFromFormat($format, $value);
+                    $pathValue = DateTimeImmutable::createFromFormat($format, $value);
                 }
 
-                if (!$pathValue instanceof \DateTimeImmutable) {
-                    throw new \InvalidArgumentException(
+                if (!$pathValue instanceof DateTimeImmutable) {
+                    throw new InvalidArgumentException(
                         sprintf("Value expected to be a date/time string in '%s' format", $format),
                         400
                     );
@@ -289,9 +313,12 @@ class DataParser implements DataParserInterface
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $data
+     * @param string $path
+     * @param Closure $itemsParser
+     * @return array|null
      */
-    public function parseArray($data, $path, \Closure $itemsParser)
+    public function parseArray(mixed $data, string $path, Closure $itemsParser): ?array
     {
         $this->setPath($path);
 
@@ -299,7 +326,7 @@ class DataParser implements DataParserInterface
         if ($this->hasValue($data, $path)) {
             $value = $this->getValue($data, $path);
             if (false === is_array($value)) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     sprintf("Value expected to be an array, but %s given", gettype($value)),
                     400
                 );
@@ -359,7 +386,7 @@ class DataParser implements DataParserInterface
 
             $name = $this->parseString($value, 'type');
             if ($name !== $metadata->getName()) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     sprintf("Value must contain resource of type '%s'", $metadata->getName()),
                     409
                 );
@@ -423,7 +450,7 @@ class DataParser implements DataParserInterface
     /**
      * @inheritdoc
      */
-    public function parseDocument($data, $docType)
+    public function parseDocument(mixed $data, string $docType): mixed
     {
         try {
             $this->initPathStack();
@@ -433,7 +460,7 @@ class DataParser implements DataParserInterface
 
             $metadata = $this->factory->getMetadataFor($docType);
             if (!$metadata instanceof DocumentMetadataInterface) {
-                throw new \InvalidArgumentException(sprintf("Failed to parse %s as JSON API document", $docType));
+                throw new InvalidArgumentException(sprintf("Failed to parse %s as JSON API document", $docType));
             }
 
             /* @var $metadata \Reva2\JsonApi\Contracts\Decoders\Mapping\DocumentMetadataInterface */
@@ -453,7 +480,7 @@ class DataParser implements DataParserInterface
             return $doc;
         } catch (JsonApiException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw  $this->convertToApiException($e, 'document');
         }
     }
@@ -461,24 +488,16 @@ class DataParser implements DataParserInterface
     /**
      * @inheritdoc
      */
-    public function parseQueryParams($data, $paramsType)
+    public function parseQueryParams(mixed $data, string $paramsType): EncodingParametersInterface
     {
         try {
             $this->initPathStack();
             $this->initContext();
 
-            $query = $this->parseObjectValue($data, $paramsType);
-            if (!$query instanceof EncodingParametersInterface) {
-                throw new \InvalidArgumentException(sprintf(
-                    "Query parameters object must implement interface %s",
-                    EncodingParametersInterface::class
-                ));
-            }
-
-            return $query;
+            return $this->parseObjectValue($data, $paramsType);
         } catch (JsonApiException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw  $this->convertToApiException($e, 'query');
         }
     }
@@ -489,7 +508,7 @@ class DataParser implements DataParserInterface
      * @param string $path
      * @return string
      */
-    protected function preparePathSegment($path)
+    protected function preparePathSegment($path): string
     {
         return trim(preg_replace('~[\/]+~si', '/', str_replace(['.', '[', ']'], '/', (string) $path)), '/');
     }
@@ -499,7 +518,7 @@ class DataParser implements DataParserInterface
      */
     protected function initPathStack()
     {
-        $this->path = new \SplStack();
+        $this->path = new SplStack();
     }
 
     /**
@@ -518,7 +537,7 @@ class DataParser implements DataParserInterface
      * @param string $type
      * @return float|int|null
      */
-    protected function parseNumeric($data, $path, $type)
+    protected function parseNumeric(mixed $data, string $path, string $type): mixed
     {
         $this->setPath($path);
 
@@ -531,7 +550,7 @@ class DataParser implements DataParserInterface
             } elseif (is_numeric($value)) {
                 $pathValue = ('int' === $type) ? (int) $value : (float) $value;
             } elseif (null !== $value) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     sprintf("Value expected to be %s, but %s given", $type, gettype($value)),
                     400
                 );
@@ -610,7 +629,7 @@ class DataParser implements DataParserInterface
                 return $this->parseRaw($data, $path);
 
             default:
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     "Unsupported property data type '%s'",
                     $metadata->getDataType()
                 ));
@@ -626,8 +645,12 @@ class DataParser implements DataParserInterface
      * @param PropertyMetadataInterface $propMetadata
      * @return mixed|null
      */
-    public function parseResourceOrObject($data, $path, $objClass, PropertyMetadataInterface $propMetadata)
-    {
+    public function parseResourceOrObject(
+        mixed $data,
+        string $path,
+        string $objClass,
+        PropertyMetadataInterface $propMetadata
+    ): mixed {
         $objMetadata = $this->factory->getMetadataFor($objClass);
         if ($objMetadata instanceof ResourceMetadataInterface) {
             $loader = null;
@@ -650,11 +673,11 @@ class DataParser implements DataParserInterface
      * @param string $objType
      * @return mixed
      */
-    public function parseObjectValue($data, $objType)
+    public function parseObjectValue(mixed $data, string $objType): mixed
     {
         $metadata = $this->factory->getMetadataFor($objType);
         if (!$metadata instanceof ObjectMetadataInterface) {
-            throw new \InvalidArgumentException('Invalid object metadata');
+            throw new InvalidArgumentException('Invalid object metadata');
         }
 
         $discClass = $this->getClassByDiscriminator($metadata, $data);
@@ -682,8 +705,12 @@ class DataParser implements DataParserInterface
      * @param PropertyMetadataInterface $propMetadata
      * @return array|null
      */
-    public function parseArrayValue($data, $path, array $params, PropertyMetadataInterface $propMetadata)
-    {
+    public function parseArrayValue(
+        mixed $data,
+        string $path,
+        array $params,
+        PropertyMetadataInterface $propMetadata
+    ): ?array {
         $type = $params[0];
         $typeParams = $params[1];
 
@@ -735,7 +762,7 @@ class DataParser implements DataParserInterface
                 );
 
             default:
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     "Unsupported array item type '%s' specified",
                     $type
                 ));
@@ -750,37 +777,25 @@ class DataParser implements DataParserInterface
      * @param string $type
      * @return bool|float|int|null|string
      */
-    public function parseScalarValue($data, $path, $type)
+    public function parseScalarValue(mixed $data, string $path, string $type): mixed
     {
-        switch ($type) {
-            case 'string':
-                return $this->parseString($data, $path);
-
-            case 'bool':
-            case 'boolean':
-                return $this->parseBool($data, $path);
-
-            case 'int':
-            case 'integer':
-                return $this->parseInt($data, $path);
-
-            case 'float':
-            case 'double':
-                return $this->parseFloat($data, $path);
-
-            default:
-                throw new \InvalidArgumentException(sprintf("Unsupported scalar type '%s' specified", $type));
-        }
+        return match ($type) {
+            'string' => $this->parseString($data, $path),
+            'bool', 'boolean' => $this->parseBool($data, $path),
+            'int', 'integer' => $this->parseInt($data, $path),
+            'float', 'double' => $this->parseFloat($data, $path),
+            default => throw new InvalidArgumentException(sprintf("Unsupported scalar type '%s' specified", $type)),
+        };
     }
 
     /**
      * Convert any exception to JSON API exception
      *
-     * @param \Exception $e
+     * @param Exception $e
      * @param string $objType
      * @return JsonApiException
      */
-    private function convertToApiException(\Exception $e, $objType)
+    private function convertToApiException(Exception $e, string $objType): JsonApiException
     {
         $status = $e->getCode();
         $message = 'Failed to parse request';
@@ -800,7 +815,14 @@ class DataParser implements DataParserInterface
                 break;
         }
 
-        $error = new Error(rand(), null, $status, self::ERROR_CODE, $message, $e->getMessage(), $source);
+        $error = new Error(
+            idx: rand(),
+            status: $status,
+            code: self::ERROR_CODE,
+            title: $message,
+            detail: $e->getMessage(),
+            source: $source
+        );
 
         return new JsonApiException($error, $status, $e);
     }
@@ -812,7 +834,7 @@ class DataParser implements DataParserInterface
      * @param array|object $data
      * @return string|null
      */
-    private function getClassByDiscriminator(ClassMetadataInterface $metadata, $data)
+    private function getClassByDiscriminator(ClassMetadataInterface $metadata, mixed $data): ?string
     {
         if (null === ($discField = $metadata->getDiscriminatorField())) {
             return null;
@@ -822,7 +844,7 @@ class DataParser implements DataParserInterface
         if (empty($discValue)) {
             $this->setPath($discField->getDataPath());
 
-            throw new \InvalidArgumentException("Field value required and can not be empty", 422);
+            throw new InvalidArgumentException("Field value required and can not be empty", 422);
         }
 
         return $metadata->getDiscriminatorClass($discValue);
@@ -850,7 +872,7 @@ class DataParser implements DataParserInterface
      *
      * @param mixed $data
      */
-    private function parseLinkedResources($data)
+    private function parseLinkedResources(mixed $data): void
     {
         if (false === $this->hasValue($data, 'included')) {
             return;
@@ -888,10 +910,12 @@ class DataParser implements DataParserInterface
      * @param PropertyMetadataInterface $relationship
      * @return void
      */
-    private function parseRelationship($data, $pathValue, PropertyMetadataInterface $relationship)
+    private function parseRelationship(mixed $data, mixed $pathValue, PropertyMetadataInterface $relationship): void
     {
         if ('array' === $relationship->getDataType()) {
-            return $this->parseArrayRelationship($data, $pathValue, $relationship);
+            $this->parseArrayRelationship($data, $pathValue, $relationship);
+
+            return;
         }
 
         $resType = null;
@@ -908,7 +932,9 @@ class DataParser implements DataParserInterface
             (null !== $resType) &&
             (null !== ($res = $this->context->getResource($resType, $resId)))
         ) {
-            return $this->setProperty($pathValue, $res, $relationship);
+            $this->setProperty($pathValue, $res, $relationship);
+
+            return;
         }
 
 
@@ -934,8 +960,9 @@ class DataParser implements DataParserInterface
      * @param mixed $data
      * @param mixed $pathValue
      * @param PropertyMetadataInterface $relationship
+     * @return void
      */
-    private function parseArrayRelationship($data, $pathValue, PropertyMetadataInterface $relationship)
+    private function parseArrayRelationship(mixed $data, mixed $pathValue, PropertyMetadataInterface $relationship): void
     {
         $data = $this->parseArray($data, $relationship->getDataPath(), function ($data, $path) use ($relationship) {
             $resType = null;
@@ -991,7 +1018,7 @@ class DataParser implements DataParserInterface
      * @param mixed $value
      * @param PropertyMetadataInterface $metadata
      */
-    private function setProperty($obj, $value, PropertyMetadataInterface $metadata)
+    private function setProperty(mixed $obj, mixed $value, PropertyMetadataInterface $metadata): void
     {
         $setter = $metadata->getSetter();
         if (null !== $setter) {
@@ -1007,13 +1034,13 @@ class DataParser implements DataParserInterface
      *
      * @param object $data
      */
-    private function parseErrors($data)
+    private function parseErrors(mixed $data): void
     {
         if (!$this->hasValue($data, 'errors')) {
             return;
         }
 
-        $errors = $this->parseArray($data, 'errors', function ($data, $path, DataParser $parser) {
+        $errors = $this->parseArray($data, 'errors', function ($data, $path) {
             $source = null;
             if ($this->hasValue($data, $path . '.source.pointer')) {
                 $source = ['pointer' => $this->parseString($data, $path . '.source.pointer')];
@@ -1021,15 +1048,17 @@ class DataParser implements DataParserInterface
                 $source = ['parameter' => $this->parseString($data, $path . '.source.parameter')];
             }
 
+            $meta = $this->parseRaw($data, $path . '.meta');
+
             return new Error(
-                $this->parseString($data, $path . '.id'),
-                null,
-                $this->parseString($data, $path . '.status'),
-                $this->parseString($data, $path . '.code'),
-                $this->parseString($data, $path . '.title'),
-                $this->parseString($data, $path . '.detail'),
-                $source,
-                $this->parseRaw($data, $path . '.meta')
+                idx: $this->parseString($data, $path . '.id'),
+                status: $this->parseString($data, $path . '.status'),
+                code: $this->parseString($data, $path . '.code'),
+                title: $this->parseString($data, $path . '.title'),
+                detail: $this->parseString($data, $path . '.detail'),
+                source: $source,
+                hasMeta: !!$meta,
+                meta: $this->parseRaw($data, $path . '.meta')
             );
         });
 

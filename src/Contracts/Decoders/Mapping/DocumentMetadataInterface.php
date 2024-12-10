@@ -21,21 +21,21 @@ interface DocumentMetadataInterface extends GenericMetadataInterface
     /**
      * Returns metadata data for document' content
      * 
-     * @return PropertyMetadataInterface
+     * @return PropertyMetadataInterface|null
      */
-    public function getContentMetadata();
+    public function getContentMetadata(): ?PropertyMetadataInterface;
 
     /**
      * Returns metadata for document' metadata
      *
-     * @return PropertyMetadataInterface
+     * @return PropertyMetadataInterface|null
      */
-    public function getMetadata();
+    public function getMetadata(): ?PropertyMetadataInterface;
 
     /**
      * Returns whether document can be empty
      * 
      * @return bool
      */
-    public function isAllowEmpty();
+    public function isAllowEmpty(): bool;
 }

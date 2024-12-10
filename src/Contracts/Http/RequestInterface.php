@@ -10,7 +10,7 @@
 
 namespace Reva2\JsonApi\Contracts\Http;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 
 /**
@@ -26,7 +26,7 @@ interface RequestInterface
      *
      * @return EnvironmentInterface
      */
-    public function getEnvironment();
+    public function getEnvironment(): EnvironmentInterface;
 
     /**
      * Sets request query parameters
@@ -34,14 +34,14 @@ interface RequestInterface
      * @param EncodingParametersInterface|null $query
      * @return $this
      */
-    public function setQuery(EncodingParametersInterface $query = null);
+    public function setQuery(EncodingParametersInterface $query = null): self;
 
     /**
      * Returns query parameters
      *
      * @return EncodingParametersInterface|null
      */
-    public function getQuery();
+    public function getQuery(): ?EncodingParametersInterface;
 
     /**
      * Sets request body
@@ -49,12 +49,12 @@ interface RequestInterface
      * @param mixed|null $body
      * @return $this
      */
-    public function setBody($body = null);
+    public function setBody(mixed $body = null): self;
 
     /**
      * Returns request body
      *
      * @return mixed|null
      */
-    public function getBody();
+    public function getBody(): mixed;
 }

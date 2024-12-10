@@ -29,7 +29,7 @@ interface FactoryInterface extends BaseFactory
      * @param array|null $config
      * @return EnvironmentInterface
      */
-    public function createEnvironment(array $config = null);
+    public function createEnvironment(array $config = null): EnvironmentInterface;
 
     /**
      * Create JSON API request object
@@ -37,5 +37,5 @@ interface FactoryInterface extends BaseFactory
      * @param EnvironmentInterface $environment
      * @return RequestInterface
      */
-    public function createRequest(EnvironmentInterface $environment);
+    public function createRequest(EnvironmentInterface $environment): RequestInterface;
 }

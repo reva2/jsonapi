@@ -10,6 +10,7 @@
 
 namespace Reva2\JsonApi\Encoder;
 
+use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Encoder\Encoder as BaseEncoder;
 use Reva2\JsonApi\Factories\Factory;
 
@@ -24,7 +25,7 @@ class Encoder extends BaseEncoder
     /**
      * @inheritdoc
      */
-    protected static function getFactory()
+    protected static function createFactory(): FactoryInterface
     {
         return new Factory();
     }

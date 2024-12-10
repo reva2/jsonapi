@@ -25,14 +25,14 @@ class GenericMetadata implements GenericMetadataInterface
      * @var string
      * @internal
      */
-    public $className;
+    public string $className;
 
     /**
      * Constructor
      *
-     * @param $className
+     * @param string $className
      */
-    public function __construct($className)
+    public function __construct(string $className)
     {
         $this->className = $className;
     }
@@ -40,7 +40,7 @@ class GenericMetadata implements GenericMetadataInterface
     /**
      * @inheritdoc
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }

@@ -23,13 +23,13 @@ interface MetadataFactoryInterface
      * 
      * @param string $value
      */
-    public function getMetadataFor($value);
+    public function getMetadataFor(string $value): mixed;
 
     /**
      * Returns whether we have metadata for specified value
      *
-     * @param string $value
+     * @param mixed $value
      * @return bool
      */
-    public function hasMetadataFor($value);
+    public function hasMetadataFor(mixed $value): bool;
 }

@@ -11,7 +11,7 @@
 namespace Reva2\JsonApi\Schema;
 
 use Doctrine\Common\Util\ClassUtils;
-use Neomerx\JsonApi\Schema\Container as BaseContainer;
+use Neomerx\JsonApi\Schema\SchemaContainer;
 
 /**
  * Schema container for JSON API encoder
@@ -19,12 +19,12 @@ use Neomerx\JsonApi\Schema\Container as BaseContainer;
  * @package Reva2\JsonApi\Schema
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class Container extends BaseContainer
+class Container extends SchemaContainer
 {
     /**
      * @inheritdoc
      */
-    protected function getResourceType($resource)
+    protected function getResourceType($resource): string
     {
         return ClassUtils::getRealClass(get_class($resource));
     }

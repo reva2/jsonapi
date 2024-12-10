@@ -10,13 +10,11 @@
 
 namespace Reva2\JsonApi\Http\Headers;
 
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\AcceptHeaderInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\HeaderInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\HeaderParametersInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\HeadersCheckerInterface;
-use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Contracts\Http\Headers\AcceptMediaTypeInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Schema\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Reva2\JsonApi\Contracts\Codec\CodecMatcherInterface;
 
 /**
  * Headers checker
@@ -24,7 +22,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  * @package Reva2\JsonApi\Http\Headers
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class HeadersChecker implements HeadersCheckerInterface
+class HeadersChecker
 {
     const INVALID_CONTENT_TYPE_ERROR = 'ebb239c5-221d-42d2-a2f7-ca4bbc3d476f';
     const UNSUPPORTED_CONTENT_TYPE_ERROR = 'aa389b54-1b33-4b0f-a5f4-1d680ca5f6d3';
@@ -32,7 +30,7 @@ class HeadersChecker implements HeadersCheckerInterface
     /**
      * @var CodecMatcherInterface
      */
-    protected $matcher;
+    protected CodecMatcherInterface $matcher;
 
     /**
      * Constructor
@@ -45,34 +43,24 @@ class HeadersChecker implements HeadersCheckerInterface
     }
 
     /**
-     * @inheritdoc
+     * @param MediaTypeInterface $contentType
+     * @param AcceptMediaTypeInterface[] $acceptedContentTypes
+     * @return void
      */
-    public function checkHeaders(HeaderParametersInterface $parameters)
+    public function checkHeaders(MediaTypeInterface $contentType, iterable $acceptedContentTypes): void
     {
-
-        $this->checkContentTypeHeader($parameters->getContentTypeHeader());
-        $this->checkAcceptHeader($parameters->getAcceptHeader());
+        $this->checkContentTypeHeader($contentType);
+        $this->checkAcceptHeader($acceptedContentTypes);
     }
 
     /**
      * Check content type header
      *
-     * @param HeaderInterface $header
+     * @param MediaTypeInterface $contentType
      */
-    private function checkContentTypeHeader(HeaderInterface $header)
+    private function checkContentTypeHeader(MediaTypeInterface $contentType)
     {
-        if (count($header->getMediaTypes()) > 1) {
-            throw new JsonApiException(
-                $this->createApiError(
-                    JsonApiException::HTTP_CODE_BAD_REQUEST,
-                    self::INVALID_CONTENT_TYPE_ERROR,
-                    "Invalid content type"
-                ),
-                JsonApiException::HTTP_CODE_BAD_REQUEST
-            );
-        }
-
-        $this->matcher->matchDecoder($header);
+        $this->matcher->matchDecoder($contentType);
         if (null === $this->matcher->getDecoderHeaderMatchedType()) {
             throw new JsonApiException(
                 $this->createApiError(
@@ -88,12 +76,11 @@ class HeadersChecker implements HeadersCheckerInterface
     /**
      * Check accept header
      *
-     * @param AcceptHeaderInterface $header
-     * @return Error
+     * @param AcceptMediaTypeInterface[] $acceptedMediaTypes
      */
-    private function checkAcceptHeader(AcceptHeaderInterface $header)
+    private function checkAcceptHeader(iterable $acceptedMediaTypes): void
     {
-        $this->matcher->matchEncoder($header);
+        $this->matcher->matchEncoder($acceptedMediaTypes);
 
         if (null === $this->matcher->getEncoderHeaderMatchedType()) {
             throw new JsonApiException(
@@ -116,6 +103,6 @@ class HeadersChecker implements HeadersCheckerInterface
      */
     private function createApiError($status, $code, $title)
     {
-        return new Error(rand(), null, $status, $code, $title);
+        return new Error(idx: rand(), status:  $status, code: $code, title: $title);
     }
 }

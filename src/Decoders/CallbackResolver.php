@@ -11,6 +11,7 @@
 
 namespace Reva2\JsonApi\Decoders;
 
+use InvalidArgumentException;
 use Reva2\JsonApi\Contracts\Decoders\CallbackResolverInterface;
 
 /**
@@ -26,7 +27,7 @@ class CallbackResolver implements CallbackResolverInterface
     /**
      * @inheritdoc
      */
-    public function resolveCallback($name)
+    public function resolveCallback(string $name): callable
     {
         if (preg_match(static::STATIC_METHOD_PATTERN, $name)) {
             list($class, $method) = explode('::', $name, 2);
@@ -36,7 +37,7 @@ class CallbackResolver implements CallbackResolverInterface
         }
 
         if (!is_callable($callback)) {
-            throw new \InvalidArgumentException(sprintf("'%s' is not callable", $name));
+            throw new InvalidArgumentException(sprintf("'%s' is not callable", $name));
         }
 
         return $callback;
