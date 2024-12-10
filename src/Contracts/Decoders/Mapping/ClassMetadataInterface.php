@@ -24,7 +24,7 @@ interface ClassMetadataInterface extends GenericMetadataInterface
      *
      * @return PropertyMetadataInterface|null
      */
-    public function getDiscriminatorField();
+    public function getDiscriminatorField(): ?PropertyMetadataInterface;
 
     /**
      * Returns class name that corresponds to specified
@@ -33,12 +33,12 @@ interface ClassMetadataInterface extends GenericMetadataInterface
      * @param string $value
      * @return string
      */
-    public function getDiscriminatorClass($value);
+    public function getDiscriminatorClass(string $value): string;
 
     /**
      * Merge parent object metadata
      *
      * @param mixed $metadata
      */
-    public function mergeMetadata($metadata);
+    public function mergeMetadata(mixed $metadata): self;
 }

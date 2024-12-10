@@ -13,6 +13,8 @@ namespace Reva2\JsonApi\Tests\Http;
 
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Http\ResponseFactory;
@@ -45,20 +47,16 @@ class ResponseFactoryTest extends TestCase
      */
     private function getEnvironment()
     {
-        $encoderMediaType = $this->getMockBuilder(MediaTypeInterface::class)->getMock();
-        $encoderMediaType->expects($this->once())->method('getMediaType')->willReturn('application/vnd.json+api');
-
         $environment = $this->getMockBuilder(EnvironmentInterface::class)->getMock();
-        $environment->expects($this->once())->method('getEncoderMediaType')->willReturn($encoderMediaType);
 
         return $environment;
     }
 
     /**
-     * @return ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return SchemaContainerInterface|MockObject
      */
     private function getSchemas()
     {
-        return $this->getMockBuilder(ContainerInterface::class)->getMock();
+        return $this->getMockBuilder(SchemaContainerInterface::class)->getMock();
     }
 }

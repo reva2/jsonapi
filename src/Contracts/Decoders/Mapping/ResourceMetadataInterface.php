@@ -21,33 +21,33 @@ interface ResourceMetadataInterface extends ClassMetadataInterface
     /**
      * Returns resource name
      *
-     * @return string
+     * @return string|null
      */
-    public function getName();
+    public function getName(): ?string;
 
     /**
      * Returns resource loader
      *
      * @return string|null
      */
-    public function getLoader();
+    public function getLoader(): ?string;
 
     /**
-     * @return PropertyMetadataInterface
+     * @return PropertyMetadataInterface|null
      */
-    public function getIdMetadata();
+    public function getIdMetadata(): ?PropertyMetadataInterface;
 
     /**
      * Returns metadata resource attributes
      *
      * @return PropertyMetadataInterface[]
      */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
      * Returns metadata for resource relationships
      *
      * @return PropertyMetadataInterface[]
      */
-    public function getRelationships();
+    public function getRelationships(): array;
 }

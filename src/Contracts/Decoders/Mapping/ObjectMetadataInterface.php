@@ -24,5 +24,5 @@ interface ObjectMetadataInterface extends ClassMetadataInterface
      *
      * @return PropertyMetadataInterface[]
      */
-    public function getProperties();
+    public function getProperties(): array;
 }

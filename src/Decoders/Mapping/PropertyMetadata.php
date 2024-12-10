@@ -25,49 +25,49 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @var string
      * @internal
      */
-    public $propertyName;
-
-    /**
-     * @var string
-     * @internal
-     */
-    public $setter;
-
-    /**
-     * @var string
-     * @internal
-     */
-    public $dataPath;
-
-    /**
-     * @var string
-     * @internal
-     */
-    public $dataType;
-
-    /**
-     * @var mixed
-     * @internal
-     */
-    public $dataTypeParams;
+    public string $propertyName;
 
     /**
      * @var string|null
      * @internal
      */
-    public $converter;
+    public ?string $setter = null;
+
+    /**
+     * @var string|null
+     * @internal
+     */
+    public ?string $dataPath = null;
+
+    /**
+     * @var string
+     * @internal
+     */
+    public string $dataType;
+
+    /**
+     * @var mixed
+     * @internal
+     */
+    public mixed $dataTypeParams;
+
+    /**
+     * @var string|null
+     * @internal
+     */
+    public ?string $converter;
 
     /**
      * @var array
      * @internal
      */
-    public $groups = ['Default'];
+    public array $groups = ['Default'];
 
     /**
      * @var array
      * @internal
      */
-    public $loaders = [];
+    public array $loaders = [];
 
     /**
      * Constructor
@@ -75,7 +75,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param string $property
      * @param string $className
      */
-    public function __construct($property, $className)
+    public function __construct(string $property, string $className)
     {
         parent::__construct($className);
 
@@ -85,7 +85,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * @inheritdoc
      */
-    public function getPropertyName()
+    public function getPropertyName(): string
     {
         return $this->propertyName;
     }
@@ -93,7 +93,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * @inheritdoc
      */
-    public function getSetter()
+    public function getSetter(): ?string
     {
         return $this->setter;
     }
@@ -104,7 +104,8 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param string|null $setter
      * @return $this
      */
-    public function setSetter($setter = null) {
+    public function setSetter(string $setter = null): self
+    {
         $this->setter = $setter;
 
         return $this;
@@ -113,7 +114,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * @return string
      */
-    public function getDataPath()
+    public function getDataPath(): string
     {
         return (null !== $this->dataPath) ? $this->dataPath : $this->propertyName;
     }
@@ -122,7 +123,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param string|null $dataPath
      * @return $this
      */
-    public function setDataPath($dataPath = null)
+    public function setDataPath(string $dataPath = null): self
     {
         $this->dataPath = $dataPath;
 
@@ -134,7 +135,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      *
      * @return string
      */
-    public function getDataType()
+    public function getDataType(): string
     {
         return $this->dataType;
     }
@@ -145,7 +146,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param string $dataType
      * @return $this
      */
-    public function setDataType($dataType)
+    public function setDataType(string $dataType): self
     {
         $this->dataType = $dataType;
 
@@ -157,7 +158,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      *
      * @return mixed
      */
-    public function getDataTypeParams()
+    public function getDataTypeParams(): mixed
     {
         return $this->dataTypeParams;
     }
@@ -168,7 +169,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param mixed $dataTypeParams
      * @return $this
      */
-    public function setDataTypeParams($dataTypeParams = null)
+    public function setDataTypeParams(mixed $dataTypeParams = null): self
     {
         $this->dataTypeParams = $dataTypeParams;
 
@@ -178,7 +179,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * @return string|null
      */
-    public function getConverter()
+    public function getConverter(): ?string
     {
         return $this->converter;
     }
@@ -187,7 +188,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param string|null $converter
      * @return $this
      */
-    public function setConverter($converter)
+    public function setConverter(string $converter = null): self
     {
         $this->converter = $converter;
 
@@ -197,7 +198,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * @return array
      */
-    public function getGroups()
+    public function getGroups(): array
     {
         return $this->groups;
     }
@@ -206,7 +207,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param array $groups
      * @return $this
      */
-    public function setGroups(array $groups)
+    public function setGroups(array $groups): self
     {
         $this->groups = $groups;
 
@@ -217,7 +218,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
      * @param array $loaders
      * @return $this
      */
-    public function setLoaders(array $loaders)
+    public function setLoaders(array $loaders): self
     {
         $this->loaders = $loaders;
 
@@ -227,7 +228,7 @@ class PropertyMetadata extends GenericMetadata implements PropertyMetadataInterf
     /**
      * @return array
      */
-    public function getLoaders()
+    public function getLoaders(): array
     {
         return $this->loaders;
     }

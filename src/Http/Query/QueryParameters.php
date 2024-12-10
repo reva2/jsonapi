@@ -11,8 +11,8 @@
 
 namespace Reva2\JsonApi\Http\Query;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Reva2\JsonApi\Attributes as API;
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -79,7 +79,7 @@ class QueryParameters implements EncodingParametersInterface
     /**
      * @inheritdoc
      */
-    public function getFieldSet($type)
+    public function getFieldSet($type): ?array
     {
         return (isset($this->fieldSets[$type])) ? $this->fieldSets[$type] : null;
     }
@@ -114,29 +114,12 @@ class QueryParameters implements EncodingParametersInterface
     /**
      * @inheritdoc
      */
-    public function getFilteringParameters()
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getUnrecognizedParameters()
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         if (empty($this->getIncludePaths()) &&
             empty($this->getFieldSets()) &&
             empty($this->getSortParameters()) &&
-            empty($this->getPaginationParameters()) &&
-            empty($this->getFilteringParameters())
+            empty($this->getPaginationParameters())
         ) {
             return true;
         }

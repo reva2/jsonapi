@@ -26,19 +26,19 @@ class JsonApiRegistry implements JsonApiRegistryInterface
      *
      * @var array
      */
-    protected $decoders = [];
+    protected array $decoders = [];
 
     /**
      * Encoders map
      *
      * @var array
      */
-    protected $encoders = [];
+    protected array $encoders = [];
 
     /**
      * @inheritdoc
      */
-    public function registerDecoder($name, \Closure $decoder)
+    public function registerDecoder($name, \Closure $decoder): self
     {
         $this->decoders[$name] = $decoder;
 

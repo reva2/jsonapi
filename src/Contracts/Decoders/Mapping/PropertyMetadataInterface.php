@@ -23,54 +23,54 @@ interface PropertyMetadataInterface extends GenericMetadataInterface
      *
      * @return string
      */
-    public function getPropertyName();
+    public function getPropertyName(): string;
 
     /**
-     * Returns path to data. By default equals to property name.
+     * Returns path to data. Equals to property name by default.
      *
      * @return string
      */
-    public function getDataPath();
+    public function getDataPath(): string;
 
     /**
      * Returns property data type
      *
      * @return string
      */
-    public function getDataType();
+    public function getDataType(): string;
 
     /**
      * Returns property data type additional parameters
      * 
      * @return mixed
      */
-    public function getDataTypeParams();
+    public function getDataTypeParams(): mixed;
 
     /**
      * Returns name of setter
      *
      * @return string|null
      */
-    public function getSetter();
+    public function getSetter(): ?string;
 
     /**
      * Returns converter for value
      *
      * @return string|null
      */
-    public function getConverter();
+    public function getConverter(): ?string;
 
     /**
      * Returns serialization groups
      *
      * @return string[]
      */
-    public function getGroups();
+    public function getGroups(): array;
 
     /**
      * Returns loaders
      *
      * @return array
      */
-    public function getLoaders();
+    public function getLoaders(): array;
 }

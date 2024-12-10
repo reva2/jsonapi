@@ -11,6 +11,8 @@
 
 namespace Reva2\JsonApi\Contracts\Decoders;
 
+use InvalidArgumentException;
+
 /**
  * Callback resolver
  *
@@ -24,7 +26,7 @@ interface CallbackResolverInterface
      *
      * @param string $name
      * @return mixed
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function resolveCallback($name);
+    public function resolveCallback(string $name): callable;
 }

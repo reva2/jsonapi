@@ -23,27 +23,27 @@ use Reva2\JsonApi\Contracts\Decoders\Mapping\PropertyMetadataInterface;
 class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterface
 {
     /**
-     * @var PropertyMetadataInterface
+     * @var PropertyMetadataInterface|null
      * @internal
      */
-    public $content;
+    public ?PropertyMetadataInterface $content = null;
 
     /**
-     * @var PropertyMetadataInterface
+     * @var PropertyMetadataInterface|null
      * @internal
      */
-    public $metadata;
+    public ?PropertyMetadataInterface $metadata = null;
 
     /**
      * @var bool
      * @internal
      */
-    public $allowEmpty = false;
+    public bool $allowEmpty = false;
 
     /**
      * @inheritdoc
      */
-    public function getContentMetadata()
+    public function getContentMetadata(): ?PropertyMetadataInterface
     {
         return $this->content;
     }
@@ -54,7 +54,7 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
      * @param PropertyMetadataInterface $metadata
      * @return $this
      */
-    public function setContentMetadata(PropertyMetadataInterface $metadata)
+    public function setContentMetadata(PropertyMetadataInterface $metadata): self
     {
         $this->content = $metadata;
 
@@ -62,9 +62,9 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
     }
 
     /**
-     * @return PropertyMetadataInterface
+     * @return PropertyMetadataInterface|null
      */
-    public function getMetadata()
+    public function getMetadata(): ?PropertyMetadataInterface
     {
         return $this->metadata;
     }
@@ -73,7 +73,7 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
      * @param PropertyMetadataInterface $metadata
      * @return DocumentMetadata
      */
-    public function setMetadata($metadata)
+    public function setMetadata(PropertyMetadataInterface $metadata): self
     {
         $this->metadata = $metadata;
 
@@ -83,7 +83,7 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
     /**
      * @inheritdoc
      */
-    public function isAllowEmpty()
+    public function isAllowEmpty(): bool
     {
         return $this->allowEmpty;
     }
@@ -94,7 +94,7 @@ class DocumentMetadata extends GenericMetadata implements DocumentMetadataInterf
      * @param bool $allow
      * @return $this
      */
-    public function setAllowEmpty($allow)
+    public function setAllowEmpty(bool $allow): self
     {
         $this->allowEmpty = $allow;
 

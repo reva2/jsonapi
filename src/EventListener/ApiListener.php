@@ -29,14 +29,14 @@ class ApiListener implements EventSubscriberInterface
     /**
      * @var FactoryInterface
      */
-    protected $factory;
+    protected FactoryInterface $factory;
 
     /**
      * Default matcher configuration
      *
      * @var array
      */
-    protected $defMatcher;
+    protected array $defMatcher;
 
     /**
      * Constructor

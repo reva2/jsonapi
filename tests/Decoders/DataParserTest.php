@@ -12,14 +12,14 @@
 namespace Reva2\JsonApi\Tests\Decoders;
 
 use InvalidArgumentException;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\SortParameterInterface;
-use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Schema\Error;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Decoders\CallbackResolver;
 use Reva2\JsonApi\Decoders\DataParser;
 use Reva2\JsonApi\Decoders\Mapping\Factory\LazyMetadataFactory;
 use Reva2\JsonApi\Decoders\Mapping\Loader\AttributeLoader;
+use Reva2\JsonApi\Encoder\Parameters\SortParameter;
 use Reva2\JsonApi\Http\Query\ListQueryParameters;
 use Reva2\JsonApi\Tests\Fixtures\Documents\OfficesListDocument;
 use Reva2\JsonApi\Tests\Fixtures\Documents\PetsListDocument;
@@ -559,11 +559,11 @@ class DataParserTest extends TestCase
         $this->assertIsArray($sort);
         $this->assertCount(2, $sort);
 
-        $this->assertInstanceOf(SortParameterInterface::class, $sort[0]);
+        $this->assertInstanceOf(SortParameter::class, $sort[0]);
         $this->assertSame('store.id', $sort[0]->getField());
         $this->assertFalse($sort[0]->isAscending());
 
-        $this->assertInstanceOf(SortParameterInterface::class, $sort[1]);
+        $this->assertInstanceOf(SortParameter::class, $sort[1]);
         $this->assertSame('name', $sort[1]->getField());
         $this->assertTrue($sort[1]->isAscending());
     }

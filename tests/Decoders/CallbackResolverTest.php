@@ -48,7 +48,7 @@ class CallbackResolverTest extends TestCase
     /**
      * @test
      */
-    public function shouldResolveSimpleFuncations()
+    public function shouldResolveSimpleFunctions()
     {
         $name = 'intval';
 

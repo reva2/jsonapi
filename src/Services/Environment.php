@@ -29,63 +29,63 @@ class Environment implements EnvironmentInterface
      *
      * @var string|null
      */
-    protected $queryType;
+    protected ?string $queryType = null;
 
     /**
      * Expected body content type
      *
      * @var string|null
      */
-    protected $bodyType;
+    protected ?string $bodyType = null;
 
     /**
      * Codec matcher configuration
      *
      * @var array
      */
-    protected $matcherConfiguration;
+    protected array $matcherConfiguration;
 
     /**
      * URLs prefix
      *
      * @var string
      */
-    protected $urlPrefix = '';
+    protected string $urlPrefix = '';
 
     /**
      * Serialization groups
      *
      * @var string[]
      */
-    protected $serializationGroups = ['Default'];
+    protected array $serializationGroups = ['Default'];
 
     /**
      * Validation groups
      *
      * @var string[]|null
      */
-    protected $validationGroups;
+    protected ?array $validationGroups = null;
 
     /**
      * Request decoder
      *
      * @var DecoderInterface|null
      */
-    protected $decoder;
+    protected ?DecoderInterface $decoder;
 
     /**
      * Response encoder
      *
      * @var EncoderInterface|null
      */
-    protected $encoder;
+    protected ?EncoderInterface $encoder;
 
     /**
      * Response encoder media type
      *
      * @var MediaTypeInterface|null
      */
-    protected $encoderMediaType;
+    protected ?MediaTypeInterface $encoderMediaType;
 
     /**
      * Constructor
@@ -102,7 +102,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getQueryType()
+    public function getQueryType(): ?string
     {
         return $this->queryType;
     }
@@ -113,7 +113,7 @@ class Environment implements EnvironmentInterface
      * @param null|string $queryType
      * @return $this
      */
-    public function setQueryType($queryType = null)
+    public function setQueryType(?string $queryType = null): self
     {
         $this->queryType = $queryType;
 
@@ -123,7 +123,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getBodyType()
+    public function getBodyType(): ?string
     {
         return $this->bodyType;
     }
@@ -134,7 +134,7 @@ class Environment implements EnvironmentInterface
      * @param null|string $bodyType
      * @return $this
      */
-    public function setBodyType($bodyType = null)
+    public function setBodyType(?string $bodyType = null): self
     {
         $this->bodyType = $bodyType;
 
@@ -144,7 +144,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getMatcherConfiguration()
+    public function getMatcherConfiguration(): array
     {
         return $this->matcherConfiguration;
     }
@@ -155,7 +155,7 @@ class Environment implements EnvironmentInterface
      * @param array $matcherConfiguration
      * @return $this
      */
-    public function setMatcherConfiguration(array $matcherConfiguration)
+    public function setMatcherConfiguration(array $matcherConfiguration): self
     {
         $this->matcherConfiguration = $matcherConfiguration;
 
@@ -165,7 +165,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getUrlPrefix()
+    public function getUrlPrefix(): string
     {
         return $this->urlPrefix;
     }
@@ -176,7 +176,7 @@ class Environment implements EnvironmentInterface
      * @param string $urlPrefix
      * @return $this
      */
-    public function setUrlPrefix($urlPrefix)
+    public function setUrlPrefix(string $urlPrefix): self
     {
         $this->urlPrefix = $urlPrefix;
 
@@ -186,7 +186,7 @@ class Environment implements EnvironmentInterface
     /**
      * @return string[]
      */
-    public function getSerializationGroups()
+    public function getSerializationGroups(): array
     {
         return $this->serializationGroups;
     }
@@ -195,7 +195,7 @@ class Environment implements EnvironmentInterface
      * @param string[] $serializationGroups
      * @return $this
      */
-    public function setSerializationGroups(array $serializationGroups)
+    public function setSerializationGroups(array $serializationGroups): self
     {
         $this->serializationGroups = $serializationGroups;
 
@@ -205,7 +205,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getValidationGroups()
+    public function getValidationGroups(): ?array
     {
         return $this->validationGroups;
     }
@@ -216,7 +216,7 @@ class Environment implements EnvironmentInterface
      * @param array|null $validationGroups
      * @return $this
      */
-    public function setValidationGroups(array $validationGroups = null)
+    public function setValidationGroups(array $validationGroups = null): self
     {
         $this->validationGroups = $validationGroups;
 
@@ -226,7 +226,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getEncoder()
+    public function getEncoder(): ?EncoderInterface
     {
         return $this->encoder;
     }
@@ -234,10 +234,10 @@ class Environment implements EnvironmentInterface
     /**
      * Sets response encoder
      *
-     * @param EncoderInterface $encoder
+     * @param EncoderInterface|null $encoder
      * @return $this
      */
-    public function setEncoder(EncoderInterface $encoder)
+    public function setEncoder(?EncoderInterface $encoder): self
     {
         $this->encoder = $encoder;
 
@@ -247,7 +247,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getEncoderMediaType()
+    public function getEncoderMediaType(): ?MediaTypeInterface
     {
         return $this->encoderMediaType;
     }
@@ -255,12 +255,12 @@ class Environment implements EnvironmentInterface
     /**
      * Sets response encoder media type
      *
-     * @param MediaTypeInterface $encoderMediaType
+     * @param MediaTypeInterface|null $mediaType
      * @return $this
      */
-    public function setEncoderMediaType(MediaTypeInterface $encoderMediaType)
+    public function setEncoderMediaType(?MediaTypeInterface $mediaType): self
     {
-        $this->encoderMediaType = $encoderMediaType;
+        $this->encoderMediaType = $mediaType;
 
         return $this;
     }
@@ -268,7 +268,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function setDecoder(DecoderInterface $decoder)
+    public function setDecoder(?DecoderInterface $decoder): self
     {
         $this->decoder = $decoder;
 
@@ -278,7 +278,7 @@ class Environment implements EnvironmentInterface
     /**
      * @inheritdoc
      */
-    public function getDecoder()
+    public function getDecoder(): ?DecoderInterface
     {
         return $this->decoder;
     }
@@ -288,7 +288,7 @@ class Environment implements EnvironmentInterface
      *
      * @param array $config
      */
-    protected function fromArray(array $config)
+    protected function fromArray(array $config): void
     {
         $fields = [
             'query' => 'setQueryType',

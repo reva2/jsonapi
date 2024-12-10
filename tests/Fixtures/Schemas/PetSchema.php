@@ -11,7 +11,8 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Schemas;
 
-use Neomerx\JsonApi\Schema\SchemaProvider;
+use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
+use Neomerx\JsonApi\Schema\BaseSchema;
 
 /**
  * JSON API schema for pets resource
@@ -19,12 +20,12 @@ use Neomerx\JsonApi\Schema\SchemaProvider;
  * @package Reva2\JsonApi\Tests\Fixtures\Schemas
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class PetSchema extends SchemaProvider
+class PetSchema extends BaseSchema
 {
     /**
      * @inheritdoc
      */
-    public function getResourceType()
+    public function getType(): string
     {
         return 'pets';
     }
@@ -32,7 +33,7 @@ class PetSchema extends SchemaProvider
     /**
      * @inheritdoc
      */
-    public function getId($resource)
+    public function getId($resource): ?string
     {
         /* @var $resource \Reva2\JsonApi\Tests\Fixtures\Resources\Pet */
 
@@ -42,7 +43,7 @@ class PetSchema extends SchemaProvider
     /**
      * @inheritdoc
      */
-    public function getAttributes($resource)
+    public function getAttributes(mixed $resource, ContextInterface $context): array
     {
         /* @var $resource \Reva2\JsonApi\Tests\Fixtures\Resources\Pet */
 
@@ -55,14 +56,15 @@ class PetSchema extends SchemaProvider
     /**
      * @inheritdoc
      */
-    public function getRelationships($resource, $isPrimary, array $includeRelationships)
+    public function getRelationships($resource, ContextInterface $context): array
     {
         /* @var $resource \Reva2\JsonApi\Tests\Fixtures\Resources\Pet */
 
         return [
             'store' => [
-                self::DATA => $resource->store,
-                self::SHOW_RELATED => true
+                self::RELATIONSHIP_DATA => $resource->store,
+                self::RELATIONSHIP_LINKS_RELATED => true,
+                self::RELATIONSHIP_LINKS_SELF => false
             ]
         ];
     }

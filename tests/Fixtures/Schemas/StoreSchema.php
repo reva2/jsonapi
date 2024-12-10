@@ -11,7 +11,8 @@
 
 namespace Reva2\JsonApi\Tests\Fixtures\Schemas;
 
-use Neomerx\JsonApi\Schema\SchemaProvider;
+use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
+use Neomerx\JsonApi\Schema\BaseSchema;
 
 /**
  * StoreSchema
@@ -19,12 +20,12 @@ use Neomerx\JsonApi\Schema\SchemaProvider;
  * @package Reva2\JsonApi\Tests\Fixtures\Schemas
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class StoreSchema extends SchemaProvider
+class StoreSchema extends BaseSchema
 {
     /**
      * @inheritdoc
      */
-    public function getResourceType()
+    public function getType(): string
     {
         return 'stores';
     }
@@ -32,7 +33,7 @@ class StoreSchema extends SchemaProvider
     /**
      * @inheritdoc
      */
-    public function getId($resource)
+    public function getId($resource): ?string
     {
         /* @var $resource \Reva2\JsonApi\Tests\Fixtures\Resources\Store */
 
@@ -42,12 +43,17 @@ class StoreSchema extends SchemaProvider
     /**
      * @inheritdoc
      */
-    public function getAttributes($resource)
+    public function getAttributes(mixed $resource, ContextInterface $context): array
     {
         /* @var $resource \Reva2\JsonApi\Tests\Fixtures\Resources\Store */
         return [
             'name' => $resource->getName(),
             'address' => $resource->getAddress()
         ];
+    }
+
+    public function getRelationships($resource, ContextInterface $context): array
+    {
+        return [];
     }
 }

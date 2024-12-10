@@ -11,8 +11,8 @@
 
 namespace Reva2\JsonApi\Services;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Schema\Error;
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
 use Reva2\JsonApi\Contracts\Services\ValidationServiceInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -56,13 +56,11 @@ class ValidationService implements ValidationServiceInterface
             }
             
             $errors[] = new Error(
-                rand(),
-                null,
-                422,
-                $violation->getCode(),
-                $violation->getMessage(),
-                null,
-                $source
+                idx: rand(),
+                status: 422,
+                code: $violation->getCode(),
+                title: $violation->getMessage(),
+                source: $source
             );
         }
 

@@ -24,5 +24,5 @@ interface GenericMetadataInterface
      *
      * @return string
      */
-    public function getClassName();
+    public function getClassName(): string;
 }

@@ -14,6 +14,7 @@ namespace Reva2\JsonApi\Tests\Services;
 use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
@@ -314,7 +315,7 @@ class JsonApiServiceTest extends TestCase
         );
     }
 
-    private function getApiFactory()
+    private function getApiFactory(): Factory
     {
         return new Factory();
     }
@@ -353,7 +354,7 @@ class JsonApiServiceTest extends TestCase
      *
      * @return RequestDecoder
      */
-    private function getDecoder()
+    private function getDecoder(): RequestDecoder
     {
         return new RequestDecoder($this->getDataParser());
     }
@@ -363,7 +364,7 @@ class JsonApiServiceTest extends TestCase
      *
      * @return DataParser
      */
-    private function getDataParser()
+    private function getDataParser(): DataParser
     {
         if (null === $this->parser) {
             $this->parser = new DataParser($this->getMetadataFactory(), new CallbackResolver());
@@ -377,7 +378,7 @@ class JsonApiServiceTest extends TestCase
      *
      * @return LazyMetadataFactory
      */
-    private function getMetadataFactory()
+    private function getMetadataFactory(): LazyMetadataFactory
     {
         return new LazyMetadataFactory(new AttributeLoader());
     }
@@ -399,7 +400,7 @@ class JsonApiServiceTest extends TestCase
      * @param FactoryInterface $factory
      * @return array
      */
-    private function getSchemas(FactoryInterface $factory)
+    private function getSchemas(FactoryInterface $factory): array
     {
         $petClosure = function () use ($factory) {
             return new PetSchema($factory);
@@ -417,7 +418,7 @@ class JsonApiServiceTest extends TestCase
      * Returns schemas container
      *
      * @param FactoryInterface $factory
-     * @return ContainerInterface
+     * @return SchemaContainerInterface
      */
     private function getContainer(FactoryInterface $factory)
     {

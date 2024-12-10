@@ -28,16 +28,6 @@ class QueryParametersTest extends TestCase
     /**
      * @test
      */
-    public function shouldIgnoreUnrecognizedParameters()
-    {
-        $query = new QueryParameters();
-
-        $this->assertNull($query->getUnrecognizedParameters());
-    }
-
-    /**
-     * @test
-     */
     public function shouldThrowOnInvalidIncludePaths()
     {
         $this->expectException(InvalidArgumentException::class);

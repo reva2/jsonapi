@@ -107,5 +107,5 @@ interface EnvironmentInterface
      *
      * @return MediaTypeInterface|null
      */
-    public function getEncoderMediaType();
+    public function getEncoderMediaType(): ?MediaTypeInterface;
 }

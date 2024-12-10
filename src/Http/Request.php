@@ -10,7 +10,7 @@
 
 namespace Reva2\JsonApi\Http;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 
@@ -25,17 +25,17 @@ class Request implements RequestInterface
     /**
      * @var EnvironmentInterface
      */
-    protected $environment;
+    protected EnvironmentInterface $environment;
 
     /**
-     * @var EncodingParametersInterface
+     * @var EncodingParametersInterface|null
      */
-    protected $query;
+    protected ?EncodingParametersInterface $query = null;
 
     /**
      * @var mixed|null
      */
-    protected $body;
+    protected mixed $body = null;
 
     /**
      * Constructor
@@ -50,7 +50,7 @@ class Request implements RequestInterface
     /**
      * @inheritdoc
      */
-    public function getEnvironment()
+    public function getEnvironment(): EnvironmentInterface
     {
         return $this->environment;
     }
@@ -58,7 +58,7 @@ class Request implements RequestInterface
     /**
      * @inheritdoc
      */
-    public function getQuery()
+    public function getQuery(): ?EncodingParametersInterface
     {
         return $this->query;
     }
@@ -67,7 +67,7 @@ class Request implements RequestInterface
      * @param EncodingParametersInterface|null $query
      * @return $this
      */
-    public function setQuery(EncodingParametersInterface $query = null)
+    public function setQuery(?EncodingParametersInterface $query = null): self
     {
         $this->query = $query;
 
@@ -77,7 +77,7 @@ class Request implements RequestInterface
     /**
      * @inheritdoc
      */
-    public function getBody()
+    public function getBody(): mixed
     {
         return $this->body;
     }
@@ -86,7 +86,7 @@ class Request implements RequestInterface
      * @param mixed|null $body
      * @return $this
      */
-    public function setBody($body = null)
+    public function setBody(mixed $body = null): self
     {
         $this->body = $body;
 

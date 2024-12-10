@@ -11,11 +11,14 @@
 
 namespace Reva2\JsonApi\Decoders\Mapping\Factory;
 
+use InvalidArgumentException;
+use ReflectionClass;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Cache\CacheInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\ClassMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Factory\MetadataFactoryInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\GenericMetadataInterface;
 use Reva2\JsonApi\Contracts\Decoders\Mapping\Loader\LoaderInterface;
+use RuntimeException;
 
 /**
  * JSON API metadata factory
@@ -28,19 +31,19 @@ class LazyMetadataFactory implements MetadataFactoryInterface
     /**
      * @var LoaderInterface
      */
-    protected $loader;
+    protected LoaderInterface $loader;
 
     /**
-     * @var CacheInterface
+     * @var CacheInterface|null
      */
-    protected $cache;
+    protected ?CacheInterface $cache;
 
     /**
      * Loaded metadata indexed by class name
      *
      * @var GenericMetadataInterface[]
      */
-    protected $loadedClasses = [];
+    protected array $loadedClasses = [];
 
     /**
      * Constructor
@@ -57,10 +60,10 @@ class LazyMetadataFactory implements MetadataFactoryInterface
     /**
      * @inheritdoc
      */
-    public function getMetadataFor($value)
+    public function getMetadataFor($value): mixed
     {
         if (!is_object($value) && !is_string($value)) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 "Cannot create metadata for non-objects. Got: %s",
                 gettype($value)
             ));
@@ -77,22 +80,17 @@ class LazyMetadataFactory implements MetadataFactoryInterface
         }
         
         if (!class_exists($class)) {
-            throw new \RuntimeException(sprintf(
-                "The class '%s' doesn't exist",
-                $class
-            ));
+            throw new RuntimeException(sprintf("The class '%s' doesn't exist", $class));
         }
         
-        $reflection = new \ReflectionClass($class);
+        $reflection = new ReflectionClass($class);
         
         $metadata = $this->loader->loadClassMetadata($reflection);
         if (($metadata instanceof ClassMetadataInterface) && (false !== ($parent = $reflection->getParentClass()))) {
             $metadata->mergeMetadata($this->getMetadataFor($parent->getName()));
         }
 
-        if (null !== $this->cache) {
-            $this->cache->write($metadata);
-        }
+        $this->cache?->write($metadata);
 
         return $this->loadedClasses[$class] = $metadata;
     }
@@ -100,7 +98,7 @@ class LazyMetadataFactory implements MetadataFactoryInterface
     /**
      * @inheritdoc
      */
-    public function hasMetadataFor($value)
+    public function hasMetadataFor(mixed $value): bool
     {
         if (!is_object($value) && !is_string($value)) {
             return false;

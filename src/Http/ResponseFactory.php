@@ -8,12 +8,13 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Reva2\JsonApi\Http;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Http\Responses;
+use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
+use Neomerx\JsonApi\Http\BaseResponses;
+use Reva2\JsonApi\Contracts\Encoder\EncodingParametersInterface;
 use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,32 +24,37 @@ use Symfony\Component\HttpFoundation\Response;
  * @package Reva2\JsonApi\Http
  * @author Sergey Revenko <dedsemen@gmail.com>
  */
-class ResponseFactory extends Responses
+class ResponseFactory extends BaseResponses
 {
+    const PARAM_SUPPORTED_EXT = 'supported-ext';
+    const PARAM_EXT = 'ext';
+
+    const HEADER_LOCATION = 'Location';
+
     /**
-     * @var ContainerInterface
+     * @var SchemaContainerInterface
      */
-    protected $schemas;
+    protected SchemaContainerInterface $schemas;
 
     /**
      * @var EnvironmentInterface
      */
-    protected $environment;
+    protected EnvironmentInterface $environment;
 
     /**
-     * @var EncodingParametersInterface
+     * @var EncodingParametersInterface|null
      */
-    protected $params;
+    protected ?EncodingParametersInterface $params;
 
     /**
      * Constructor
      *
-     * @param ContainerInterface $schemas
+     * @param SchemaContainerInterface $schemas
      * @param EnvironmentInterface $environment
      * @param EncodingParametersInterface|null $params
      */
     public function __construct(
-        ContainerInterface $schemas,
+        SchemaContainerInterface $schemas,
         EnvironmentInterface $environment,
         EncodingParametersInterface $params = null
     ) {
@@ -57,59 +63,135 @@ class ResponseFactory extends Responses
         $this->params = $params;
     }
 
+    public function buildContentResponse(
+        mixed $data,
+        int $statusCode = self::HTTP_OK,
+        mixed $meta = null,
+        array $links = [],
+        array $headers = []
+    ): Response {
+        $encoder = $this->getEncoder();
+        $this->addMetadataAndLinks($encoder, $meta, $links);
+
+        $content = $encoder->encodeData($data);
+
+        return $this->createJsonApiResponse($content, $statusCode, $headers);
+    }
+
+    public function buildCreatedResponse(
+        mixed $data,
+        mixed $meta = null,
+        array $links = [],
+        array $headers = []
+    ): Response
+    {
+        return $this->buildContentResponse($data, Response::HTTP_CREATED, $meta, $links, $headers);
+    }
+
+    public function buildEmptyResponse(array $headers = []): Response
+    {
+        return $this->createJsonApiResponse(null, Response::HTTP_NO_CONTENT, $headers);
+    }
+
+    protected function createJsonApiResponse(
+        ?string $content,
+        ?int $statusCode = Response::HTTP_OK,
+        array $headers = [],
+        $addContentType = true
+    ): Response {
+        if ($addContentType === true) {
+            $mediaType   = $this->getMediaType();
+            $contentType = $mediaType->getMediaType();
+            $params      = $mediaType->getParameters();
+
+            $separator = ';';
+            if (isset($params[self::PARAM_EXT])) {
+                $ext = $params[self::PARAM_EXT];
+                if (empty($ext) === false) {
+                    $contentType .= $separator . self::PARAM_EXT . '="' . $ext . '"';
+                    $separator   = ',';
+                }
+            }
+
+            $extensions = $this->getSupportedExtensions();
+            if ($extensions !== null && ($list = $extensions->getExtensions()) !== null && empty($list) === false) {
+                $contentType .= $separator . self::PARAM_SUPPORTED_EXT . '="' . $list . '"';
+            }
+
+            $headers['Content-Type'] = $contentType;
+        }
+
+        return $this->createResponse($content, $statusCode, $headers);
+    }
+
     /**
-     * @inheritdoc
+     * @param string|null $content
+     * @param int $statusCode
+     * @param array $headers
+     * @return Response
      */
-    protected function createResponse($content, $statusCode, array $headers)
+    protected function createResponse(?string $content = null, int $statusCode = 200, array $headers = []): Response
     {
         return new Response($content, $statusCode, $headers);
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getEncoder()
+
+    protected function getEncoder(): EncoderInterface
     {
+        $encoder = $this->environment->getEncoder();
+        $encoder
+            ->reset()
+            ->withUrlPrefix($this->environment->getUrlPrefix());
+
+        if ($this->params !== null) {
+            $encoder
+                ->withFieldSets($this->params->getFieldSets())
+                ->withIncludedPaths($this->params->getIncludePaths());
+        }
+
         return $this->environment->getEncoder();
     }
 
     /**
-     * @inheritdoc
+     * @return EncodingParametersInterface
      */
-    protected function getUrlPrefix()
-    {
-        return $this->environment->getUrlPrefix();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getEncodingParameters()
+    protected function getEncodingParameters(): EncodingParametersInterface
     {
         return $this->params;
     }
 
     /**
-     * @inheritdoc
+     * @return SchemaContainerInterface
      */
-    protected function getSchemaContainer()
+    protected function getSchemaContainer(): SchemaContainerInterface
     {
         return $this->schemas;
     }
 
     /**
-     * @inheritdoc
+     * @return array|null
      */
-    protected function getSupportedExtensions()
+    protected function getSupportedExtensions(): ?array
     {
         return null;
     }
 
     /**
-     * @inheritdoc
+     * @return MediaTypeInterface
      */
-    protected function getMediaType()
+    protected function getMediaType(): MediaTypeInterface
     {
         return $this->environment->getEncoderMediaType();
+    }
+
+    private function addMetadataAndLinks(EncoderInterface $encoder, mixed $meta = null, array $links = []): void
+    {
+        if (!empty($meta)) {
+            $encoder->withMeta($meta);
+        }
+
+        if (!empty($links)) {
+            $encoder->withLinks($links);
+        }
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Reva2\JsonApi\Decoders;
 
-use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Schema\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
 use Reva2\JsonApi\Contracts\Decoders\DecoderInterface;
@@ -61,7 +61,7 @@ class RequestDecoder implements DecoderInterface
     /**
      * @inheritdoc
      */
-    public function decode($content)
+    public function decode($content): mixed
     {
         $data = $this->decodeJson($content);
 
@@ -100,12 +100,11 @@ class RequestDecoder implements DecoderInterface
             }
             
             $apiError = new Error(
-                rand(),
-                null,
-                400,
-                self::INVALID_JSON_ERROR,
-                'Unable to parse JSON data',
-                $error
+                idx: rand(),
+                status: 400,
+                code: self::INVALID_JSON_ERROR,
+                title: 'Unable to parse JSON data',
+                detail: $error
             );
 
             throw new JsonApiException($apiError, 400);

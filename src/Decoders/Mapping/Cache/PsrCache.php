@@ -18,12 +18,12 @@ class PsrCache implements CacheInterface
         $this->pool = $pool;
     }
 
-    public function has($class)
+    public function has(string $class): bool
     {
         return $this->pool->getItem($this->getCacheKey($class))->isHit();
     }
 
-    public function read($class)
+    public function read(string $class): mixed
     {
         $item = $this->pool->getItem($this->getCacheKey($class));
         if ($item->isHit()) {
