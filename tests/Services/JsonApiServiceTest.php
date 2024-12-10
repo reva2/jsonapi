@@ -13,7 +13,6 @@ namespace Reva2\JsonApi\Tests\Services;
 
 use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
@@ -58,7 +57,7 @@ class JsonApiServiceTest extends TestCase
     protected $parser;
 
     /**
-     * @var ContainerInterface
+     * @var SchemaContainerInterface
      */
     protected $container;
 

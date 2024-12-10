@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Http\Query;
 
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
+use Reva2\JsonApi\Contracts\Encoder\SortParameterInterface;
 use Reva2\JsonApi\Encoder\Parameters\SortParameter;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Reva2\JsonApi\Attributes as API;
