@@ -50,7 +50,7 @@ class ListQueryParameters extends QueryParameters
      */
     #[API\Property(path: '[sort]', parser: 'parseSortingParameters')]
     #[Assert\Type('array')]
-    protected ?array $sortParameters;
+    protected ?array $sortParameters = null;
 
     /**
      * @param int|null $pageNumber
