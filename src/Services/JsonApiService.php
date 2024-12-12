@@ -258,11 +258,11 @@ class JsonApiService implements JsonApiServiceInterface
         $parser = $this->factory->createHeaderParametersParser();
 
         $contentType = $parser->parseContentTypeHeader(
-            $request->headers->get(HeaderParametersParserInterface::HEADER_ACCEPT)
+            $request->headers->get(HeaderParametersParserInterface::HEADER_CONTENT_TYPE, '')
         );
 
         $acceptContentTypes = $parser->parseAcceptHeader(
-            $request->headers->get(HeaderParametersParserInterface::HEADER_ACCEPT)
+            $request->headers->get(HeaderParametersParserInterface::HEADER_ACCEPT, '')
         );
 
         $checker = $this->factory->createHeadersChecker($matcher);

@@ -97,7 +97,7 @@ class ResponseFactory extends BaseResponses
         ?string $content,
         ?int $statusCode = Response::HTTP_OK,
         array $headers = [],
-        $addContentType = true
+                $addContentType = true
     ): Response {
         if ($addContentType === true) {
             $mediaType   = $this->getMediaType();
@@ -143,10 +143,12 @@ class ResponseFactory extends BaseResponses
             ->reset()
             ->withUrlPrefix($this->environment->getUrlPrefix());
 
-        if ($this->params !== null) {
-            $encoder
-                ->withFieldSets($this->params->getFieldSets())
-                ->withIncludedPaths($this->params->getIncludePaths());
+        if (null !== ($fieldSets = $this?->params->getFieldSets())) {
+            $encoder->withFieldSets($fieldSets);
+        }
+
+        if (null !== ($includePaths = $this?->params->getIncludePaths())) {
+            $encoder->withIncludedPaths($includePaths);
         }
 
         return $this->environment->getEncoder();
