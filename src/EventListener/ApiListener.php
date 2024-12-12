@@ -59,18 +59,30 @@ class ApiListener implements EventSubscriberInterface
     public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
-        if (!is_array($controller)) {
-            return;
+
+        switch (true) {
+            case is_object($controller):
+                $ctrlClass = get_class($controller);
+                $ctrlMethod = '__invoke';
+                break;
+
+            case is_array($controller):
+                $ctrlClass = $controller[0];
+                $ctrlMethod = $controller[1];
+                break;
+
+            default:
+                return;
         }
 
         $config = null;
 
-        $refClass = new ReflectionClass($controller[0]);
+        $refClass = new ReflectionClass($ctrlClass);
         if (null !== ($attr = $this->getAttribute($refClass->getAttributes(Request::class)))) {
             $config = $attr->toArray();
         }
 
-        $refMethod = $refClass->getMethod($controller[1]);
+        $refMethod = $refClass->getMethod($ctrlMethod);
         if (null !== ($attr = $this->getAttribute($refMethod->getAttributes(Request::class)))) {
             if (null !== $config) {
                 $config = array_replace($config, $attr->toArray());
@@ -78,7 +90,6 @@ class ApiListener implements EventSubscriberInterface
                 $config = $attr->toArray();
             }
         }
-
 
         if (null !== $config) {
             if (!array_key_exists('matcher', $config)) {
