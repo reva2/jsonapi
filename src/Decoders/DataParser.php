@@ -906,6 +906,7 @@ class DataParser implements DataParserInterface
 
         if ((null !== $resId) &&
             (null !== $resType) &&
+            (true === $this->isExpectedResourceType($resType, $relationship->getDataTypeParams())) &&
             (null !== ($res = $this->context->getResource($resType, $resId)))
         ) {
             return $this->setProperty($pathValue, $res, $relationship);
@@ -948,14 +949,15 @@ class DataParser implements DataParserInterface
                 $resId = $this->getValue($data, $path . '.id');
             }
 
+            $params = $relationship->getDataTypeParams();
+
             if ((null !== $resType) &&
                 (null !== $resId) &&
+                (true === $this->isExpectedResourceType($resType, $params[1])) &&
                 (null !== ($parsed = $this->context->getResource($resType, $resId)))
             ) {
                 return $parsed;
             }
-
-            $params = $relationship->getDataTypeParams();
 
             if (null !== ($linkedData = $this->context->getLinkedData($resType, $resId))) {
                 $idx = $this->context->getLinkedDataIndex($resType, $resId);
@@ -982,6 +984,35 @@ class DataParser implements DataParserInterface
         if (is_array($data)) {
             $this->setProperty($pathValue, $data, $relationship);
         }
+    }
+
+    /**
+     * Checks that the resource type provided in request matches the type
+     * expected by the relationship.
+     *
+     * Relationship "fast paths" look up an already parsed resource in the
+     * context by the (type, id) pair taken from the request. Without this
+     * check a resource of a different type registered under the same
+     * (type, id) by another relationship would be reused as-is and passed to
+     * a setter that expects a different class, raising an uncaught \TypeError
+     * (HTTP 500) instead of a proper "wrong type" error. When the type does
+     * not match we skip the fast path and fall back to regular parsing, which
+     * reports the type mismatch the same way as {@see parseResource()}.
+     *
+     * @param string|null $resType Resource type provided in request
+     * @param string $resClass Class expected by the relationship
+     * @return bool
+     */
+    private function isExpectedResourceType($resType, $resClass)
+    {
+        if (null === $resType) {
+            return false;
+        }
+
+        $metadata = $this->factory->getMetadataFor($resClass);
+
+        return ($metadata instanceof ResourceMetadataInterface) &&
+            ($resType === $metadata->getName());
     }
 
     /**

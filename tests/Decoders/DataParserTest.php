@@ -25,6 +25,7 @@ use Reva2\JsonApi\Tests\Fixtures\Metadata\PetsListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Objects\AnotherObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\BaseObject;
 use Reva2\JsonApi\Tests\Fixtures\Objects\ExampleObject;
+use Reva2\JsonApi\Tests\Fixtures\Resources\Cart;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Cat;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Dog;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Person;
@@ -305,6 +306,43 @@ class DataParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Something::class, $result->getVirtualRel());
         $this->assertSame('test', $result->getVirtualRel()->id);
+    }
+
+    /**
+     * Two relationships of different types may reference the same (type, id)
+     * pair in a request. The resource registered in the parsing context by the
+     * first relationship must not be reused for the second one when its type
+     * does not match: otherwise a resource of the wrong class is passed to a
+     * type hinted setter, which raises an uncaught \TypeError (HTTP 500)
+     * instead of a proper "wrong type" error. With the type check in place the
+     * mismatch is reported the same way as for a standalone resource.
+     *
+     * @test
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionCode 409
+     * @expectedExceptionMessageRegExp #Value must contain resource of type 'persons'#
+     */
+    public function shouldNotReuseContextResourceOfDifferentTypeForRelationship()
+    {
+        $data = json_decode(json_encode([
+            'cart' => [
+                'type' => 'carts',
+                'id' => '1',
+                'relationships' => [
+                    'store' => [
+                        'data' => ['type' => 'stores', 'id' => 'shared-id'],
+                    ],
+                    // "owner" must reference a "persons" resource, but the
+                    // request mislabels it with the "store" relationship type
+                    // and reuses the same id, so it collides in the context.
+                    'owner' => [
+                        'data' => ['type' => 'stores', 'id' => 'shared-id'],
+                    ],
+                ],
+            ],
+        ]));
+
+        $this->parser->parseResource($data, 'cart', Cart::class);
     }
 
     /**
