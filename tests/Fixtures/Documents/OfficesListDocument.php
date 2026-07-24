@@ -6,9 +6,6 @@ use Reva2\JsonApi\Attributes as API;
 use Reva2\JsonApi\Tests\Fixtures\Metadata\OfficesListMetadata;
 use Reva2\JsonApi\Tests\Fixtures\Resources\Office;
 
-/**
- * @API\ApiDocument()
- */
 #[API\Document]
 class OfficesListDocument
 {
