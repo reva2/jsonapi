@@ -173,8 +173,8 @@ class QueryParameters implements EncodingParametersInterface
      * Validate specified include paths
      *
      * @param ExecutionContextInterface $context
-     * @Assert\Callback()
      */
+    #[Assert\Callback()]
     public function validateIncludePaths(ExecutionContextInterface $context)
     {
         if (!is_array($this->includePaths)) {
@@ -198,8 +198,8 @@ class QueryParameters implements EncodingParametersInterface
      * Validate specified fields sets
      *
      * @param ExecutionContextInterface $context
-     * @Assert\Callback()
      */
+    #[Assert\Callback()]
     public function validateFieldSets(ExecutionContextInterface $context)
     {
         if (!is_array($this->fieldSets)) {

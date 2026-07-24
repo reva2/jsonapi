@@ -9,14 +9,14 @@ class Office
 {
     /**
      * @var ?string
-     * @API\Id()
      */
+    #[API\Id]
     public ?string $id;
 
     /**
      * @var ?string
-     * @API\Attribute()
      */
+    #[API\Attribute]
     public ?string $name;
 
     /**
@@ -27,7 +27,6 @@ class Office
 
     /**
      * @var array|Window[]
-     * @API\Relationship(type="Reva2\JsonApi\Tests\Fixtures\Resources\Window[]")
      */
     #[API\Relationship(type: Window::class . '[]')]
     public ?array $windows;

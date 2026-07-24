@@ -89,7 +89,6 @@ class Pet
     /**
      * @param string $virtualAttr
      * @return Pet
-     * @API\VirtualAttribute(name="virtualAttr", type="string")
      */
     #[API\VirtualAttribute(name: "virtualAttr", type: "string")]
     public function setVirtualAttr(?string $virtualAttr): self

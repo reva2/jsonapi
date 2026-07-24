@@ -95,7 +95,6 @@ class ExampleObject extends BaseObject
 
     /**
      * @var int[]
-     * @API\Property()
      */
     #[API\Property()]
     public array $intArray;
@@ -124,9 +123,6 @@ class ExampleObject extends BaseObject
     #[API\Property(parser: "parseCustomProp")]
     public array $customProp;
 
-    /**
-     * @API\Property()
-     */
     #[API\Property]
     public $rawProp;
 
