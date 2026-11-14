@@ -208,6 +208,10 @@ class JsonApiService implements JsonApiServiceInterface
         $decoder = $matcher->getDecoder();
         if (null !== $decoder) {
             $environment->setDecoder($decoder);
+        } elseif ($environment instanceof Environment) {
+            // EnvironmentInterface::setDecoder() does not accept null, so reset is possible only for the bundled
+            // implementation; it prevents reuse of the decoder selected for a previous request
+            $environment->setDecoder(null);
         }
 
         $environment
@@ -339,6 +343,14 @@ class JsonApiService implements JsonApiServiceInterface
     private function parseBody(Request $request, EnvironmentInterface $environment): mixed
     {
         if (null === $environment->getBodyType()) {
+            return null;
+        }
+
+        if (
+            ($environment instanceof Environment) &&
+            $environment->isBodyOptional() &&
+            '' === $request->getContent()
+        ) {
             return null;
         }
 

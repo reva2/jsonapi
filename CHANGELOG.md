@@ -11,10 +11,16 @@
 - This also affects endpoints whose `bodyType` is inherited from the class-level `#[Request]` attribute, including `GET`
   ones: such a request without a body and without a `Content-Type` header used to reach the controller with a `null`
   body in 3.3.0, now it is rejected with HTTP 415 (and with a supported `Content-Type` it fails with HTTP 400, as
-  before). Set `bodyType` only on the methods that read a body.
+  before). Set `bodyType` only on the methods that read a body, or mark the body as optional with `bodyOptional: true`
+  (see below).
 
 ### Added
 - `HeadersChecker::createUnsupportedContentTypeException()`.
+- `bodyOptional` option of `#[Request]` (class or method level; `Environment::setBodyOptional()` /
+  `isBodyOptional()`). When `bodyType` is set the body is required by default. With `bodyOptional: true` a request
+  without body (empty content) passes with a `null` body for any `Content-Type`; a request with a body is checked as
+  usual (415 `UNSUPPORTED_CONTENT_TYPE_ERROR` for an unsupported `Content-Type`, 415 `INVALID_CONTENT_TYPE_ERROR` for a
+  missing or malformed one). The option is honoured only by the bundled `Environment` implementation.
 
 ## 3.3.0 - 2026-11-14
 

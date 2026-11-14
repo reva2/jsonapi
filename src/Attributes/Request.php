@@ -26,6 +26,13 @@ class Request
     public ?string $body;
 
     /**
+     * Is body optional (request without body is accepted)
+     *
+     * @var ?bool
+     */
+    public ?bool $bodyOptional;
+
+    /**
      * Code matcher
      *
      * @var ?Matcher
@@ -61,6 +68,7 @@ class Request
      * @param string|null $urlPrefix
      * @param array|string[] $serialization
      * @param string[] $validation
+     * @param bool|null $bodyOptional
      */
     public function __construct(
         ?string  $query = null,
@@ -69,6 +77,7 @@ class Request
         ?Matcher $matcher = null,
         array    $serialization = ['Default'],
         array    $validation = ['Default'],
+        ?bool    $bodyOptional = null,
     )
     {
         $this->query = $query;
@@ -77,6 +86,7 @@ class Request
         $this->urlPrefix = $urlPrefix;
         $this->serialization = $serialization;
         $this->validation = $validation;
+        $this->bodyOptional = $bodyOptional;
     }
 
     /**
@@ -86,7 +96,7 @@ class Request
     {
         $data = [];
 
-        $properties = ['query', 'body', 'urlPrefix', 'validation', 'serialization'];
+        $properties = ['query', 'body', 'urlPrefix', 'validation', 'serialization', 'bodyOptional'];
         foreach ($properties as $property) {
             $value = $this->{$property};
             if (null !== $value) {
