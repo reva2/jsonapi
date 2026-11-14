@@ -27,6 +27,8 @@ class HeadersChecker
     const INVALID_CONTENT_TYPE_ERROR = 'ebb239c5-221d-42d2-a2f7-ca4bbc3d476f';
     const UNSUPPORTED_CONTENT_TYPE_ERROR = 'aa389b54-1b33-4b0f-a5f4-1d680ca5f6d3';
     const UNSUPPORTED_ACCEPT_ERROR = '6df3b139-d9ef-4576-8d0a-c0ce2e803827';
+    const INVALID_ACCEPT_ERROR = '3b0c8a1e-5f0e-4f6b-9c63-0c1c4d7d2a55';
+
     /**
      * @var CodecMatcherInterface
      */
@@ -43,14 +45,53 @@ class HeadersChecker
     }
 
     /**
-     * @param MediaTypeInterface $contentType
+     * @param MediaTypeInterface|null $contentType Content type (null - request has no body, skip check)
      * @param AcceptMediaTypeInterface[] $acceptedContentTypes
      * @return void
      */
-    public function checkHeaders(MediaTypeInterface $contentType, iterable $acceptedContentTypes): void
+    public function checkHeaders(?MediaTypeInterface $contentType, iterable $acceptedContentTypes): void
     {
-        $this->checkContentTypeHeader($contentType);
+        if (null !== $contentType) {
+            $this->checkContentTypeHeader($contentType);
+        }
+
         $this->checkAcceptHeader($acceptedContentTypes);
+    }
+
+    /**
+     * Create exception for missing or malformed content type header
+     *
+     * @param string $title
+     * @return JsonApiException
+     */
+    public static function createInvalidContentTypeException(string $title = 'Invalid content type'): JsonApiException
+    {
+        return new JsonApiException(
+            self::createApiError(
+                JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
+                self::INVALID_CONTENT_TYPE_ERROR,
+                $title
+            ),
+            JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
+        );
+    }
+
+    /**
+     * Create exception for malformed accept header
+     *
+     * @param string $title
+     * @return JsonApiException
+     */
+    public static function createInvalidAcceptException(string $title = 'Invalid accept header'): JsonApiException
+    {
+        return new JsonApiException(
+            self::createApiError(
+                JsonApiException::HTTP_CODE_NOT_ACCEPTABLE,
+                self::INVALID_ACCEPT_ERROR,
+                $title
+            ),
+            JsonApiException::HTTP_CODE_NOT_ACCEPTABLE
+        );
     }
 
     /**
@@ -85,11 +126,11 @@ class HeadersChecker
         if (null === $this->matcher->getEncoderHeaderMatchedType()) {
             throw new JsonApiException(
                 $this->createApiError(
-                    JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
+                    JsonApiException::HTTP_CODE_NOT_ACCEPTABLE,
                     self::UNSUPPORTED_ACCEPT_ERROR,
-                    'Unsupported media type'
+                    'Not acceptable'
                 ),
-                JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
+                JsonApiException::HTTP_CODE_NOT_ACCEPTABLE
             );
         }
     }
@@ -101,7 +142,7 @@ class HeadersChecker
      * @param string $title
      * @return Error
      */
-    private function createApiError($status, $code, $title)
+    private static function createApiError($status, $code, $title)
     {
         return new Error(idx: rand(), status:  $status, code: $code, title: $title);
     }

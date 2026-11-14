@@ -299,6 +299,196 @@ class JsonApiServiceTest extends TestCase
     }
 
     /**
+     * @test
+     */
+    public function shouldParseRequestWithoutHeaders()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $environment = $this->createHeadersEnvironment($request);
+
+        $this->assertInstanceOf(RequestInterface::class, $this->service->parseRequest($request));
+        $this->assertSame('application/vnd.json+api', $this->mediaTypeString($environment));
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnNullBodyIfDecoderIsNotSelected()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        $apiRequest = $this->service->parseRequest($request);
+
+        $this->assertNull($environment->getDecoder());
+        $this->assertNull($apiRequest->getBody());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotRejectUnsupportedContentTypeOfRequestWithoutBody()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Content-Type', 'application/json');
+        $environment = $this->createHeadersEnvironment($request);
+
+        $this->assertInstanceOf(RequestInterface::class, $this->service->parseRequest($request));
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSelectDecoderAndFailOnEmptyBodyWithValidContentType()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'application/vnd.json+api');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        try {
+            $this->service->parseRequest($request);
+            $this->fail('JsonApiException expected');
+        } catch (\Neomerx\JsonApi\Exceptions\JsonApiException $e) {
+            $this->assertSame(400, $e->getHttpCode());
+        }
+
+        $this->assertNotNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldIgnoreMalformedContentTypeOfRequestWithoutBody()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Content-Type', 'garbage');
+        $environment = $this->createHeadersEnvironment($request);
+
+        $this->assertInstanceOf(RequestInterface::class, $this->service->parseRequest($request));
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotReplaceZeroQualityAcceptWithAnyType()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Accept', 'application/vnd.json+api;q=0');
+        $this->createHeadersEnvironment($request);
+
+        $this->assertHeaderError($request, 406);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowOnUnsupportedContentType()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST, [], [], [], [], '{"data":{}}');
+        $request->headers->set('Content-Type', 'text/plain');
+        $this->createHeadersEnvironment($request);
+
+        $this->assertHeaderError($request, 415);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldTreatEmptyAcceptAsAnyType()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Accept', '');
+        $environment = $this->createHeadersEnvironment($request);
+
+        $this->service->parseRequest($request);
+        $this->assertSame('application/vnd.json+api', $this->mediaTypeString($environment));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowOnBodyWithoutContentType()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST, [], [], [], [], '{"data":{}}');
+        $this->createHeadersEnvironment($request);
+
+        $this->assertHeaderError($request, 415);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowOnUnsupportedAccept()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Accept', 'text/html');
+        $this->createHeadersEnvironment($request);
+
+        $this->assertHeaderError($request, 406);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowOnInvalidAccept()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Accept', 'garbage');
+        $this->createHeadersEnvironment($request);
+
+        $this->assertHeaderError($request, 406);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowOnInvalidContentType()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST, [], [], [], [], '{"data":{}}');
+        $request->headers->set('Content-Type', 'garbage');
+        $this->createHeadersEnvironment($request);
+
+        $this->assertHeaderError($request, 415);
+    }
+
+    private function createHeadersEnvironment(Request $request): Environment
+    {
+        $environment = new Environment();
+        $environment
+            ->setMatcherConfiguration([
+                'decoders' => ['application/vnd.json+api' => 'jsonapi.decoders.jsonapi'],
+                'encoders' => ['application/vnd.json+api' => 'jsonapi.encoders.jsonapi']
+            ])
+            ->setValidationGroups(['Default']);
+
+        $request->attributes->set('_jsonapi', $environment);
+
+        return $environment;
+    }
+
+    private function mediaTypeString(Environment $environment): string
+    {
+        $type = $environment->getEncoderMediaType();
+
+        return $type->getType() . '/' . $type->getSubType();
+    }
+
+    private function assertHeaderError(Request $request, int $code): void
+    {
+        try {
+            $this->service->parseRequest($request);
+            $this->fail('JsonApiException expected');
+        } catch (\Neomerx\JsonApi\Exceptions\JsonApiException $e) {
+            $this->assertSame($code, $e->getHttpCode());
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     protected function setUp(): void
