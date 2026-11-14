@@ -99,6 +99,9 @@ class JsonApiService implements JsonApiServiceInterface
 
     /**
      * @inheritdoc
+     *
+     * The environment is designed for a single request: reusing one environment object for several requests
+     * is not supported (a decoder set manually before the call is never reset).
      */
     public function parseRequest(Request $request, EnvironmentInterface $environment = null): RequestInterface
     {
@@ -208,10 +211,6 @@ class JsonApiService implements JsonApiServiceInterface
         $decoder = $matcher->getDecoder();
         if (null !== $decoder) {
             $environment->setDecoder($decoder);
-        } elseif ($environment instanceof Environment) {
-            // EnvironmentInterface::setDecoder() does not accept null, so reset is possible only for the bundled
-            // implementation; it prevents reuse of the decoder selected for a previous request
-            $environment->setDecoder(null);
         }
 
         $environment

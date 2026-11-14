@@ -22,6 +22,10 @@
   usual (415 `UNSUPPORTED_CONTENT_TYPE_ERROR` for an unsupported `Content-Type`, 415 `INVALID_CONTENT_TYPE_ERROR` for a
   missing or malformed one). The option is honoured only by the bundled `Environment` implementation.
 
+### Changed
+- The environment (`_jsonapi` request attribute) is designed for a single request: reusing one environment object for
+  several `parseRequest()` calls is not supported, and a decoder set manually before the call is never reset.
+
 ## 3.3.0 - 2026-11-14
 
 ### Changed

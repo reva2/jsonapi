@@ -26,7 +26,9 @@ class Request
     public ?string $body;
 
     /**
-     * Is body optional (request without body is accepted)
+     * Is body optional (request without body is accepted). Honoured only by the bundled
+     * Reva2\JsonApi\Services\Environment: other EnvironmentInterface implementations ignore it, so an empty request
+     * is rejected with 415 as for a required body
      *
      * @var ?bool
      */

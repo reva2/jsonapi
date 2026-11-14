@@ -18,6 +18,7 @@ use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use PHPUnit\Framework\TestCase;
 use Reva2\JsonApi\Attributes\Request as RequestAttribute;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
+use Reva2\JsonApi\Contracts\Decoders\DecoderInterface;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Reva2\JsonApi\Decoders\CallbackResolver;
@@ -443,6 +444,32 @@ class JsonApiServiceTest extends TestCase
 
         $this->assertInstanceOf(PetDocument::class, $apiRequest->getBody());
         $this->assertNotNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldKeepManuallySetDecoderOnEmptyRequestWithoutContentType()
+    {
+        $decoder = new class implements DecoderInterface {
+            public function setContentType(string $type)
+            {
+            }
+
+            public function decode(string $data): mixed
+            {
+                return null;
+            }
+        };
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->remove('Content-Type');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class)->setDecoder($decoder);
+
+        $apiRequest = $this->service->parseRequest($request);
+
+        $this->assertNull($apiRequest->getBody());
+        $this->assertSame($decoder, $environment->getDecoder());
     }
 
     /**
