@@ -65,12 +65,12 @@ interface EnvironmentInterface
     public function getValidationGroups();
 
     /**
-     * Sets request decoders
+     * Sets request decoder (null if decoder was not selected, e.g. request has no body)
      *
-     * @param DecoderInterface $decoder
+     * @param DecoderInterface|null $decoder
      * @return $this
      */
-    public function setDecoder(DecoderInterface $decoder);
+    public function setDecoder(?DecoderInterface $decoder);
 
     /**
      * Returns request decoder

@@ -128,7 +128,7 @@ class HeadersChecker
                 $this->createApiError(
                     JsonApiException::HTTP_CODE_NOT_ACCEPTABLE,
                     self::UNSUPPORTED_ACCEPT_ERROR,
-                    'Unsupported media type'
+                    'Not acceptable'
                 ),
                 JsonApiException::HTTP_CODE_NOT_ACCEPTABLE
             );

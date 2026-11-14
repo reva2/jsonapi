@@ -329,6 +329,52 @@ class JsonApiServiceTest extends TestCase
     /**
      * @test
      */
+    public function shouldNotRejectUnsupportedContentTypeOfRequestWithoutBody()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Content-Type', 'application/json');
+        $environment = $this->createHeadersEnvironment($request);
+
+        $this->assertInstanceOf(RequestInterface::class, $this->service->parseRequest($request));
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSelectDecoderAndFailOnEmptyBodyWithValidContentType()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'application/vnd.json+api');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        try {
+            $this->service->parseRequest($request);
+            $this->fail('JsonApiException expected');
+        } catch (\Neomerx\JsonApi\Exceptions\JsonApiException $e) {
+            $this->assertSame(400, $e->getHttpCode());
+        }
+
+        $this->assertNotNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldIgnoreMalformedContentTypeOfRequestWithoutBody()
+    {
+        $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+        $request->headers->set('Content-Type', 'garbage');
+        $environment = $this->createHeadersEnvironment($request);
+
+        $this->assertInstanceOf(RequestInterface::class, $this->service->parseRequest($request));
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
     public function shouldNotReplaceZeroQualityAcceptWithAnyType()
     {
         $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);

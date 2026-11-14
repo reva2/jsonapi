@@ -259,19 +259,30 @@ class JsonApiService implements JsonApiServiceInterface
     {
         $parser = $this->factory->createHeaderParametersParser();
 
+        $hasBody = '' !== $request->getContent();
         $contentType = null;
         $contentTypeHeader = trim((string) $request->headers->get(
             HeaderParametersParserInterface::HEADER_CONTENT_TYPE,
             ''
         ));
+
         if ('' !== $contentTypeHeader) {
             try {
                 $contentType = $parser->parseContentTypeHeader($contentTypeHeader);
-            } catch (InvalidArgumentException | NeomerxInvalidArgumentException $e) {
-                throw HeadersChecker::createInvalidContentTypeException();
+            } catch (NeomerxInvalidArgumentException $e) {
+                if ($hasBody) {
+                    throw HeadersChecker::createInvalidContentTypeException();
+                }
             }
-        } elseif ('' !== $request->getContent()) {
+        } elseif ($hasBody) {
             throw HeadersChecker::createInvalidContentTypeException('Content type header is required');
+        }
+
+        if ((null !== $contentType) && (!$hasBody)) {
+            // Request without body: select decoder by content type (if it is supported), but do not reject request
+            // because of unsupported content type
+            $matcher->matchDecoder($contentType);
+            $contentType = null;
         }
 
         $acceptHeader = trim((string) $request->headers->get(HeaderParametersParserInterface::HEADER_ACCEPT, ''));
@@ -281,7 +292,7 @@ class JsonApiService implements JsonApiServiceInterface
 
         try {
             $acceptContentTypes = iterator_to_array($parser->parseAcceptHeader($acceptHeader), false);
-        } catch (InvalidArgumentException | NeomerxInvalidArgumentException $e) {
+        } catch (NeomerxInvalidArgumentException $e) {
             throw HeadersChecker::createInvalidAcceptException();
         }
 
