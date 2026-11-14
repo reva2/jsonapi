@@ -1,11 +1,11 @@
 # Changelog
 
-## Unreleased
+## 3.3.0 - 2026-11-14
 
 ### Changed
 - Missing or empty `Accept` header is treated as `*/*`; missing `Content-Type` is not checked for requests without body.
-  Malformed headers now result in `JsonApiException` (415 for `Content-Type` of requests with body, 406 for `Accept`) instead of
-  `InvalidArgumentException`.
+  Malformed headers now result in `JsonApiException` (415 for `Content-Type` of requests with body, 406 for `Accept`)
+  instead of `InvalidArgumentException`.
 - Unsupported `Accept` now results in HTTP 406 (was 415).
 - A request with a non-empty body and no `Content-Type` header is rejected with HTTP 415, even if the endpoint has no
   `bodyType` configured (so the body is never parsed).
