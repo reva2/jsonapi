@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Http\Headers\HeaderParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
+use Neomerx\JsonApi\Exceptions\InvalidArgumentException as NeomerxInvalidArgumentException;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Schema\Error;
 use Reva2\JsonApi\Contracts\Codec\CodecMatcherInterface;
@@ -27,6 +28,7 @@ use Reva2\JsonApi\Contracts\Services\EnvironmentInterface;
 use Reva2\JsonApi\Contracts\Services\JsonApiRegistryInterface;
 use Reva2\JsonApi\Contracts\Services\JsonApiServiceInterface;
 use Reva2\JsonApi\Contracts\Services\ValidationServiceInterface;
+use Reva2\JsonApi\Http\Headers\HeadersChecker;
 use Reva2\JsonApi\Http\ResponseFactory;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -257,13 +259,31 @@ class JsonApiService implements JsonApiServiceInterface
     {
         $parser = $this->factory->createHeaderParametersParser();
 
-        $contentType = $parser->parseContentTypeHeader(
-            $request->headers->get(HeaderParametersParserInterface::HEADER_CONTENT_TYPE, '')
-        );
+        $contentType = null;
+        $contentTypeHeader = trim((string) $request->headers->get(
+            HeaderParametersParserInterface::HEADER_CONTENT_TYPE,
+            ''
+        ));
+        if ('' !== $contentTypeHeader) {
+            try {
+                $contentType = $parser->parseContentTypeHeader($contentTypeHeader);
+            } catch (InvalidArgumentException | NeomerxInvalidArgumentException $e) {
+                throw HeadersChecker::createInvalidContentTypeException();
+            }
+        } elseif ('' !== $request->getContent()) {
+            throw HeadersChecker::createInvalidContentTypeException('Content type header is required');
+        }
 
-        $acceptContentTypes = $parser->parseAcceptHeader(
-            $request->headers->get(HeaderParametersParserInterface::HEADER_ACCEPT, '')
-        );
+        $acceptHeader = trim((string) $request->headers->get(HeaderParametersParserInterface::HEADER_ACCEPT, ''));
+        if ('' === $acceptHeader) {
+            $acceptHeader = '*/*';
+        }
+
+        try {
+            $acceptContentTypes = iterator_to_array($parser->parseAcceptHeader($acceptHeader), false);
+        } catch (InvalidArgumentException | NeomerxInvalidArgumentException $e) {
+            throw HeadersChecker::createInvalidAcceptException();
+        }
 
         $checker = $this->factory->createHeadersChecker($matcher);
 
@@ -307,6 +327,10 @@ class JsonApiService implements JsonApiServiceInterface
         }
 
         $decoder = $environment->getDecoder();
+        if (null === $decoder) {
+            return null;
+        }
+
         if ($decoder instanceof DecoderInterface) {
             $decoder->setContentType($environment->getBodyType());
         }

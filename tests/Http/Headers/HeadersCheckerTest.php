@@ -11,14 +11,11 @@
 
 namespace Reva2\JsonApi\Tests\Http\Headers;
 
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\AcceptHeaderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\AcceptMediaTypeInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\HeaderInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\HeaderParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit\Framework\TestCase;
+use Reva2\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Reva2\JsonApi\Http\Headers\HeadersChecker;
 
 /**
@@ -34,59 +31,35 @@ class HeadersCheckerTest extends TestCase
      */
     public function shouldCheckRequestHeaders()
     {
-        $contentMediaTypes = [$this->getMockBuilder(MediaTypeInterface::class)->getMock()];
+        $contentType = $this->createMock(MediaTypeInterface::class);
+        $accept = [$this->createMock(AcceptMediaTypeInterface::class)];
 
-        $contentTypeHeader = $this->getMockBuilder(HeaderInterface::class)->getMock();
-        $contentTypeHeader->expects($this->once())->method('getMediaTypes')->willReturn($contentMediaTypes);
+        $matcher = $this->createMock(CodecMatcherInterface::class);
+        $matcher->expects($this->once())->method('matchDecoder')->with($contentType);
+        $matcher->expects($this->once())->method('getDecoderHeaderMatchedType')
+            ->willReturn($this->createMock(MediaTypeInterface::class));
+        $matcher->expects($this->once())->method('matchEncoder')->with($accept);
+        $matcher->expects($this->once())->method('getEncoderHeaderMatchedType')
+            ->willReturn($this->createMock(AcceptMediaTypeInterface::class));
 
-        $acceptHeader = $this->getMockBuilder(AcceptHeaderInterface::class)->getMock();
-
-        $headers = $this->getMockBuilder(HeaderParametersInterface::class)->getMock();
-        $headers->expects($this->once())->method('getContentTypeHeader')->willReturn($contentTypeHeader);
-        $headers->expects($this->once())->method('getAcceptHeader')->willReturn($acceptHeader);
-
-        $decoderMediaType = $this->getMockBuilder(MediaTypeInterface::class)->getMock();
-        $encoderMediaType = $this->getMockBuilder(AcceptMediaTypeInterface::class)->getMock();
-
-        $matcher = $this->getMockBuilder(CodecMatcherInterface::class)->getMock();
-        $matcher->expects($this->once())->method('matchDecoder')->with($contentTypeHeader);
-        $matcher->expects($this->once())->method('getDecoderHeaderMatchedType')->willReturn($decoderMediaType);
-        $matcher->expects($this->once())->method('matchEncoder')->with($acceptHeader);
-        $matcher->expects($this->once())->method('getEncoderHeaderMatchedType')->willReturn($encoderMediaType);
-
-        $checker = new HeadersChecker($matcher);
-        $checker->checkHeaders($headers);
+        (new HeadersChecker($matcher))->checkHeaders($contentType, $accept);
     }
 
     /**
      * @test
      */
-    public function shouldThrowExceptionOnInvalidContentType()
+    public function shouldSkipContentTypeCheckIfItIsNull()
     {
-        $contentMediaTypes = [
-            $this->getMockBuilder(MediaTypeInterface::class)->getMock(),
-            $this->getMockBuilder(MediaTypeInterface::class)->getMock()
-        ];
+        $accept = [$this->createMock(AcceptMediaTypeInterface::class)];
 
-        $contentTypeHeader = $this->getMockBuilder(HeaderInterface::class)->getMock();
-        $contentTypeHeader->expects($this->once())->method('getMediaTypes')->willReturn($contentMediaTypes);
+        $matcher = $this->createMock(CodecMatcherInterface::class);
+        $matcher->expects($this->never())->method('matchDecoder');
+        $matcher->expects($this->never())->method('getDecoderHeaderMatchedType');
+        $matcher->expects($this->once())->method('matchEncoder')->with($accept);
+        $matcher->expects($this->once())->method('getEncoderHeaderMatchedType')
+            ->willReturn($this->createMock(AcceptMediaTypeInterface::class));
 
-        $headers = $this->getMockBuilder(HeaderParametersInterface::class)->getMock();
-        $headers->expects($this->once())->method('getContentTypeHeader')->willReturn($contentTypeHeader);
-
-        $matcher = $this->getMockBuilder(CodecMatcherInterface::class)->getMock();
-
-        try {
-            $checker = new HeadersChecker($matcher);
-            $checker->checkHeaders($headers);
-
-            $this->fail("Checker should throw exception on invalid content type");
-        } catch (JsonApiException $e) {
-            $this->assertEquals(400, $e->getHttpCode());
-
-            $errors = $e->getErrors();
-            $this->assertEquals(HeadersChecker::INVALID_CONTENT_TYPE_ERROR, $errors[0]->getCode());
-        }
+        (new HeadersChecker($matcher))->checkHeaders(null, $accept);
     }
 
     /**
@@ -94,25 +67,15 @@ class HeadersCheckerTest extends TestCase
      */
     public function shouldThrowExceptionOnUnsupportedContentType()
     {
-        $contentMediaTypes = [$this->getMockBuilder(MediaTypeInterface::class)->getMock()];
-
-        $contentTypeHeader = $this->getMockBuilder(HeaderInterface::class)->getMock();
-        $contentTypeHeader->expects($this->once())->method('getMediaTypes')->willReturn($contentMediaTypes);
-
-        $headers = $this->getMockBuilder(HeaderParametersInterface::class)->getMock();
-        $headers->expects($this->once())->method('getContentTypeHeader')->willReturn($contentTypeHeader);
-
-        $matcher = $this->getMockBuilder(CodecMatcherInterface::class)->getMock();
+        $matcher = $this->createMock(CodecMatcherInterface::class);
         $matcher->expects($this->once())->method('getDecoderHeaderMatchedType')->willReturn(null);
 
         try {
-            $checker = new HeadersChecker($matcher);
-            $checker->checkHeaders($headers);
+            (new HeadersChecker($matcher))->checkHeaders($this->createMock(MediaTypeInterface::class), []);
 
             $this->fail('Checker should throw exception on unsupported content type');
         } catch (JsonApiException $e) {
             $this->assertEquals(415, $e->getHttpCode());
-
             $this->assertEquals(HeadersChecker::UNSUPPORTED_CONTENT_TYPE_ERROR, $e->getErrors()[0]->getCode());
         }
     }
@@ -122,30 +85,15 @@ class HeadersCheckerTest extends TestCase
      */
     public function shouldThrowExceptionOnUnsupportedAcceptType()
     {
-        $contentMediaTypes = [$this->getMockBuilder(MediaTypeInterface::class)->getMock()];
-
-        $contentTypeHeader = $this->getMockBuilder(HeaderInterface::class)->getMock();
-        $contentTypeHeader->expects($this->once())->method('getMediaTypes')->willReturn($contentMediaTypes);
-
-        $acceptHeader = $this->getMockBuilder(AcceptHeaderInterface::class)->getMock();
-
-        $headers = $this->getMockBuilder(HeaderParametersInterface::class)->getMock();
-        $headers->expects($this->once())->method('getContentTypeHeader')->willReturn($contentTypeHeader);
-        $headers->expects($this->once())->method('getAcceptHeader')->willReturn($acceptHeader);
-
-        $decoderMediaType = $this->getMockBuilder(MediaTypeInterface::class)->getMock();
-
-        $matcher = $this->getMockBuilder(CodecMatcherInterface::class)->getMock();
-        $matcher->expects($this->once())->method('getDecoderHeaderMatchedType')->willReturn($decoderMediaType);
+        $matcher = $this->createMock(CodecMatcherInterface::class);
         $matcher->expects($this->once())->method('getEncoderHeaderMatchedType')->willReturn(null);
 
         try {
-            $checker = new HeadersChecker($matcher);
-            $checker->checkHeaders($headers);
+            (new HeadersChecker($matcher))->checkHeaders(null, []);
 
             $this->fail('Checker should throw exception on unsupported response media type');
         } catch (JsonApiException $e) {
-            $this->assertEquals(415, $e->getHttpCode());
+            $this->assertEquals(406, $e->getHttpCode());
             $this->assertEquals(HeadersChecker::UNSUPPORTED_ACCEPT_ERROR, $e->getErrors()[0]->getCode());
         }
     }
