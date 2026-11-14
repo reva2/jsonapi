@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.3.1 - 2026-11-14
+## 3.4.0 - 2026-11-14
 
 ### Fixed
 - An empty request to an endpoint with `bodyType` for which no decoder was selected is rejected with HTTP 415 and
