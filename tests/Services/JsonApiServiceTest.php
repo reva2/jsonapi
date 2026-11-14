@@ -329,6 +329,20 @@ class JsonApiServiceTest extends TestCase
     /**
      * @test
      */
+    public function shouldRejectEmptyPostWithoutContentTypeIfBodyTypeIsSet()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->remove('Content-Type');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        $this->assertUnsupportedContentType($request);
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
     public function shouldRejectEmptyRequestWithUnsupportedContentTypeIfBodyTypeIsSet()
     {
         $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);

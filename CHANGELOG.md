@@ -8,6 +8,10 @@
   unsupported `Content-Type` this restores the 3.2.3 behaviour; for a missing or malformed `Content-Type` the response
   is 415 for the first time (3.2.3 failed with HTTP 500). An empty body with a supported `Content-Type` still fails
   with HTTP 400, endpoints without `bodyType` are not affected.
+- This also affects endpoints whose `bodyType` is inherited from the class-level `#[Request]` attribute, including `GET`
+  ones: such a request without a body and without a `Content-Type` header used to reach the controller with a `null`
+  body in 3.3.0, now it is rejected with HTTP 415 (and with a supported `Content-Type` it fails with HTTP 400, as
+  before). Set `bodyType` only on the methods that read a body.
 
 ### Added
 - `HeadersChecker::createUnsupportedContentTypeException()`.
