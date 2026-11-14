@@ -205,8 +205,12 @@ class JsonApiService implements JsonApiServiceInterface
 
         $this->parseRequestHeaders($request, $matcher);
 
+        $decoder = $matcher->getDecoder();
+        if (null !== $decoder) {
+            $environment->setDecoder($decoder);
+        }
+
         $environment
-            ->setDecoder($matcher->getDecoder())
             ->setEncoder($matcher->getEncoder())
             ->setEncoderMediaType($matcher->getEncoderRegisteredMatchedType());
     }

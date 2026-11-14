@@ -71,7 +71,7 @@ class Environment implements EnvironmentInterface
      *
      * @var DecoderInterface|null
      */
-    protected ?DecoderInterface $decoder;
+    protected ?DecoderInterface $decoder = null;
 
     /**
      * Response encoder
