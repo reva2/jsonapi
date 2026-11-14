@@ -12,6 +12,7 @@
 namespace Reva2\JsonApi\Tests\Services;
 
 use InvalidArgumentException;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,7 @@ use Reva2\JsonApi\Decoders\Mapping\Loader\AttributeLoader;
 use Reva2\JsonApi\Decoders\RequestDecoder;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Factories\Factory;
+use Reva2\JsonApi\Http\Headers\HeadersChecker;
 use Reva2\JsonApi\Services\Environment;
 use Reva2\JsonApi\Services\JsonApiRegistry;
 use Reva2\JsonApi\Services\JsonApiService;
@@ -314,16 +316,80 @@ class JsonApiServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldReturnNullBodyIfDecoderIsNotSelected()
+    public function shouldRejectEmptyRequestWithoutContentTypeIfBodyTypeIsSet()
     {
         $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
         $environment = $this->createHeadersEnvironment($request);
         $environment->setBodyType(PetDocument::class);
 
-        $apiRequest = $this->service->parseRequest($request);
-
+        $this->assertUnsupportedContentType($request);
         $this->assertNull($environment->getDecoder());
-        $this->assertNull($apiRequest->getBody());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRejectEmptyRequestWithUnsupportedContentTypeIfBodyTypeIsSet()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        $this->assertUnsupportedContentType($request);
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRejectEmptyRequestWithMalformedContentTypeIfBodyTypeIsSet()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'garbage');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        $this->assertUnsupportedContentType($request);
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldPassEmptyRequestWithoutBodyTypeForAnyContentType()
+    {
+        foreach ([null, 'application/json', 'application/x-www-form-urlencoded', 'garbage'] as $contentType) {
+            $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+            if (null !== $contentType) {
+                $request->headers->set('Content-Type', $contentType);
+            }
+            $environment = $this->createHeadersEnvironment($request);
+
+            $apiRequest = $this->service->parseRequest($request);
+
+            $this->assertNull($environment->getDecoder());
+            $this->assertNull($apiRequest->getBody());
+        }
+    }
+
+    /**
+     * Assert that request is rejected with 415 and unsupported content type error
+     *
+     * @param Request $request
+     */
+    private function assertUnsupportedContentType(Request $request): void
+    {
+        try {
+            $this->service->parseRequest($request);
+            $this->fail('JsonApiException expected');
+        } catch (JsonApiException $e) {
+            $this->assertSame(415, $e->getHttpCode());
+            $this->assertSame(
+                HeadersChecker::UNSUPPORTED_CONTENT_TYPE_ERROR,
+                $e->getErrors()[0]->getCode()
+            );
+        }
     }
 
     /**

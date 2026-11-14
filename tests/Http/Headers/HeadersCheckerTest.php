@@ -97,4 +97,16 @@ class HeadersCheckerTest extends TestCase
             $this->assertEquals(HeadersChecker::UNSUPPORTED_ACCEPT_ERROR, $e->getErrors()[0]->getCode());
         }
     }
+
+    /**
+     * @test
+     */
+    public function shouldCreateUnsupportedContentTypeException()
+    {
+        $e = HeadersChecker::createUnsupportedContentTypeException();
+
+        $this->assertEquals(415, $e->getHttpCode());
+        $this->assertEquals(HeadersChecker::UNSUPPORTED_CONTENT_TYPE_ERROR, $e->getErrors()[0]->getCode());
+        $this->assertEquals('Unsupported content type', $e->getErrors()[0]->getTitle());
+    }
 }

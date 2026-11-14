@@ -334,6 +334,7 @@ class JsonApiService implements JsonApiServiceInterface
      * @param Request $request
      * @param EnvironmentInterface $environment
      * @return mixed|null
+     * @throws JsonApiException
      */
     private function parseBody(Request $request, EnvironmentInterface $environment): mixed
     {
@@ -343,7 +344,7 @@ class JsonApiService implements JsonApiServiceInterface
 
         $decoder = $environment->getDecoder();
         if (null === $decoder) {
-            return null;
+            throw HeadersChecker::createUnsupportedContentTypeException();
         }
 
         if ($decoder instanceof DecoderInterface) {

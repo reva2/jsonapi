@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.3.1 - 2026-11-14
+
+### Fixed
+- An empty request to an endpoint with `bodyType` for which no decoder was selected is rejected with HTTP 415 and
+  `HeadersChecker::UNSUPPORTED_CONTENT_TYPE_ERROR` (3.3.0 let it through with a `null` body). For a valid but
+  unsupported `Content-Type` this restores the 3.2.3 behaviour; for a missing or malformed `Content-Type` the response
+  is 415 for the first time (3.2.3 failed with HTTP 500). An empty body with a supported `Content-Type` still fails
+  with HTTP 400, endpoints without `bodyType` are not affected.
+
+### Added
+- `HeadersChecker::createUnsupportedContentTypeException()`.
+
 ## 3.3.0 - 2026-11-14
 
 ### Changed
