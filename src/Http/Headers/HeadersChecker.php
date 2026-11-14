@@ -77,6 +77,25 @@ class HeadersChecker
     }
 
     /**
+     * Create exception for unsupported content type
+     *
+     * @param string $title
+     * @return JsonApiException
+     */
+    public static function createUnsupportedContentTypeException(
+        string $title = 'Unsupported content type'
+    ): JsonApiException {
+        return new JsonApiException(
+            self::createApiError(
+                JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
+                self::UNSUPPORTED_CONTENT_TYPE_ERROR,
+                $title
+            ),
+            JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
+        );
+    }
+
+    /**
      * Create exception for malformed accept header
      *
      * @param string $title
@@ -103,14 +122,7 @@ class HeadersChecker
     {
         $this->matcher->matchDecoder($contentType);
         if (null === $this->matcher->getDecoderHeaderMatchedType()) {
-            throw new JsonApiException(
-                $this->createApiError(
-                    JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
-                    self::UNSUPPORTED_CONTENT_TYPE_ERROR,
-                    'Unsupported content type'
-                ),
-                JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
-            );
+            throw self::createUnsupportedContentTypeException();
         }
     }
 

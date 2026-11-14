@@ -39,6 +39,13 @@ class Environment implements EnvironmentInterface
     protected ?string $bodyType = null;
 
     /**
+     * Is request body optional
+     *
+     * @var bool
+     */
+    protected bool $bodyOptional = false;
+
+    /**
      * Codec matcher configuration
      *
      * @var array
@@ -137,6 +144,29 @@ class Environment implements EnvironmentInterface
     public function setBodyType(?string $bodyType = null): self
     {
         $this->bodyType = $bodyType;
+
+        return $this;
+    }
+
+    /**
+     * Returns true if request body is optional (request without body is not rejected)
+     *
+     * @return bool
+     */
+    public function isBodyOptional(): bool
+    {
+        return $this->bodyOptional;
+    }
+
+    /**
+     * Sets whether request body is optional
+     *
+     * @param bool $bodyOptional
+     * @return $this
+     */
+    public function setBodyOptional(bool $bodyOptional = true): self
+    {
+        $this->bodyOptional = $bodyOptional;
 
         return $this;
     }
@@ -293,6 +323,7 @@ class Environment implements EnvironmentInterface
         $fields = [
             'query' => 'setQueryType',
             'body' => 'setBodyType',
+            'bodyOptional' => 'setBodyOptional',
             'matcher' => 'setMatcherConfiguration',
             'urlPrefix' => 'setUrlPrefix',
             'serialization' => 'setSerializationGroups',

@@ -12,10 +12,13 @@
 namespace Reva2\JsonApi\Tests\Services;
 
 use InvalidArgumentException;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use PHPUnit\Framework\TestCase;
+use Reva2\JsonApi\Attributes\Request as RequestAttribute;
 use Reva2\JsonApi\Contracts\Decoders\DataParserInterface;
+use Reva2\JsonApi\Contracts\Decoders\DecoderInterface;
 use Reva2\JsonApi\Contracts\Factories\FactoryInterface;
 use Reva2\JsonApi\Contracts\Http\RequestInterface;
 use Reva2\JsonApi\Decoders\CallbackResolver;
@@ -25,6 +28,7 @@ use Reva2\JsonApi\Decoders\Mapping\Loader\AttributeLoader;
 use Reva2\JsonApi\Decoders\RequestDecoder;
 use Reva2\JsonApi\Encoder\Encoder;
 use Reva2\JsonApi\Factories\Factory;
+use Reva2\JsonApi\Http\Headers\HeadersChecker;
 use Reva2\JsonApi\Services\Environment;
 use Reva2\JsonApi\Services\JsonApiRegistry;
 use Reva2\JsonApi\Services\JsonApiService;
@@ -314,16 +318,229 @@ class JsonApiServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldReturnNullBodyIfDecoderIsNotSelected()
+    public function shouldRejectEmptyRequestWithoutContentTypeIfBodyTypeIsSet()
     {
         $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
         $environment = $this->createHeadersEnvironment($request);
         $environment->setBodyType(PetDocument::class);
 
+        $this->assertUnsupportedContentType($request);
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRejectEmptyPostWithoutContentTypeIfBodyTypeIsSet()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->remove('Content-Type');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        $this->assertUnsupportedContentType($request);
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRejectEmptyRequestWithUnsupportedContentTypeIfBodyTypeIsSet()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        $this->assertUnsupportedContentType($request);
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRejectEmptyRequestWithMalformedContentTypeIfBodyTypeIsSet()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'garbage');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class);
+
+        $this->assertUnsupportedContentType($request);
+        $this->assertNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldPassEmptyRequestWithoutBodyTypeForAnyContentType()
+    {
+        foreach ([null, 'application/json', 'application/x-www-form-urlencoded', 'garbage'] as $contentType) {
+            $request = Request::create('http://test.com/api/pets/my-cat', Request::METHOD_GET);
+            if (null !== $contentType) {
+                $request->headers->set('Content-Type', $contentType);
+            }
+            $environment = $this->createHeadersEnvironment($request);
+
+            $apiRequest = $this->service->parseRequest($request);
+
+            $this->assertNull($environment->getDecoder());
+            $this->assertNull($apiRequest->getBody());
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider contentTypeProvider
+     */
+    public function shouldPassEmptyRequestWithOptionalBodyForAnyContentType(?string $contentType, bool $supported)
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->remove('Content-Type');
+        if (null !== $contentType) {
+            $request->headers->set('Content-Type', $contentType);
+        }
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class)->setBodyOptional(true);
+
         $apiRequest = $this->service->parseRequest($request);
 
-        $this->assertNull($environment->getDecoder());
         $this->assertNull($apiRequest->getBody());
+        $this->assertSame($supported, null !== $environment->getDecoder());
+    }
+
+    /**
+     * @return array
+     */
+    public function contentTypeProvider(): array
+    {
+        return [
+            'missing' => [null, false],
+            'supported' => ['application/vnd.json+api', true],
+            'unsupported' => ['application/x-www-form-urlencoded', false],
+            'malformed' => ['garbage', false],
+        ];
+    }
+
+    /**
+     * @test
+     */
+    public function shouldDecodeNonEmptyBodyIfBodyIsOptional()
+    {
+        $request = Request::create(
+            'http://test.com/api/pets/my-cat',
+            Request::METHOD_PATCH,
+            [],
+            [],
+            [],
+            [],
+            $this->getDataFromFile('update-pet-request.json')
+        );
+        $request->headers->set('Content-Type', 'application/vnd.json+api');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class)->setBodyOptional(true);
+
+        $apiRequest = $this->service->parseRequest($request);
+
+        $this->assertInstanceOf(PetDocument::class, $apiRequest->getBody());
+        $this->assertNotNull($environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldKeepManuallySetDecoderOnEmptyRequestWithoutContentType()
+    {
+        $decoder = new class implements DecoderInterface {
+            public function setContentType(string $type)
+            {
+            }
+
+            public function decode(string $data): mixed
+            {
+                return null;
+            }
+        };
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST);
+        $request->headers->remove('Content-Type');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class)->setDecoder($decoder);
+
+        $apiRequest = $this->service->parseRequest($request);
+
+        $this->assertNull($apiRequest->getBody());
+        $this->assertSame($decoder, $environment->getDecoder());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRejectOptionalBodyWithUnsupportedContentType()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST, [], [], [], [], '{"data":{}}');
+        $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class)->setBodyOptional(true);
+
+        $this->assertUnsupportedContentType($request);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRejectOptionalBodyWithoutContentType()
+    {
+        $request = Request::create('http://test.com/api/pets', Request::METHOD_POST, [], [], [], [], '{"data":{}}');
+        $request->headers->remove('Content-Type');
+        $environment = $this->createHeadersEnvironment($request);
+        $environment->setBodyType(PetDocument::class)->setBodyOptional(true);
+
+        try {
+            $this->service->parseRequest($request);
+            $this->fail('JsonApiException expected');
+        } catch (JsonApiException $e) {
+            $this->assertSame(415, $e->getHttpCode());
+            $this->assertSame(HeadersChecker::INVALID_CONTENT_TYPE_ERROR, $e->getErrors()[0]->getCode());
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReadBodyOptionalFromEnvironmentConfig()
+    {
+        $this->assertFalse((new Environment(['body' => PetDocument::class]))->isBodyOptional());
+        $this->assertTrue((new Environment(['body' => PetDocument::class, 'bodyOptional' => true]))->isBodyOptional());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldExportBodyOptionalFromRequestAttribute()
+    {
+        $this->assertArrayNotHasKey('bodyOptional', (new RequestAttribute())->toArray());
+        $this->assertTrue(
+            (new RequestAttribute(bodyOptional: true))->toArray()['bodyOptional']
+        );
+    }
+
+    /**
+     * Assert that request is rejected with 415 and unsupported content type error
+     *
+     * @param Request $request
+     */
+    private function assertUnsupportedContentType(Request $request): void
+    {
+        try {
+            $this->service->parseRequest($request);
+            $this->fail('JsonApiException expected');
+        } catch (JsonApiException $e) {
+            $this->assertSame(415, $e->getHttpCode());
+            $this->assertSame(
+                HeadersChecker::UNSUPPORTED_CONTENT_TYPE_ERROR,
+                $e->getErrors()[0]->getCode()
+            );
+        }
     }
 
     /**

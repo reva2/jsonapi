@@ -99,6 +99,9 @@ class JsonApiService implements JsonApiServiceInterface
 
     /**
      * @inheritdoc
+     *
+     * The environment is designed for a single request: reusing one environment object for several requests
+     * is not supported (a decoder set manually before the call is never reset).
      */
     public function parseRequest(Request $request, EnvironmentInterface $environment = null): RequestInterface
     {
@@ -334,6 +337,7 @@ class JsonApiService implements JsonApiServiceInterface
      * @param Request $request
      * @param EnvironmentInterface $environment
      * @return mixed|null
+     * @throws JsonApiException
      */
     private function parseBody(Request $request, EnvironmentInterface $environment): mixed
     {
@@ -341,9 +345,17 @@ class JsonApiService implements JsonApiServiceInterface
             return null;
         }
 
+        if (
+            ($environment instanceof Environment) &&
+            $environment->isBodyOptional() &&
+            '' === $request->getContent()
+        ) {
+            return null;
+        }
+
         $decoder = $environment->getDecoder();
         if (null === $decoder) {
-            return null;
+            throw HeadersChecker::createUnsupportedContentTypeException();
         }
 
         if ($decoder instanceof DecoderInterface) {
